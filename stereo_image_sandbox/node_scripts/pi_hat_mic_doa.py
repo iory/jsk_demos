@@ -8,6 +8,7 @@ from audio_common_msgs.msg import AudioData
 from jsk_hark_msgs.msg import HarkPower
 import numpy as np
 import rospy
+from jsk_topic_tools import ConnectionBasedTransport
 
 
 class AudioStream(object):
@@ -203,15 +204,22 @@ class DOA(Element):
         return theta, peakL, peakR
 
 
-class DOANode(object):
+class DOANode(ConnectionBasedTransport):
 
     def __init__(self):
-        self.pub = rospy.Publisher('/doa',
-                                   HarkPower,
-                                   queue_size=1)
+        super(DOANode, self).__init__()
+        self.pub = self.advertise('/doa',
+                                  HarkPower,
+                                  queue_size=1)
         self.doa = DOA()
+
+    def subscribe(self):
         input_sample_rate = 16000
         self.stream = AudioStream(buffer_size=input_sample_rate * 1)
+
+    def unsubscribe(self):
+        self.stream.sub_audio.unregister()
+        del self.stream
 
     def run(self):
         rate = rospy.Rate(1)
