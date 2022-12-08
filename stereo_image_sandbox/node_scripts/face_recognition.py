@@ -198,7 +198,7 @@ class FaceRecognition(ConnectionBasedTransport):
             # image format https://github.com/ros-perception/image_transport_plugins/blob/f0afd122ed9a66ff3362dc7937e6d465e3c3ccf7/compressed_image_transport/src/compressed_publisher.cpp#L116  # NOQA
             vis_compressed_msg.format = 'bgr8' + '; jpeg compressed bgr8'
             vis_compressed_msg.data = np.array(
-                cv2.imencode('.jpg', image)[1]).tostring()
+                cv2.imencode('.jpg', image)[1]).tobytes()
             self.pub_img_compressed.publish(vis_compressed_msg)
 
 

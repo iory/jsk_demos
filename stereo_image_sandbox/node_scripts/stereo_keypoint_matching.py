@@ -2,12 +2,12 @@
 
 import os
 
+import numpy as np
 from warnings import filterwarnings
 filterwarnings(action='ignore', category=DeprecationWarning,
-               message='`np.bool` is a deprecated alias')
+               message='`np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.')
 
 from jsk_topic_tools import ConnectionBasedTransport
-import numpy as np
 
 # OpenCV import for python3
 if os.environ['ROS_PYTHON_VERSION'] == '3':
