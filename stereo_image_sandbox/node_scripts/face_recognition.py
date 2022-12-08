@@ -3,7 +3,6 @@
 import os
 import sys
 
-import mediapipe as mp
 from jsk_topic_tools import ConnectionBasedTransport
 import numpy as np
 import rospy
@@ -30,9 +29,11 @@ opencv_apps_enabled = False
 # OpenCV import for python3
 if os.environ['ROS_PYTHON_VERSION'] == '3':
     import cv2
+    import mediapipe as mp
 else:
     sys.path.remove('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
     import cv2  # NOQA
+    import mediapipe as mp
     sys.path.append('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
 
 # cv_bridge_python3 import
@@ -176,13 +177,15 @@ class FaceRecognition(ConnectionBasedTransport):
             self.faces_pub.publish(face_msgs)
         self.skeleton_pub.publish(skeleton_msgs)
 
-        if self.pub_img.get_num_connections() > 0:
+        if self.pub_img.get_num_connections() > 0 or self.pub_img_compressed.get_num_connections() > 0:
             # Draw the pose annotations on the image.
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             if results.detections:
                 for detection in results.detections:
                     mp_drawing.draw_detection(image, detection)
+
+        if self.pub_img.get_num_connections() > 0:
             out_img_msg = bridge.cv2_to_imgmsg(
                 image, encoding='bgr8')
             out_img_msg.header = img_msg.header
@@ -194,9 +197,8 @@ class FaceRecognition(ConnectionBasedTransport):
             vis_compressed_msg.header = img_msg.header
             # image format https://github.com/ros-perception/image_transport_plugins/blob/f0afd122ed9a66ff3362dc7937e6d465e3c3ccf7/compressed_image_transport/src/compressed_publisher.cpp#L116  # NOQA
             vis_compressed_msg.format = 'bgr8' + '; jpeg compressed bgr8'
-            vis_img_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             vis_compressed_msg.data = np.array(
-                cv2.imencode('.jpg', vis_img_bgr)[1]).tostring()
+                cv2.imencode('.jpg', image)[1]).tostring()
             self.pub_img_compressed.publish(vis_compressed_msg)
 
 

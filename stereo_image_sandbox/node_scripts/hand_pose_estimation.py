@@ -202,14 +202,16 @@ class HandPoseEstimation(ConnectionBasedTransport):
         self.pose_pub.publish(people_pose_msg)
         self.skeleton_pub.publish(skeleton_msgs)
 
-        if self.pub_img.get_num_connections() > 0:
-            # Draw the hand annotations on the image.
+        if self.pub_img.get_num_connections() > 0 or self.pub_img_compressed.get_num_connections() > 0:
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             if results.multi_hand_landmarks:
                 for hand_landmarks in results.multi_hand_landmarks:
                     mp_drawing.draw_landmarks(
                         image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+
+        if self.pub_img.get_num_connections() > 0:
+            # Draw the hand annotations on the image.
             out_img_msg = bridge.cv2_to_imgmsg(
                 image, encoding='bgr8')
             out_img_msg.header = img_msg.header
@@ -221,9 +223,8 @@ class HandPoseEstimation(ConnectionBasedTransport):
             vis_compressed_msg.header = img_msg.header
             # image format https://github.com/ros-perception/image_transport_plugins/blob/f0afd122ed9a66ff3362dc7937e6d465e3c3ccf7/compressed_image_transport/src/compressed_publisher.cpp#L116  # NOQA
             vis_compressed_msg.format = 'bgr8' + '; jpeg compressed bgr8'
-            vis_img_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             vis_compressed_msg.data = np.array(
-                cv2.imencode('.jpg', vis_img_bgr)[1]).tostring()
+                cv2.imencode('.jpg', image)[1]).tostring()
             self.pub_img_compressed.publish(vis_compressed_msg)
 
 
