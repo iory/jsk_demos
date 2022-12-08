@@ -2,10 +2,8 @@
 
 import os
 
+from scipy import linalg
 import numpy as np
-from warnings import filterwarnings
-filterwarnings(action='ignore', category=DeprecationWarning,
-               message='`np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.')
 
 from jsk_topic_tools import ConnectionBasedTransport
 
@@ -30,7 +28,6 @@ from jsk_recognition_msgs.msg import HumanSkeleton
 from jsk_recognition_msgs.msg import HumanSkeletonArray
 from jsk_recognition_msgs.msg import Segment
 import message_filters
-from scipy import linalg
 
 
 try:
@@ -40,6 +37,11 @@ try:
         return xy[:, 0], xy[:, 1]
 except:
     from scipy.optimize import linear_sum_assignment as linear_assignment
+
+from warnings import filterwarnings
+filterwarnings(action='ignore', category=DeprecationWarning,
+               message='`np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.')
+
 
 
 def DLT(P1, P2, point1, point2):
