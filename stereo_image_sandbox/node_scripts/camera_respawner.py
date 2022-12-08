@@ -157,7 +157,7 @@ class CameraNodeletRespawner(object):
                 subprocess.Popen(cmdline)
 
             self.img_msg = None
-            rospy.sleep(30.0)
+            rospy.sleep(120.0)
 
     def run(self):
         rate = rospy.Rate(1)
@@ -173,7 +173,7 @@ class CameraNodeletRespawner(object):
                     if alive is False:
                         rospy.logwarn('{} is not launched.'.format(node_name))
                 rate.sleep()
-        rospy.sleep(30.0)
+        rospy.sleep(120.0)
 
         while not rospy.is_shutdown():
             rate.sleep()
@@ -184,7 +184,7 @@ class CameraNodeletRespawner(object):
                 duration = (rospy.Time.now()
                             - self.img_msg.header.stamp).to_sec()
                 # rospy.logwarn('{}'.format(duration))
-            if self.img_msg is None or duration > 60.0:
+            if self.img_msg is None or duration > 120.0:
                 rospy.logwarn('respawn camera nodes')
                 self.respawn()
 
