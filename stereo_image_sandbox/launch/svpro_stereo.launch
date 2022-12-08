@@ -130,6 +130,13 @@
 
   </group>
 
+  <node name="camera_respawner"
+        pkg="stereo_image_sandbox" type="camera_respawner.py"
+        output="screen"
+        respawn="true"
+        clear_params="true" >
+  </node>
+
   <group if="$(arg gui)" >
     <group ns="$(arg camera_name)" >
       <group ns="left_camera" >
