@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 
+import os
+
 from jsk_topic_tools import ConnectionBasedTransport
 import numpy as np
-from cameramodels import PinholeCameraModel
+
+# OpenCV import for python3
+if os.environ['ROS_PYTHON_VERSION'] == '3':
+    import cv2
+    from cameramodels import PinholeCameraModel
+else:
+    sys.path.remove('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
+    import cv2  # NOQA
+    from cameramodels import PinholeCameraModel
+    sys.path.append('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
+
 import rospy
 from sensor_msgs.msg import CameraInfo
 from jsk_recognition_msgs.msg import PeoplePoseArray
