@@ -58,9 +58,10 @@
 
   <group ns="sound_play_jp" >
     <node name="is_speaking"
-          pkg="sound_play" type="is_speaking.py" >
+          pkg="sound_play" type="is_speaking.py"
+          respawn="true">
       <remap from="~robotsound" to="/robotsound_jp/status" />
-      <remap from="~output/is_speaking" to="/robotsound_jp/is_speaking" />
+      <remap from="~output/is_speaking" to="/is_speaking" />
     </node>
   </group>
 
@@ -85,7 +86,7 @@
   <node name="input_audio_selector"
         pkg="stereo_image_sandbox" type="mux_selector.py"
 	    respawn="true"
-	    args="/robotsound_jp/is_speaking 'm.data is False' $(arg raw_audio_topic) /is_speaking 'm.data is True' $(arg dummy_audio_topic)">
+	    args="/is_speaking 'm.data is False' $(arg raw_audio_topic) /is_speaking 'm.data is True' $(arg dummy_audio_topic)">
     <remap from="mux" to="input_audio_mux" />
     <param name="default_select" value="$(arg dummy_audio_topic)" />
     <param name="wait" value="true" />

@@ -231,11 +231,12 @@ class DOANode(ConnectionBasedTransport):
             if self.stream is None:
                 continue
 
-            if len(self.stream.audio_buffer) == 0:
+            if self.stream is not None and len(self.stream.audio_buffer) == 0:
                 rospy.loginfo('waiting input audio topic')
                 continue
             theta, peakL, peakR = self.doa.get_direction(self.stream.audio_buffer)
-            self.stream.clear()
+            if self.stream is not None:
+                self.stream.clear()
             rospy.loginfo('Direction of Arrival: {} degree, peakL: {}, peakR: {}'.format(
                 theta, peakL, peakR))
             msg.header.stamp = rospy.Time.now()

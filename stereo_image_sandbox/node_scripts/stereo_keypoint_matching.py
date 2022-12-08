@@ -2,6 +2,10 @@
 
 import os
 
+from warnings import filterwarnings
+filterwarnings(action='ignore', category=DeprecationWarning,
+               message='`np.bool` is a deprecated alias')
+
 from jsk_topic_tools import ConnectionBasedTransport
 import numpy as np
 
