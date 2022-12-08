@@ -57,9 +57,9 @@ class CameraNodeletRespawner(object):
 
         self._nodelet_list = [
             '/stereo/camera_driver',
-            '/stereo/disparity',
+            # '/stereo/disparity',
             '/stereo/left_camera/rectify_color',
-            '/stereo/point_cloud',
+            # '/stereo/point_cloud',
             '/stereo/right_camera/rectify_color',
             '/stereo/split_image',
             '/stereo/throttle_image',
