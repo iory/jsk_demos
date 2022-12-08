@@ -228,7 +228,7 @@ class DOANode(ConnectionBasedTransport):
         msg = HarkPower()
         while not rospy.is_shutdown():
             rate.sleep()
-            if self.stream.audio_buffer is None:
+            if self.stream is None:
                 continue
 
             if len(self.stream.audio_buffer) == 0:
