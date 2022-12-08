@@ -15,6 +15,8 @@ import psutil
 import rospy
 from nodelet.srv import NodeletList
 
+from jsk_tools.sanity_lib import checkNodeState
+
 
 try:
     from xmlrpc.client import ServerProxy
@@ -155,10 +157,24 @@ class CameraNodeletRespawner(object):
                 subprocess.Popen(cmdline)
 
             self.img_msg = None
+            rospy.sleep(30.0)
 
     def run(self):
         rate = rospy.Rate(1)
-        rospy.sleep(30)
+
+        if self._nodelet_list is not None:
+            while True:
+                ret = []
+                for node_name in self._nodelet_list:
+                    ret.append(checkNodeState(node_name, needed=True))
+                if all(ret):
+                    break
+                for node_name, alive in zip(self._nodelet_list, ret):
+                    if alive is False:
+                        rospy.logwarn('{} is not launched.'.format(node_name))
+                rate.sleep()
+        rospy.sleep(30.0)
+
         while not rospy.is_shutdown():
             rate.sleep()
             if self.img_msg is None:
