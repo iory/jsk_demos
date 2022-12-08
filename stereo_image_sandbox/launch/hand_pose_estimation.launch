@@ -8,6 +8,7 @@
     <group ns="left_camera" >
       <node name="hand_pose_estimation"
             pkg="stereo_image_sandbox" type="hand_pose_estimation.py"
+            respawn="true"
             clear_params="true"
             output="screen" >
         <remap from="~input" to="image_rect_color" />
@@ -19,6 +20,7 @@
     <group ns="right_camera" >
       <node name="hand_pose_estimation"
             pkg="stereo_image_sandbox" type="hand_pose_estimation.py"
+            respawn="true"
             clear_params="true"
             output="screen" >
         <remap from="~input" to="image_rect_color" />
@@ -29,6 +31,7 @@
 
     <node name="hand_pose_estimation"
           pkg="stereo_image_sandbox" type="stereo_keypoint_matching.py"
+          respawn="true"
           clear_params="true"
           output="screen" >
         <remap from="~left/camera_info" to="left_camera/camera_info" />

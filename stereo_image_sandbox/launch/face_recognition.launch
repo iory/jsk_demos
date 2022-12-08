@@ -9,6 +9,7 @@
       <node name="face_recognition"
             pkg="stereo_image_sandbox" type="face_recognition.py"
             clear_params="true"
+            respawn="true"
             output="screen" >
         <remap from="~input" to="image_rect_color" />
         <rosparam subst_value="true" >
@@ -20,6 +21,7 @@
       <node name="face_recognition"
             pkg="stereo_image_sandbox" type="face_recognition.py"
             clear_params="true"
+            respawn="true"
             output="screen" >
         <remap from="~input" to="image_rect_color" />
         <rosparam subst_value="true" >
@@ -30,6 +32,7 @@
     <node name="face_recognition"
           pkg="stereo_image_sandbox" type="stereo_keypoint_matching.py"
           clear_params="true"
+          respawn="true"
           output="screen" >
         <remap from="~left/camera_info" to="left_camera/camera_info" />
         <remap from="~left/skeleton" to="left_camera/face_recognition/output/skeleton" />
