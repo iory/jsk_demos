@@ -13,6 +13,7 @@
             output="screen" >
         <remap from="~input" to="image_rect_color" />
         <rosparam subst_value="true" >
+          enable_vital_check: false
         </rosparam>
       </node>
     </group>
@@ -25,6 +26,7 @@
             output="screen" >
         <remap from="~input" to="image_rect_color" />
         <rosparam subst_value="true" >
+          enable_vital_check: false
         </rosparam>
       </node>
     </group>
@@ -40,6 +42,7 @@
         <remap from="~right/skeleton" to="right_camera/face_recognition/output/skeleton" />
         <rosparam subst_value="true" >
           queue_size: $(arg queue_size)
+          enable_vital_check: false
         </rosparam>
     </node>
   </group>
