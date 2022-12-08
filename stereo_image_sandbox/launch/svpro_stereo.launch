@@ -52,7 +52,7 @@
       <remap from="~input" to="image_raw" />
       <remap from="~output" to="throttled/image_raw" />
       <rosparam>
-        update_rate: 4
+        update_rate: 1
       </rosparam>
     </node>
 
