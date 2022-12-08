@@ -15,7 +15,7 @@
 
   <arg name="queue_size" default="5" />
 
-  <arg name="respawn" default="true" />
+  <arg name="respawn" default="false" />
   <arg name="stereo_proc" default="true" />
 
   <group ns="$(arg camera_name)">
