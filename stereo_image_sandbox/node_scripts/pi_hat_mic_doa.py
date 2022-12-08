@@ -208,6 +208,7 @@ class DOANode(ConnectionBasedTransport):
 
     def __init__(self):
         super(DOANode, self).__init__()
+        self.stream.audio_buffer = None
         self.pub = self.advertise('/doa',
                                   HarkPower,
                                   queue_size=1)
@@ -220,12 +221,16 @@ class DOANode(ConnectionBasedTransport):
     def unsubscribe(self):
         self.stream.sub_audio.unregister()
         del self.stream
+        self.stream = None
 
     def run(self):
         rate = rospy.Rate(1)
         msg = HarkPower()
         while not rospy.is_shutdown():
             rate.sleep()
+            if self.stream.audio_buffer is None:
+                continue
+
             if len(self.stream.audio_buffer) == 0:
                 rospy.loginfo('waiting input audio topic')
                 continue
