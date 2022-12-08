@@ -208,7 +208,7 @@ class DOANode(ConnectionBasedTransport):
 
     def __init__(self):
         super(DOANode, self).__init__()
-        self.stream.audio_buffer = None
+        self.stream = None
         self.pub = self.advertise('/doa',
                                   HarkPower,
                                   queue_size=1)
