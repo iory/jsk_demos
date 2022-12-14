@@ -24,3 +24,10 @@ sudo cp ./udev/99-uvc.rules /etc/udev/rules.d/99-uvc.rules
 ```
 pip3 install pydub gtts
 ```
+
+## Install stereodemo for depth estimation
+
+```
+pip3 install pathlib
+pip3 install git+https://github.com/nburrus/stereodemo
+```
