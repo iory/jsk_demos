@@ -29,5 +29,6 @@ pip3 install pydub gtts
 
 ```
 pip3 install pathlib
+pip3 install torch
 pip3 install git+https://github.com/nburrus/stereodemo
 ```
