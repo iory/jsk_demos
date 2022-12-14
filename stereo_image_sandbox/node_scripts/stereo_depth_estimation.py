@@ -9,7 +9,6 @@ import rospy
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CameraInfo
 import message_filters
-from cameramodels import PinholeCameraModel
 
 from pathlib import Path
 
@@ -19,12 +18,14 @@ if os.environ['ROS_PYTHON_VERSION'] == '3':
     from stereodemo import methods
     from stereodemo.method_raft_stereo import RaftStereo
     from stereodemo.methods import Config, EnumParameter, StereoMethod, InputPair, Calibration
+    from cameramodels import PinholeCameraModel
 else:
     sys.path.remove('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
     import cv2  # NOQA
     from stereodemo import methods
     from stereodemo.method_raft_stereo import RaftStereo
     from stereodemo.methods import Config, EnumParameter, StereoMethod, InputPair, Calibration
+    from cameramodels import PinholeCameraModel
     sys.path.append('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
 
 # cv_bridge_python3 import
