@@ -9,19 +9,22 @@ import rospy
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CameraInfo
 import message_filters
-from image_geometry import PinholeCameraModel
+from cameramodels import PinholeCameraModel
 
 from pathlib import Path
-from stereodemo import methods
-from stereodemo.method_raft_stereo import RaftStereo
-from stereodemo.methods import Config, EnumParameter, StereoMethod, InputPair, Calibration
 
 # OpenCV import for python3
 if os.environ['ROS_PYTHON_VERSION'] == '3':
     import cv2
+    from stereodemo import methods
+    from stereodemo.method_raft_stereo import RaftStereo
+    from stereodemo.methods import Config, EnumParameter, StereoMethod, InputPair, Calibration
 else:
     sys.path.remove('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
     import cv2  # NOQA
+    from stereodemo import methods
+    from stereodemo.method_raft_stereo import RaftStereo
+    from stereodemo.methods import Config, EnumParameter, StereoMethod, InputPair, Calibration
     sys.path.append('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
 
 # cv_bridge_python3 import
@@ -56,7 +59,7 @@ class StereoDepthEstimation(ConnectionBasedTransport):
     def __init__(self):
         super(StereoDepthEstimation, self).__init__()
 
-        self.bridge = cv_bridge.CvBridge()
+        self.bridge = CvBridge()
 
         default_models_path = Path.home() / ".cache" / "stereodemo" / "models"
         config = methods.Config(default_models_path)
@@ -100,13 +103,12 @@ class StereoDepthEstimation(ConnectionBasedTransport):
 
         left_img = bridge.imgmsg_to_cv2(left_img_msg)
         right_img = bridge.imgmsg_to_cv2(right_img_msg)
-        cm = PinholeCameraModel()
-        cm.fromCameraInfo(right_info_msg)
+        cm = PinholeCameraModel.from_camera_info(right_info_msg)
 
-        baseline = - cm.Tx() / cm.fx()
+        baseline = - cm.Tx / cm.fx
         calib = Calibration(
-            cm.width, cm.height, cm.fx(), cm.fy(),
-            cm.cx(), cm.cx(), cm.cy(), baseline, depth_range=(0.2, 3.0),)
+            cm.width, cm.height, cm.fx, cm.fy,
+            cm.cx, cm.cx, cm.cy, baseline, depth_range=(0.2, 3.0),)
         tmp = InputPair(left_img, right_img, calib, '')
         stereo_output = self.raft_stereo.compute_disparity(tmp)
 
