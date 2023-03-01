@@ -18,7 +18,8 @@ def get_model_rpn(num_classes, pretrained_model=None,
                        rpn_anchor_generator=anchor_generator)
 
     if pretrained_model is not None:
-        state_dict = torch.load(pretrained_model)
+        state_dict = torch.load(pretrained_model,
+                                map_location='cpu')
         new_state_dict = OrderedDict()
         for k, v in state_dict.items():
             new_state_dict[k.lstrip('module.')] = v
