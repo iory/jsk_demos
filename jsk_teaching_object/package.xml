@@ -13,10 +13,30 @@
   <author email="shifan@jsk.imi.i.u-tokyo.ac.jp">shifan</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>catkin_virtualenv</build_depend>
 
+  <!-- ALPHABETICAL ORDER -->
+  <build_depend>actionlib</build_depend>
+  <build_depend>actionlib_msgs</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>jsk_data</build_depend>
+  <build_depend>jsk_topic_tools</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <!-- ALPHABETICAL ORDER -->
+
+  <!-- ALPHABETICAL ORDER -->
   <exec_depend>coral_usb</exec_depend>
   <exec_depend>jsk_data</exec_depend>
   <exec_depend>jsk_perception</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
   <exec_depend>opencv_apps</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <!-- ALPHABETICAL ORDER -->
+
+  <export>
+    <pip_requirements>requirements.txt</pip_requirements>
+  </export>
 
 </package>

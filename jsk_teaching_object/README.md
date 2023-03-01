@@ -22,3 +22,11 @@ roslaunch jsk_teaching_object sample_edgetpu_detection_with_depth_filter.launch
 ```
 
 ![](./doc/recognition.gif)
+
+```
+roslaunch jsk_teaching_object sample_object_detection.launch gui:=true
+```
+
+![](./doc/object_detection_node.jpg)
+
+

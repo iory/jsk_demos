@@ -4,16 +4,15 @@ from __future__ import print_function
 
 import argparse
 import multiprocessing
-import os.path as osp
 
 import jsk_data
 
 
 def download_data(*args, **kwargs):
     p = multiprocessing.Process(
-            target=jsk_data.download_data,
-            args=args,
-            kwargs=kwargs)
+        target=jsk_data.download_data,
+        args=args,
+        kwargs=kwargs)
     p.start()
 
 
@@ -30,6 +29,22 @@ def main():
         path='trained_data/20220420-120316-dataset-20-daily-objects.tflite',
         url='https://drive.google.com/uc?id=1AvjThabb3ODTPC5SaAOKrRZ54-e3O8f8',
         md5='cfff1e0c6709c2fd4b67401232238246',
+        quiet=quiet,
+    )
+
+    # for (rau, ba25, fan)
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/2023-03-01/model.pth',
+        url='https://drive.google.com/uc?id=1h5HKJ7FyHAgH72IxPka6-1oDyn5mKHgJ',
+        md5='6f1dda26737242398515b219a684fb22',
+        quiet=quiet,
+    )
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/2023-03-01/class_names.txt',
+        url='https://drive.google.com/uc?id=14iU7yoHtdOiH2Yi3M3m98Tt4jfTWV-Dm',
+        md5='5510e1c346ae9648594a3cf28f89162e',
         quiet=quiet,
     )
 

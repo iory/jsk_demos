@@ -22,6 +22,15 @@ def main():
         extract=False,
     )
 
+    # industry
+    download_data(
+        pkg_name=PKG,
+        path='sample/data/hand_camera_for_box_industrial-image-compressed.bag',
+        url='https://drive.google.com/uc?id=18diE6jwThqLHb7Vb5TouTxDolY_No3H7',
+        md5='a41ff9fe04398c5fa17d5dd20bf544ae',
+        extract=False,
+    )
+
 
 if __name__ == '__main__':
     main()
