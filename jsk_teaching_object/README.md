@@ -2,6 +2,22 @@
 
 This package provides a simple human teachable function for the robot to recognize objects.
 
+## Install
+
+```
+mkdir -p ~/jsk_teaching_object/src
+cd ~/jsk_teaching_object/src
+wstool init
+wstool merge https://raw.githubusercontent.com/iory/jsk_demos/teaching-object/jsk_teaching_object/noetic.rosinstall
+wstool update
+cd ../
+source /opt/ros/noetic/setup.bash
+rosdep update
+rosdep install -y -r --from-paths src --ignore-src
+catkin build jsk_teaching_object
+source devel/setup.bash
+```
+
 
 ## Training
 
