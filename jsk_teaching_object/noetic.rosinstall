@@ -1,0 +1,11 @@
+- git:
+    local-name: coral_usb_ros
+    uri: https://github.com/jsk-ros-pkg/coral_usb_ros.git
+    version: master
+- git:
+    local-name: jsk-ros-pkg/jsk_demos
+    uri: https://github.com/iory/jsk_demos
+    version: teaching-object
+- git:
+    local-name: jsk-ros-pkg/jsk_recognition
+    uri: https://github.com/jsk-ros-pkg/jsk_recognition
