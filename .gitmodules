@@ -1,3 +1,6 @@
 [submodule ".travis"]
 	path = .travis
 	url = https://github.com/jsk-ros-pkg/jsk_travis.git
+[submodule "fg_ros/node_scripts/fg_libs/yolo7"]
+	path = fg_ros/node_scripts/fg_libs/yolo7
+	url = https://github.com/RizwanMunawar/yolov7-segmentation
