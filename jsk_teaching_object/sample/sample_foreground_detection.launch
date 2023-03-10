@@ -106,7 +106,7 @@
     <remap from="~input/class" to="fg_node/output/class" />
     <remap from="~output" to="/yolo7" />
     <rosparam subst_value="true">
-      font_path: $(find jsk_recognition_utils)/font_data/NotoSansJP-Regular.otf
+      font_path: $(find jsk_teaching_object)/font_data/NotoSansJP-Regular.otf
       use_classification_result: true
       label_size: 16
     </rosparam>
