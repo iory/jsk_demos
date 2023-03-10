@@ -1,8 +1,9 @@
 <launch>
 
   <arg name="gui" default="true" />
-  <arg name="device" default="0" />
+  <arg name="device" default="-1" />
   <arg name="video_device" default="/dev/video0" />
+  <arg name="input_image" default="/usb_cam/image_raw" />
 
   <node name="usb_cam"
         pkg="usb_cam" type="usb_cam_node"
@@ -17,7 +18,7 @@
         output="screen"
         clear_params="true"
         required="true">
-    <remap from="~input" to="/usb_cam/image_raw" />
+    <remap from="~input" to="$(arg input_image)" />
     <rosparam subst_value="true">
       model_path: $(find fg_ros)/trained_data/yolo7/2023-03-09.pt
       score_thresh: 0.4
@@ -49,6 +50,7 @@
     <remap from="~input" to="label_image_decomposer_instance/output/viz" />
     <remap from="~input/rects" to="fg_node/output/rects" />
     <remap from="~input/class" to="fg_node/output/class" />
+    <remap from="~output" to="/yolo7" />
     <rosparam subst_value="true">
       font_path: $(find jsk_recognition_utils)/font_data/NotoSansJP-Regular.otf
       use_classification_result: true
@@ -59,10 +61,12 @@
   <node name="tile_image_2x1"
         pkg="jsk_perception" type="tile_image.py"
         output="screen">
-    <rosparam>
-      input_topics: [/usb_cam/image_raw, /draw_rects/output]
+    <remap from="~output" to="~output" />
+    <rosparam subst_value="true">
+      input_topics: [$(arg input_image), /yolo7]
       shape: [1, 2]
       no_sync: true
+      draw_topic_name: true
     </rosparam>
   </node>
 
