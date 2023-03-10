@@ -4,7 +4,6 @@
 import os
 import sys
 
-import cv_bridge
 import rospy
 from sensor_msgs.msg import Image
 from jsk_topic_tools import ConnectionBasedTransport
