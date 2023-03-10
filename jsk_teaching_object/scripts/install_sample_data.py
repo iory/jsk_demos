@@ -31,6 +31,15 @@ def main():
         extract=False,
     )
 
+    # 2023-03-10
+    download_data(
+        pkg_name=PKG,
+        path='sample/data/2023-03-09-18-49-40-image-compressed.bag',
+        url='https://drive.google.com/uc?id=1DBKcXB5Op7Yxnn56vpi6ub6tNTU5Z2D3',
+        md5='00df593a26a961d644479cf9d03c41b3',
+        extract=False,
+    )
+
 
 if __name__ == '__main__':
     main()

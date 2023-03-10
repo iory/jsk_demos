@@ -39,15 +39,9 @@ roslaunch jsk_teaching_object sample_edgetpu_detection_with_depth_filter.launch
 
 ![](./doc/recognition.gif)
 
-### for industry
+### for industry objects
 
 ```
-roslaunch jsk_teaching_object sample_object_detection.launch gui:=true
+roslaunch jsk_teaching_object sample_foreground_detection.launch
 ```
-
-[Movie](https://drive.google.com/file/d/1fh4JEPhvxcriUmXMRt59ncGfKdDKHh-g/view)
-
-![](./doc/object_detection_node.jpg)
-
-
 

@@ -48,6 +48,23 @@ def main():
         quiet=quiet,
     )
 
+    # 2023-03-10
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/2023-03-10/output_tflite_graph_edgetpu.tflite',
+        url='https://drive.google.com/uc?id=1zJnYti2lMsteI34X48CFAPRGSk80H6R8',
+        md5='0ac42d2a5af44533ad5bcbfc8a596e6e',
+        quiet=quiet,
+    )
+
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/2023-03-10/labels.txt',
+        url='https://drive.google.com/uc?id=1k9LQ0Kx70-pUiDPidGCOdy6lnusAD1mQ',
+        md5='03c47c34ed1d121fbb653fc5bab2782b',
+        quiet=quiet,
+    )
+
 
 if __name__ == '__main__':
     main()
