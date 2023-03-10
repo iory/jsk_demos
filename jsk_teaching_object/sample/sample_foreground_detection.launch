@@ -55,32 +55,32 @@
     </rosparam>
   </node>
 
-  <node name="edgetpu_object_detector"
-        pkg="coral_usb" type="edgetpu_object_detector.py"
-        output="screen" respawn="true">
-    <remap from="~input" to="$(arg split_input_image)" />
-    <rosparam subst_value="true" >
-      model_file: $(find jsk_teaching_object)/trained_data/2023-03-10/output_tflite_graph_edgetpu.tflite
-      label_file: $(find jsk_teaching_object)/trained_data/2023-03-10/labels.txt
-      image_transport: raw
-      device_id: 0
-    </rosparam>
-  </node>
+  <!-- <node name="edgetpu_object_detector" -->
+  <!--       pkg="coral_usb" type="edgetpu_object_detector.py" -->
+  <!--       output="screen" respawn="true"> -->
+  <!--   <remap from="~input" to="$(arg split_input_image)" /> -->
+  <!--   <rosparam subst_value="true" > -->
+  <!--     model_file: $(find jsk_teaching_object)/trained_data/2023-03-10/output_tflite_graph_edgetpu.tflite -->
+  <!--     label_file: $(find jsk_teaching_object)/trained_data/2023-03-10/labels.txt -->
+  <!--     image_transport: raw -->
+  <!--     device_id: 0 -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
 
-  <node name="draw_rects_for_tpu"
-        pkg="jsk_teaching_object" type="draw_rects.py"
-        output="screen"
-        clear_params="true" >
-    <remap from="~input" to="$(arg split_input_image)" />
-    <remap from="~input/rects" to="/edgetpu_object_detector/output/rects" />
-    <remap from="~input/class" to="/edgetpu_object_detector/output/class" />
-    <remap from="~output" to="/edgetpu" />
-    <rosparam subst_value="true">
-      font_path: $(find jsk_teaching_object)/font_data/NotoSansJP-Regular.otf
-      use_classification_result: true
-      label_size: 16
-    </rosparam>
-  </node>
+  <!-- <node name="draw_rects_for_tpu" -->
+  <!--       pkg="jsk_teaching_object" type="draw_rects.py" -->
+  <!--       output="screen" -->
+  <!--       clear_params="true" > -->
+  <!--   <remap from="~input" to="$(arg split_input_image)" /> -->
+  <!--   <remap from="~input/rects" to="/edgetpu_object_detector/output/rects" /> -->
+  <!--   <remap from="~input/class" to="/edgetpu_object_detector/output/class" /> -->
+  <!--   <remap from="~output" to="/edgetpu" /> -->
+  <!--   <rosparam subst_value="true"> -->
+  <!--     font_path: $(find jsk_teaching_object)/font_data/NotoSansJP-Regular.otf -->
+  <!--     use_classification_result: true -->
+  <!--     label_size: 16 -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
 
   <node name="label_image_decomposer_instance"
         pkg="jsk_perception" type="label_image_decomposer.py"
@@ -117,8 +117,8 @@
         output="screen">
     <remap from="~output" to="~output_cpu" />
     <rosparam subst_value="true">
-      input_topics: [$(arg split_input_image), /yolo7, /edgetpu]
-      shape: [1, 3]
+      input_topics: [$(arg split_input_image), /yolo7]
+      shape: [1, 2]
       no_sync: true
       draw_topic_name: true
     </rosparam>
