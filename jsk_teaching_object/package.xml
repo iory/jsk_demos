@@ -28,6 +28,8 @@
   <!-- ALPHABETICAL ORDER -->
 
   <!-- ALPHABETICAL ORDER -->
+  <build_depend condition="$ROS_PYTHON_VERSION == 2">cv_bridge_python3</build_depend>
+  <build_depend condition="$ROS_PYTHON_VERSION == 3">cv_bridge</build_depend>
   <exec_depend>coral_usb</exec_depend>
   <exec_depend>dynamic_reconfigure</exec_depend>
   <exec_depend>fg_ros</exec_depend>

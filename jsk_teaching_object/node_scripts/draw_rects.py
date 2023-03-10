@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 import os.path as osp
+import os
 import sys
 
 import numpy as np
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-import cv2
-import cv_bridge
 import dynamic_reconfigure.server
 from jsk_recognition_msgs.msg import ClassificationResult
 from jsk_recognition_msgs.msg import RectArray
@@ -20,6 +19,44 @@ import rospy
 import sensor_msgs.msg
 
 from jsk_teaching_object.cfg import DrawRectsConfig
+
+
+# OpenCV import for python3
+if os.environ['ROS_PYTHON_VERSION'] == '3':
+    import cv2
+else:
+    sys.path.remove('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
+    import cv2  # NOQA
+    sys.path.append('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
+
+
+# cv_bridge_python3 import
+if os.environ['ROS_PYTHON_VERSION'] == '3':
+    import cv_bridge
+else:
+    ws_python3_paths = [p for p in sys.path if 'devel/lib/python3' in p]
+    if len(ws_python3_paths) == 0:
+        # search cv_bridge in workspace and append
+        ws_python2_paths = [
+            p for p in sys.path if 'devel/lib/python2.7' in p]
+        for ws_python2_path in ws_python2_paths:
+            ws_python3_path = ws_python2_path.replace('python2.7', 'python3')
+            if os.path.exists(os.path.join(ws_python3_path, 'cv_bridge')):
+                ws_python3_paths.append(ws_python3_path)
+        if len(ws_python3_paths) == 0:
+            opt_python3_path = '/opt/ros/{}/lib/python3/dist-packages'.format(
+                os.getenv('ROS_DISTRO'))
+            sys.path = [opt_python3_path] + sys.path
+            import cv_bridge
+            sys.path.remove(opt_python3_path)
+        else:
+            sys.path = [ws_python3_paths[0]] + sys.path
+            import cv_bridge
+            sys.path.remove(ws_python3_paths[0])
+    else:
+        import cv_bridge
+
+
 
 # Taken from https://github.com/wkentaro/imgviz/blob/master/imgviz/label.py  # NOQA
 def labelcolormap(N=256):

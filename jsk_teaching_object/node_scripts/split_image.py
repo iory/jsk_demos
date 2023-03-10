@@ -1,10 +1,40 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
+
 import cv_bridge
 import rospy
 from sensor_msgs.msg import Image
 from jsk_topic_tools import ConnectionBasedTransport
+
+
+# cv_bridge_python3 import
+if os.environ['ROS_PYTHON_VERSION'] == '3':
+    import cv_bridge
+else:
+    ws_python3_paths = [p for p in sys.path if 'devel/lib/python3' in p]
+    if len(ws_python3_paths) == 0:
+        # search cv_bridge in workspace and append
+        ws_python2_paths = [
+            p for p in sys.path if 'devel/lib/python2.7' in p]
+        for ws_python2_path in ws_python2_paths:
+            ws_python3_path = ws_python2_path.replace('python2.7', 'python3')
+            if os.path.exists(os.path.join(ws_python3_path, 'cv_bridge')):
+                ws_python3_paths.append(ws_python3_path)
+        if len(ws_python3_paths) == 0:
+            opt_python3_path = '/opt/ros/{}/lib/python3/dist-packages'.format(
+                os.getenv('ROS_DISTRO'))
+            sys.path = [opt_python3_path] + sys.path
+            import cv_bridge
+            sys.path.remove(opt_python3_path)
+        else:
+            sys.path = [ws_python3_paths[0]] + sys.path
+            import cv_bridge
+            sys.path.remove(ws_python3_paths[0])
+    else:
+        import cv_bridge
 
 
 class SplitImage(ConnectionBasedTransport):
