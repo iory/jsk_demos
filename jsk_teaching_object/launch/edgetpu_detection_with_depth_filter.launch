@@ -66,7 +66,7 @@
 
   <!-- support Japanese name as class name -->
   <node name="draw_rects_with_classification_result"
-        pkg="jsk_perception" type="draw_rects.py"
+        pkg="jsk_teaching_object" type="draw_rects.py"
         output="screen"
         clear_params="true" >
     <remap from="~input" to="$(arg INPUT_IMAGE)" />

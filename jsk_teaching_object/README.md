@@ -44,4 +44,3 @@ roslaunch jsk_teaching_object sample_edgetpu_detection_with_depth_filter.launch
 ```
 roslaunch jsk_teaching_object sample_foreground_detection.launch
 ```
-

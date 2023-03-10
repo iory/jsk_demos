@@ -29,7 +29,9 @@
     <remap from="out" to="/tile_image_2x1/output" />
   </node>
 
-  <node pkg="jsk_perception" name="split_image" type="split_image.py" output="screen">
+  <node name="split_image"
+        pkg="jsk_teaching_object" type="split_image.py"
+        output="screen">
     <remap from="~input" to="$(arg input_image)" />
     <remap from="/split_image/output/vertical00/horizontal00" to="/input_image" />
     <rosparam>
@@ -66,7 +68,7 @@
   </node>
 
   <node name="draw_rects_for_tpu"
-        pkg="jsk_perception" type="draw_rects.py"
+        pkg="jsk_teaching_object" type="draw_rects.py"
         output="screen"
         clear_params="true" >
     <remap from="~input" to="$(arg split_input_image)" />
@@ -74,7 +76,7 @@
     <remap from="~input/class" to="/edgetpu_object_detector/output/class" />
     <remap from="~output" to="/edgetpu" />
     <rosparam subst_value="true">
-      font_path: $(find jsk_recognition_utils)/font_data/NotoSansJP-Regular.otf
+      font_path: $(find jsk_teaching_object)/font_data/NotoSansJP-Regular.otf
       use_classification_result: true
       label_size: 16
     </rosparam>
@@ -96,7 +98,7 @@
   </node>
 
   <node name="draw_rects"
-        pkg="jsk_perception" type="draw_rects.py"
+        pkg="jsk_teaching_object" type="draw_rects.py"
         output="screen"
         clear_params="true" >
     <remap from="~input" to="label_image_decomposer_instance/output/viz" />

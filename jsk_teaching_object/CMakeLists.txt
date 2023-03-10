@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
   catkin_virtualenv
+  dynamic_reconfigure
   jsk_data
   std_msgs
 )
@@ -25,6 +26,11 @@ add_action_files(
 )
 
 catkin_python_setup()
+
+# Dynamic reconfigure support
+generate_dynamic_reconfigure_options(
+  cfg/DrawRects.cfg
+)
 
 generate_messages(
   DEPENDENCIES actionlib_msgs std_msgs)
