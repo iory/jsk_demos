@@ -20,7 +20,6 @@ from jsk_recognition_msgs.msg import Segment
 # OpenCV import for python3
 if os.environ['ROS_PYTHON_VERSION'] == '3':
     import cv2
-    import mediapipe as mp
 else:
     sys.path.remove('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
     import cv2  # NOQA
@@ -65,6 +64,7 @@ class PeoplePoseEstimation(ConnectionBasedTransport):
         self.connections = mp.solutions.pose.POSE_CONNECTIONS
         self.names = [i.name.lower()
                       for i in mp.solutions.pose.PoseLandmark]
+        print(self.names)
 
         self.people_pose_estimator = self.mp_pose.Pose(
             min_detection_confidence=0.5,
@@ -83,7 +83,8 @@ class PeoplePoseEstimation(ConnectionBasedTransport):
 
     def subscribe(self):
         self.sub = rospy.Subscriber(
-            '~input',
+            '/camera/rgb/image_rect_color',
+            # '~input',
             Image, self.callback,
             queue_size=1, buff_size=2**24)
 
@@ -161,7 +162,8 @@ class PeoplePoseEstimation(ConnectionBasedTransport):
             if results.pose_landmarks:
                 for pose_landmarks in [results.pose_landmarks]:
                     mp_drawing.draw_landmarks(
-                        image, pose_landmarks, self.connections)
+                        image, pose_landmarks, self.connections,
+                        landmark_drawing_spec=mp.solutions.drawing_styles.get_default_pose_landmarks_style())
 
         if self.pub_img.get_num_connections() > 0:
             out_img_msg = bridge.cv2_to_imgmsg(
