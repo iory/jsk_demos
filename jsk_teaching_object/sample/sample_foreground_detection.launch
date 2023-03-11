@@ -83,7 +83,7 @@
   <!-- </node> -->
 
   <node name="label_image_decomposer_instance"
-        pkg="jsk_perception" type="label_image_decomposer.py"
+        pkg="jsk_teaching_object" type="label_image_decomposer.py"
         output="screen" clear_params="true" >
     <remap from="~input" to="/fg_node/output" />
     <remap from="~input/label" to="/fg_node/output/label_ins" />
@@ -113,7 +113,7 @@
   </node>
 
   <node name="tile_image_2x1"
-        pkg="jsk_perception" type="tile_image.py"
+        pkg="jsk_teaching_object" type="tile_image.py"
         output="screen">
     <remap from="~output" to="~output_cpu" />
     <rosparam subst_value="true">
