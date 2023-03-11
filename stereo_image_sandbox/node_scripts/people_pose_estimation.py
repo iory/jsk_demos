@@ -20,6 +20,7 @@ from jsk_recognition_msgs.msg import Segment
 # OpenCV import for python3
 if os.environ['ROS_PYTHON_VERSION'] == '3':
     import cv2
+    import mediapipe as mp
 else:
     sys.path.remove('/opt/ros/{}/lib/python2.7/dist-packages'.format(os.getenv('ROS_DISTRO')))  # NOQA
     import cv2  # NOQA
@@ -83,8 +84,7 @@ class PeoplePoseEstimation(ConnectionBasedTransport):
 
     def subscribe(self):
         self.sub = rospy.Subscriber(
-            '/camera/rgb/image_rect_color',
-            # '~input',
+            '~input',
             Image, self.callback,
             queue_size=1, buff_size=2**24)
 
