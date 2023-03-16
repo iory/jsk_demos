@@ -36,7 +36,6 @@
 
   <node name="draw_rects"
         pkg="jsk_teaching_object" type="draw_rects.py"
-        output="screen"
         clear_params="true" >
     <remap from="~input" to="label_image_decomposer_instance/output/viz" />
     <remap from="~input/rects" to="fg_node/output/rects" />
@@ -62,9 +61,13 @@
   </node>
 
   <group if="$(arg gui)" >
-    <node name="image_view00"
-          pkg="image_view" type="image_view">
-      <remap from="image" to="tile_image_2x1/output_cpu" />
+    <!-- <node name="image_view00" -->
+    <!--       pkg="image_view" type="image_view"> -->
+    <!--   <remap from="image" to="tile_image_2x1/output_cpu" /> -->
+    <!-- </node> -->
+    <node name="$(anon rviz)"
+          pkg="rviz" type="rviz"
+          args="-d $(find jsk_teaching_object)/sample/config/thk.rviz" >
     </node>
   </group>
 
