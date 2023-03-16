@@ -105,6 +105,8 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
         self.sub.unregister()
 
     def callback(self, msg):
+        if (rospy.Time.now() - msg.header.stamp).to_sec() > 0.2:
+            return
         bridge = self.bridge
         encoding = self.encoding
         im = bridge.imgmsg_to_cv2(
