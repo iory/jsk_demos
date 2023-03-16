@@ -43,6 +43,8 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
         self.classifier_name = rospy.get_param('~classifier_name', 'fg')
         self.target_names = rospy.get_param(
             '~class_names', ['foreground'])
+        self.ignore_class_names = rospy.get_param(
+            '~ignore_class_names', ['others'])
 
         weights = rospy.get_param('~model_path')
         imgsz = rospy.get_param('~img_size', (640, 640))
@@ -144,18 +146,23 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
         if len(det):
             masks = process_mask(
                 proto[0], det[:, 6:], det[:, :4], im.shape[2:], upsample=True)  # HWC
-            R, H, W = masks.shape
+            _, H, W = masks.shape
             mask_indices = np.array(
                 np.arange(H * W).reshape(H, W), dtype=np.int32)
             # Rescale boxes from img_size to im0 size
             det[:, :4] = scale_coords(im.shape[2:], det[:, :4], im0.shape).round()
             labels = []
+            valid_indices = []
             for j, (*xyxy, conf, cls) in enumerate(det[:, :6]):
+                if self.target_names[int(cls)] in self.ignore_class_names:
+                    continue
+                valid_indices.append(j)
                 x1, y1, x2, y2 = map(int, xyxy)
                 rects_msg.rects.append(Rect(x=x1, y=y1, width=x2 - x1, height=y2 - y1))
                 labels.append(int(cls))
                 scores.append(float(conf))
-            masks = masks.cpu().numpy()
+            masks = masks.cpu().numpy()[valid_indices]
+            R, H, W = masks.shape
             labels = np.array(labels, dtype=np.int32)
 
             for mask in masks:
