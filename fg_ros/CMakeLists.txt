@@ -4,6 +4,7 @@ project(fg_ros)
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
+  catkin_virtualenv
   dynamic_reconfigure
   jsk_data
 )
