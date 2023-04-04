@@ -31,6 +31,14 @@ def main():
         md5='3d95fec634d99a7cbb861d822135e279',
     )
 
+    # ['dish', 'others']
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/yolo7/2023-04-04-dish.pt',
+        url='https://drive.google.com/uc?id=1XdHXbW5KSzw9BdUXsVhTDLR9GI-xaLej',
+        md5='d97ee8fc2ae51a97a06ebb6a322c5c18',
+    )
+
 
 if __name__ == '__main__':
     main()
