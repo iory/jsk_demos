@@ -10,6 +10,7 @@
         output="screen" clear_params="true" >
     <rosparam subst_value="true" >
       video_device: $(arg video_device)
+      pixel_format: yuyv
     </rosparam>
   </node>
 
