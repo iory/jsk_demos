@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(fg_ros)
 
 find_package(catkin REQUIRED COMPONENTS
-  catkin_virtualenv
+  actionlib
+  actionlib_msgs
   dynamic_reconfigure
   jsk_data
 )
@@ -15,6 +16,18 @@ find_package(catkin REQUIRED COMPONENTS
 # add_custom_target(${PROJECT_NAME}_install_sample_data ALL COMMAND python$ENV{ROS_PYTHON_VERSION} ${PROJECT_SOURCE_DIR}/scripts/install_sample_data.py)
 # download and install trained data
 add_custom_target(${PROJECT_NAME}_install_trained_data ALL COMMAND python$ENV{ROS_PYTHON_VERSION} ${PROJECT_SOURCE_DIR}/scripts/install_trained_data.py)
+
+catkin_python_setup()
+
+add_action_files(
+  DIRECTORY action
+  FILES UpdateModel.action
+)
+
+
+generate_messages(
+  DEPENDENCIES actionlib_msgs std_msgs)
+
 
 generate_dynamic_reconfigure_options(
   cfg/InstanceSegmentation.cfg

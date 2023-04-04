@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import sys
+from threading import Lock
 
 import cv_bridge
 from dynamic_reconfigure.server import Server
@@ -34,11 +35,17 @@ from utils.general import scale_coords
 from utils.segment.general import process_mask
 from utils.torch_utils import select_device
 
+import actionlib
+from fg_ros.msg import UpdateModelResult
+from fg_ros.msg import UpdateModelAction
+
 
 class ForegroundSegmentationNode(ConnectionBasedTransport):
 
     def __init__(self):
         super(ForegroundSegmentationNode, self).__init__()
+
+        self.lock = Lock()
 
         self.classifier_name = rospy.get_param('~classifier_name', 'fg')
         self.target_names = rospy.get_param(
@@ -47,30 +54,23 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
             '~ignore_class_names', ['others'])
 
         weights = rospy.get_param('~model_path')
-        imgsz = rospy.get_param('~img_size', (640, 640))
         device = rospy.get_param('~device', 0)
         if device < 0:
             device = 'cpu'
         classes = None  # filter by class: --class 0, or --class 0 2 3
-        half = False  # use FP16 half-precision inference
 
         self.srv = Server(Config, self.config_callback)
 
         # Load model
         device = select_device(device)
-        model = DetectMultiBackend(weights, device=device, dnn=False,
-                                   data='', fp16=half)
         self.device = device
-        model.eval()
-        self.model = model
-        stride, names, pt = model.stride, model.names, model.pt
-        imgsz = check_img_size(imgsz, s=stride)  # check image size
 
         cudnn.benchmark = True  # set True to speed up constant image size inference
 
-        # Run inference
-        self.model.warmup(imgsz=(1, 3, *imgsz))  # warmup
-        self.imgsz = imgsz
+        self.target_names = rospy.get_param(
+            '~class_names', ['foreground'])
+        self.model = None
+        self.load_model(weights, self.target_names)
 
         self.bridge = cv_bridge.CvBridge()
         self.pub = self.advertise('~output', sensor_msgs.msg.Image, queue_size=1)
@@ -88,6 +88,41 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
         self.pub_class = self.advertise(
             "~output/class", ClassificationResult,
             queue_size=1)
+
+        self.update_model_server = actionlib.SimpleActionServer(
+            '~update_model',
+            UpdateModelAction,
+            execute_cb=self.update_model_action,
+            auto_start=True)
+        rospy.loginfo('update model action started.')
+
+    def update_model_action(self, goal):
+        self.load_model(goal.model_path, goal.class_name_path)
+        self.update_model_server.set_succeeded(UpdateModelResult())
+
+    def load_model(self, model_path, class_names):
+        self.lock.acquire()
+
+        self.target_names = class_names
+        rospy.loginfo("Loaded {} labels. {}".format(
+            len(self.target_names),
+            self.target_names))
+        num_classes = len(self.target_names)
+        half = False  # use FP16 half-precision inference
+
+        weights = model_path
+        del self.model
+        model = DetectMultiBackend(weights, device=self.device, dnn=False,
+                                   data='', fp16=half)
+        imgsz = rospy.get_param('~img_size', (640, 640))
+        model.eval()
+        self.model = model
+        stride, names, pt = model.stride, model.names, model.pt
+        imgsz = check_img_size(imgsz, s=stride)  # check image size
+        self.model.warmup(imgsz=(1, 3, *imgsz))  # warmup
+        self.imgsz = imgsz
+
+        self.lock.release()
 
     def config_callback(self, config, level):
         self.score_thresh = config.score_thresh
@@ -107,6 +142,7 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
     def callback(self, msg):
         if (rospy.Time.now() - msg.header.stamp).to_sec() > 0.2:
             return
+        self.lock.acquire()
         bridge = self.bridge
         encoding = self.encoding
         im = bridge.imgmsg_to_cv2(
@@ -205,6 +241,7 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
             label_proba=scores,
         )
         self.pub_class.publish(cls_msg)
+        self.lock.release()
 
 
 if __name__ == "__main__":
