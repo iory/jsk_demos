@@ -12,6 +12,8 @@ pip3 install -r requirements.txt --verbose
 python3 data.py
 ```
 
+Install cuda in addition to this.
+
 ## remove background
 
 ```
