@@ -1,0 +1,15 @@
+extendedos
+funcy
+gdown
+imantics
+imgaug
+imgviz
+joblib
+labelme
+moviepy
+numpy>=1.23.5
+pybsc>=0.1.40
+pycocotools
+rectpack
+rembg
+scikit-learn
