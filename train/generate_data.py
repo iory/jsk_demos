@@ -12,7 +12,7 @@ from data import download_yolo7_segmentation
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='data generator')
     parser.add_argument('-n', default=1000, type=int)
-    parser.add_argument('-b', default=32, type=int)
+    parser.add_argument('-b', default=16, type=int)
     parser.add_argument('--target', default='fruit', type=str)
     parser.add_argument('-t', '--target-names', nargs='+')
     parser.add_argument('--no-train', action='store_true')
