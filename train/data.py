@@ -117,7 +117,7 @@ def download_yolo7_segmentation():
         postprocess=gdown.extractall,
     )
     subprocess.call(
-        'cd {} && python3 -m venv yolov7seg && {}/yolov7seg/bin/pip install -U pip && {}/yolov7seg/bin/pip install -r {}/requirements.txt && {}/yolov7seg/bin/pip install numpy==1.23.0'.format(
+        'cd {} && python3 -m venv yolov7seg && {}/yolov7seg/bin/pip install -U pip && {}/yolov7seg/bin/pip install -r {}/requirements.txt && {}/yolov7seg/bin/pip install numpy==1.23.4'.format(
             yolo7_dir, yolo7_dir,
             yolo7_dir, yolo7_dir, yolo7_dir),
         shell=True)
