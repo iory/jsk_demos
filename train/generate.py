@@ -70,8 +70,8 @@ if __name__ == '__main__':
         p = 1.0
         p_per_class = p / (len(cnt_dict) - 1)
     else:
-        others_p = (1 - p) / cnt_dict['others']
         p = 0.9
+        others_p = (1 - p) / cnt_dict['others']
         p_per_class = p / (len(cnt_dict) - 1)
 
     for i, ip in enumerate(img_paths):

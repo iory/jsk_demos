@@ -37,7 +37,7 @@ if __name__ == '__main__':
         paths = list(sorted(Path(args.from_images_dir).glob('*/*.jpg'))) \
             + list(sorted(Path(args.from_images_dir).glob('*/*.jpeg'))) \
             + list(sorted(Path(args.from_images_dir).glob('*/*.png')))
-        outpath = Path(make_fancy_output_dir('./rembg_img', no_save=True))
+        outpath = Path(make_fancy_output_dir('./rembg_img', no_save=True)).resolve()
         target_names = []
         print('Remove background from images')
         for path in tqdm(paths):
