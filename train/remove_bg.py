@@ -58,7 +58,6 @@ def remove_background(img, path_name=None):
     img_opening = cv2.dilate(img_dil, kernel, iterations=10)
     y, x = np.where(img_opening > 0)
 
-    print(y, x)
     x1 = np.min(x)
     x2 = np.max(x)
     y1 = np.min(y)

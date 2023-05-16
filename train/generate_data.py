@@ -1,6 +1,8 @@
 import multiprocessing
 import argparse
 import datetime
+import cv2
+from tqdm import tqdm
 from eos import run_many
 from eos import make_fancy_output_dir
 from pathlib import Path
@@ -36,7 +38,8 @@ if __name__ == '__main__':
             + list(sorted(Path(args.from_images_dir).glob('*/*.png')))
         outpath = Path(make_fancy_output_dir('./rembg_img', no_save=True))
         target_names = []
-        for path in paths:
+        print('Remove background from images')
+        for path in tqdm(paths):
             try:
                 makedirs(outpath / path.parent.name)
                 out_img = remove_background(cv2.imread(str(path)))
