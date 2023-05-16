@@ -2,6 +2,7 @@ import multiprocessing
 import argparse
 import datetime
 from eos import run_many
+from eos import make_fancy_output_dir
 from pathlib import Path
 from labelme_utils import convert_coco2yolo
 from labelme_utils import labelme2coco
@@ -20,22 +21,46 @@ if __name__ == '__main__':
     parser.add_argument('--min-scale', default=None)
     parser.add_argument('--max-scale', default=None)
     parser.add_argument('--target-image-dir', type=str)
+    parser.add_argument('--from-images-dir', type=str, default='')
     args = parser.parse_args()
 
     start_time = datetime.datetime.now()
     n = args.n
     batch_size = args.b
-    # cmd = 'python generate.py --out /tmp/fg -n 1000 --target foreground'
-    if args.target_names is None or len(args.target_names) == 0:
-        target = args.target
-        cmd = 'python generate.py --out /tmp/{} -n {} --image-width 300 --target {}'.format(target, n, target)
-    else:
-        target = 'yamagata'
+
+    if len(args.from_images_dir) > 0:
+        from remove_bg import remove_background
+        target = 'from_images_dir'
+        paths = list(sorted(Path(args.from_images_dir).glob('*/*.jpg'))) \
+            + list(sorted(Path(args.from_images_dir).glob('*/*.jpeg'))) \
+            + list(sorted(Path(args.from_images_dir).glob('*/*.png')))
+        outpath = Path(make_fancy_output_dir('./rembg_img', no_save=True))
+        target_names = []
+        for path in paths:
+            try:
+                makedirs(outpath / path.parent.name)
+                out_img = remove_background(cv2.imread(str(path)))
+                cv2.imwrite(str(outpath / path.parent.name / path.with_suffix('.png').name), out_img)
+                target_names.append(path.parent)
+            except Exception as e:
+                print(str(e))
+        target_names = sorted(list(set(target_names)))
         cmd = 'python generate.py --out /tmp/{} -n {} --image-width 300 --target-names {}'.format(
             target, n,
-            ' '.join(args.target_names))
-    if len(args.target_image_dir) > 0:
-        cmd += ' --target-image-dir {}'.format(args.target_image_dir)
+            ' '.join(target_names))
+        cmd += ' --target-image-dir {}'.format(outpath)
+    else:
+        # cmd = 'python generate.py --out /tmp/fg -n 1000 --target foreground'
+        if args.target_names is None or len(args.target_names) == 0:
+            target = args.target
+            cmd = 'python generate.py --out /tmp/{} -n {} --image-width 300 --target {}'.format(target, n, target)
+        else:
+            target = 'yamagata'
+            cmd = 'python generate.py --out /tmp/{} -n {} --image-width 300 --target-names {}'.format(
+                target, n,
+                ' '.join(args.target_names))
+        if len(args.target_image_dir) > 0:
+            cmd += ' --target-image-dir {}'.format(args.target_image_dir)
 
     if args.min_scale is not None:
         cmd += ' --min-scale {}'.format(args.min_scale)
