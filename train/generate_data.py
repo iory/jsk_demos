@@ -44,7 +44,7 @@ if __name__ == '__main__':
     subprocess.call('rm -rf /tmp/{}'.format(target),
                     shell=True)
     num = 20
-    jobs = min(multiprocessing.cpu_count() // 2, num)
+    jobs = min(multiprocessing.cpu_count(), num)
     sleep_time = 1.0
     verbose = False
     run_many(cmd, num, jobs=jobs,

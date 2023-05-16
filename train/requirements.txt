@@ -7,7 +7,7 @@ imgviz
 joblib
 labelme
 moviepy
-numpy==1.23.4
+numpy<=1.23.5
 pybsc>=0.1.40
 pycocotools
 rectpack
