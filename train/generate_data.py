@@ -4,6 +4,7 @@ import datetime
 import cv2
 from tqdm import tqdm
 from eos import run_many
+from eos import makedirs
 from eos import make_fancy_output_dir
 from pathlib import Path
 from labelme_utils import convert_coco2yolo
