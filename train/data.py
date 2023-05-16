@@ -105,11 +105,7 @@ def download_bg_dataset():
 
 def download_yolo7_segmentation():
     yolo7_dir = download_dir / 'yolov7-segmentation-main'
-    gdown.cached_download(
-        'https://github.com/RizwanMunawar/yolov7-segmentation/releases/download/yolov7-segmentation/yolov7-seg.pt',
-        path=str(yolo7_dir / 'yolov7-seg.pt'),
-    )
-    if (yolo7_dir / 'yolov7seg/lib/python3.8/site-packages/scipy/signal/wavelets.py').exists():
+    if (yolo7_dir / 'yolov7-seg.pt').exists():
         return yolo7_dir
     gdown.cached_download(
         'https://github.com/RizwanMunawar/yolov7-segmentation/archive/refs/heads/main.zip',
@@ -121,6 +117,10 @@ def download_yolo7_segmentation():
             yolo7_dir, yolo7_dir,
             yolo7_dir, yolo7_dir, yolo7_dir),
         shell=True)
+    gdown.cached_download(
+        'https://github.com/RizwanMunawar/yolov7-segmentation/releases/download/yolov7-segmentation/yolov7-seg.pt',
+        path=str(yolo7_dir / 'yolov7-seg.pt'),
+    )
     return yolo7_dir
 
 

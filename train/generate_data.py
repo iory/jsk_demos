@@ -45,7 +45,7 @@ if __name__ == '__main__':
                 makedirs(outpath / path.parent.name)
                 out_img = remove_background(cv2.imread(str(path)))
                 cv2.imwrite(str(outpath / path.parent.name / path.with_suffix('.png').name), out_img)
-                target_names.append(path.parent)
+                target_names.append(path.parent.name)
             except Exception as e:
                 print(str(e))
         target_names = sorted(list(set(target_names)))
