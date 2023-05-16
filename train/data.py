@@ -121,6 +121,7 @@ def download_yolo7_segmentation():
             yolo7_dir, yolo7_dir,
             yolo7_dir, yolo7_dir, yolo7_dir),
         shell=True)
+    return yolo7_dir
 
 
 if __name__ == '__main__':
