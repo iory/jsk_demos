@@ -4,6 +4,7 @@ import argparse
 import os.path as osp
 import subprocess
 import datetime
+import six
 
 
 def current_time_str(time_format='%Y-%m-%d-%H-%M-%S-%f'):
@@ -15,7 +16,10 @@ def run_command(cmd, *args, **kwargs):
     if kwargs.pop("capture_output", False):
         kwargs["stdout"] = subprocess.PIPE
         kwargs["stderr"] = subprocess.PIPE
-    return subprocess.run(cmd, *args, **kwargs)
+    if six.PY2:
+        return subprocess.check_call(cmd, *args, **kwargs)
+    else:
+        return subprocess.run(cmd, *args, **kwargs)
 
 
 if __name__ == '__main__':
@@ -36,7 +40,6 @@ if __name__ == '__main__':
     rsync_image_command = 'rsync -e "{}" --verbose -r {} {}:{}'.format(
         proxy_command,
         source_image_dir, ssh_target, tmp_dir)
-    print(rsync_image_command)
     run_command(rsync_image_command, shell=True)
 
     source_image_dir_in_remote = osp.join(tmp_dir, osp.basename(source_image_dir))
