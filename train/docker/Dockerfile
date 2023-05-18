@@ -18,5 +18,7 @@ COPY *.py /workspace/
 COPY requirements.txt /workspace/requirements.txt
 RUN pip install -U pip \
     && pip install -r requirements.txt
+# download pretrained model
+RUN python -c 'import numpy; from rembg import remove; remove(numpy.ones((10, 10), dtype=numpy.uint8))'
 
 CMD ["bash"]
