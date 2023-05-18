@@ -20,6 +20,8 @@ xhost +local:root
 docker stop "train-object-detection-from-images"
 docker rm "train-object-detection-from-images"
 docker run --rm \
+       -u "$(id -u $USER):$(id -g $USER)" \
+       --userns=host \
        --gpus all \
        --shm-size=1g \
        --name "train-object-detection-from-images" \
