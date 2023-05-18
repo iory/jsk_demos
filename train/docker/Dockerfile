@@ -27,6 +27,9 @@ RUN pip install -U pip \
 # download pretrained model
 RUN python -c 'import numpy; from rembg import remove; remove(numpy.ones((10, 10), dtype=numpy.uint8))'
 
+USER $USER_NAME
+ENV HOME /home/$USER_NAME
+
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]
