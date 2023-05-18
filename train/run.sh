@@ -8,14 +8,6 @@ function message() {
     echo -e "\e[${color}m${message}\e[0m"
 }
 
-
-function check_variable() {
-    if [ -z "$1" ]; then
-        echo "[ERROR]: $2 がセットされていません。"
-        exit 1
-    fi
-}
-
 DATASET_DIR=$(realpath $1); shift 1;
 DATASET_NAME=$(basename $DATASET_DIR)
 if [ -z "${DATASET_DIR}" ]; then
