@@ -47,6 +47,12 @@ After training, a file containing the trained model (`best-%Y-%m-%d-%H-%M-%S-%f.
 
 If you wish to execute the code in your local environment, please follow the instructions below:
 
+0. Install nvidia docker
+
+Please see the following site and install nvidia docker.
+
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker
+
 1. Build Docker Image:
 
 Execute the `build.sh` script to build the Docker image. This script will handle the necessary dependencies and configurations. You can run the command as follows:
