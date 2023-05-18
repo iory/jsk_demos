@@ -32,6 +32,8 @@ if __name__ == '__main__':
 
 
     outpath_base = (Path(args.from_images_dir) / 'generated_data').resolve()
+    subprocess.call('rm -rf {}'.format(outpath_base),
+                    shell=True)
     makedirs(outpath_base)
     with open(str(outpath_base / '.gitignore'), 'w') as f:
         f.write('*\n')
@@ -77,7 +79,7 @@ if __name__ == '__main__':
     if args.max_scale is not None:
         cmd += ' --max-scale {}'.format(args.max_scale)
 
-    num = 1
+    num = 20
     jobs = min(multiprocessing.cpu_count(), num)
     sleep_time = 1.0
     verbose = False
