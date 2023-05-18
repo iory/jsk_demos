@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='data generator')
     parser.add_argument('-n', default=1000, type=int)
     parser.add_argument('--image-width', default=300, type=int)
-    parser.add_argument('--target', default='industry', type=str)
+    parser.add_argument('--target', default='', type=str)
     parser.add_argument('--target-names', nargs='+')
     parser.add_argument('--out', '-o', default='./gen_data', type=str)
     parser.add_argument('--min-scale', default=None)
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     max_angle = 360
     min_scale = 0.2
     max_scale = 0.6
-    if args.target is not None:
+    if len(args.target) > 0:
         targets, max_angle, min_scale, max_scale = get_targets(args.target)
     else:
         targets = args.target_names
