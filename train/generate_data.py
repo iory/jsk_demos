@@ -1,5 +1,6 @@
 import multiprocessing
 import argparse
+import shutil
 import datetime
 import cv2
 from tqdm import tqdm
@@ -97,10 +98,11 @@ if __name__ == '__main__':
     convert_coco2yolo([save_train_json_path,
                        save_val_json_path],
                       outpath_base)
-    subprocess.call('cp {}/images/*.jpg {}/images/train/'.format(outpath_base, outpath_base),
-                    shell=True)
-    subprocess.call('cp {}/images/*.jpg {}/images/test/'.format(outpath_base, outpath_base),
-                    shell=True)
+
+    for path in outpath_base.glob('images/*.jpg'):
+        shutil.copy(path, outpath_base / 'images' / 'train' / path.name)
+    for path in outpath_base.glob('images/*.jpg'):
+        shutil.copy(path, outpath_base / 'images' / 'test' / path.name)
 
     class_names = get_class_names_from_labelme_jsons(labelme_jsons)
     with open('{}/images/test/class_names.txt'.format(outpath_base), 'w') as f:
