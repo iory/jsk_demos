@@ -44,21 +44,20 @@ if __name__ == '__main__':
 
     source_image_dir_in_remote = osp.join(tmp_dir, osp.basename(source_image_dir))
 
-    python_exe = 'python'
     run_command(
-        '''{} 'bash --login -c "{} generate_data.py --from-images-dir {} -b 32"' '''.format(
-            ssh_command, python_exe, source_image_dir_in_remote),
+        '''{} 'bash --login -c "run.sh {}"' '''.format(
+            ssh_command, source_image_dir_in_remote),
         shell=True)
 
     date = current_time_str()
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
-        ssh_target, '/tmp/from_images_dir/yolov7-seg-coco/weights/best.pt',
-        'best-{}.pt'.format(date))
+        ssh_target, '{}/generated_data/yolov7-seg-coco/weights/best.pt',
+        'best-{}.pt'.format(source_image_dir_in_remote, date))
     run_command(rsync_image_command, shell=True)
 
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
-        ssh_target, '/tmp/from_images_dir/from_images_dir.yaml',
-        'from_images_dir-{}.yaml'.format(date))
+        ssh_target, '{}/from_images_dir.yaml',
+        'from_images_dir-{}.yaml'.format(source_image_dir_in_remote, date))
     run_command(rsync_image_command, shell=True)

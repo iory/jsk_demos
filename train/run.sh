@@ -16,6 +16,13 @@ if [ -z "${DATASET_DIR}" ]; then
 fi
 echo "Target Dir: ${DATASET_DIR}"
 
+if [ -t 1 ]; then
+    TTY_OPT='-ti'
+else
+    TTY_OPT=''
+fi
+
+
 xhost +local:root
 docker stop "train-object-detection-from-images"
 docker rm "train-object-detection-from-images"
@@ -30,7 +37,7 @@ docker run --rm \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
        --volume="$HOME/.project_t:/root/.project_t:rw" \
        --volume="${DATASET_DIR}:/workspace/target_data:rw" \
-       -it train-object-detection-from-images /bin/bash -c 'python -- generate_data.py --from-images-dir /workspace/target_data'
+       ${TTY_OPT} train-object-detection-from-images 'python -- generate_data.py --from-images-dir /workspace/target_data'
 xhost +local:docker
 
 message 32 "Done generating model file for pytorch object detection"
