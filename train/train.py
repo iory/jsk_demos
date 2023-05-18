@@ -7,6 +7,38 @@ import datetime
 import six
 
 
+class Colors(object):
+
+    bold = '\033[1m'
+    underlined = '\033[4m'
+
+    black = '\033[30m'
+    red = '\033[31m'
+    green = '\033[32m'
+    yellow = '\033[33m'
+    blue = '\033[34m'
+    magenta = '\033[35m'
+    cyan = '\033[36m'
+    lightgray = '\033[37m'
+    darkgray = '\033[90m'
+    lightred = '\033[91m'
+    lightgreen = '\033[92m'
+    lightyellow = '\033[93m'
+    lightblue = '\033[94m'
+    lightmagenta = '\033[95m'
+    lightcyan = '\033[96m'
+
+    background_black = '\033[40m'
+    background_red = '\033[41m'
+    background_green = '\033[42m'
+    background_yellow = '\033[43m'
+    background_blue = '\033[44m'
+    background_magenta = '\033[45m'
+    background_cyan = '\033[46m'
+
+    reset = '\033[0m'
+
+
 def current_time_str(time_format='%Y-%m-%d-%H-%M-%S-%f'):
     time_str = datetime.datetime.now().strftime(time_format)
     return time_str
@@ -55,9 +87,11 @@ if __name__ == '__main__':
         ssh_target, '{}/generated_data/yolov7-seg-coco/weights/best.pt'.format(source_image_dir_in_remote),
         'best-{}.pt'.format(date))
     run_command(rsync_image_command, shell=True)
-
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/from_images_dir.yaml'.format(source_image_dir_in_remote),
         'from_images_dir-{}.yaml'.format(date))
     run_command(rsync_image_command, shell=True)
+    print(Colors.green + "Done copying model file for pytorch object detection" + Colors.reset)
+    print(Colors.green + " - {}".format('best-{}.pt'.format(date)) + Colors.reset)
+    print(Colors.green + " - {}".format('from_images_dir-{}.yaml'.format(date)) + Colors.reset)
