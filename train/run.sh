@@ -33,7 +33,7 @@ docker run --rm \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-       --volume="$HOME/.project_t:/root/.project_t:rw" \
+       --volume="$HOME/.project_t:/home/user/.project_t:rw" \
        --volume="${DATASET_DIR}:/workspace/target_data:rw" \
        ${TTY_OPT} train-object-detection-from-images 'python -- generate_data.py --from-images-dir /workspace/target_data'
 xhost +local:docker
