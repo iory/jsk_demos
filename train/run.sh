@@ -1,5 +1,29 @@
 #!/bin/bash
 
+function message() {
+    local color=$1; shift;
+    local message=$@
+
+    # Output command being executed
+    echo -e "\e[${color}m${message}\e[0m"
+}
+
+
+function check_variable() {
+    if [ -z "$1" ]; then
+        echo "[ERROR]: $2 がセットされていません。"
+        exit 1
+    fi
+}
+
+DATASET_DIR=$(realpath $1); shift 1;
+DATASET_NAME=$(basename $DATASET_DIR)
+if [ -z "${DATASET_DIR}" ]; then
+    echo "[ERROR]: DATASET_DIR should be set."
+    exit 1
+fi
+echo "Target Dir: ${DATASET_DIR}"
+
 xhost +local:root
 docker stop "train-object-detection-from-images"
 docker rm "train-object-detection-from-images"
@@ -10,7 +34,11 @@ docker run --rm \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-       --volume="$(pwd):/workspace:rw" \
        --volume="$HOME/.project_t:/root/.project_t:rw" \
-       -it train-object-detection-from-images /bin/bash
+       --volume="${DATASET_DIR}:/workspace/target_data:rw" \
+       -it train-object-detection-from-images /bin/bash -c 'python -- generate_data.py --from-images-dir /workspace/target_data'
 xhost +local:docker
+
+message 32 "Done generating model file for pytorch object detection"
+message 32 " - ${DATASET_DIR}/generated_data/yolov7-seg-coco/weights/best.pt"
+message 32 " - ${DATASET_DIR}/generated_data/from_images_dir.yaml"
