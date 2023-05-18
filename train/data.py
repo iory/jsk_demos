@@ -103,7 +103,7 @@ def download_bg_dataset():
 
 
 
-def download_yolo7_segmentation():
+def download_yolo7_segmentation(create_venv=False):
     yolo7_dir = download_dir / 'yolov7-segmentation-main'
     if (yolo7_dir / 'yolov7-seg.pt').exists():
         return yolo7_dir
@@ -112,11 +112,12 @@ def download_yolo7_segmentation():
         path=str(download_dir / 'main.zip'),
         postprocess=gdown.extractall,
     )
-    subprocess.call(
-        'cd {} && python3 -m venv yolov7seg && {}/yolov7seg/bin/pip install -U pip && {}/yolov7seg/bin/pip install -r {}/requirements.txt && {}/yolov7seg/bin/pip install numpy==1.23.4'.format(
-            yolo7_dir, yolo7_dir,
-            yolo7_dir, yolo7_dir, yolo7_dir),
-        shell=True)
+    if create_venv:
+        subprocess.call(
+            'cd {} && python3 -m venv yolov7seg && {}/yolov7seg/bin/pip install -U pip && {}/yolov7seg/bin/pip install -r {}/requirements.txt && {}/yolov7seg/bin/pip install numpy==1.23.4'.format(
+                yolo7_dir, yolo7_dir,
+                yolo7_dir, yolo7_dir, yolo7_dir),
+            shell=True)
     gdown.cached_download(
         'https://github.com/RizwanMunawar/yolov7-segmentation/releases/download/yolov7-segmentation/yolov7-seg.pt',
         path=str(yolo7_dir / 'yolov7-seg.pt'),

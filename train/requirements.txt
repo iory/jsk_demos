@@ -8,8 +8,12 @@ joblib
 labelme
 moviepy
 numpy<=1.23.5
+pandas
 pybsc>=0.1.40
 pycocotools
 rectpack
 rembg
 scikit-learn
+seaborn
+tensorboard
+torch

@@ -119,9 +119,13 @@ if __name__ == '__main__':
 
 
     if args.no_train is False:
-        yolo7_dir = download_yolo7_segmentation()
-        train_cmd = '{}/yolov7seg/bin/python {}/segment/train.py --noval --noplots --data /tmp/{}/{}.yaml --batch {} --weights "{}/yolov7-seg.pt" --cfg {}/models/segment/yolov7-seg.yaml --epochs 10 --name yolov7-seg-coco --img 300 --hyp hyp.scratch-high.yaml --project /tmp/{} --noval --nosave'.format(
-            yolo7_dir, yolo7_dir, target, target, batch_size, yolo7_dir, yolo7_dir, target)
+        create_venv = False
+        yolo7_dir = download_yolo7_segmentation(create_venv=create_venv)
+        python_exe = 'python'
+        if create_venv:
+            python_exe = "{}/python".format(yolo7_dir)
+        train_cmd = '{} {}/segment/train.py --noval --noplots --data /tmp/{}/{}.yaml --batch {} --weights "{}/yolov7-seg.pt" --cfg {}/models/segment/yolov7-seg.yaml --epochs 10 --name yolov7-seg-coco --img 300 --hyp hyp.scratch-high.yaml --project /tmp/{} --noval --nosave'.format(
+            python_exe, yolo7_dir, target, target, batch_size, yolo7_dir, yolo7_dir, target)
         subprocess.call(train_cmd, shell=True)
     end_time = datetime.datetime.now()
     print(end_time - start_time)
