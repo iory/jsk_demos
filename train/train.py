@@ -53,11 +53,11 @@ if __name__ == '__main__':
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/yolov7-seg-coco/weights/best.pt'.format(source_image_dir_in_remote),
-        'best-{}.pt'.format(source_image_dir_in_remote, date))
+        'best-{}.pt'.format(date))
     run_command(rsync_image_command, shell=True)
 
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
-        ssh_target, '{}/generated_data//from_images_dir.yaml'.format(source_image_dir_in_remote),
-        'from_images_dir-{}.yaml'.format(source_image_dir_in_remote, date))
+        ssh_target, '{}/generated_data/from_images_dir.yaml'.format(source_image_dir_in_remote),
+        'from_images_dir-{}.yaml'.format(date))
     run_command(rsync_image_command, shell=True)
