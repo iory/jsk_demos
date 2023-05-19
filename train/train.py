@@ -58,12 +58,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Image training Script")
     parser.add_argument('-u', '--username', type=str, default="thk")
     parser.add_argument("--ip", type=str, default='133.11.216.13', help="IP Address")
+    parser.add_argument(
+        "-i", '--identity-file', type=str,
+        default=osp.join(osp.expanduser('~'), '.ssh', 'id_rsa'), help="SSH Identify File")
     parser.add_argument("image_directory", type=str, help="Image Directory")
     args = parser.parse_args()
+    print(args.identity_file)
 
-    proxy_command = "ssh -o ProxyCommand='ssh -W %h:%p {}@dlbox2.jsk.imi.i.u-tokyo.ac.jp'".format(args.username)
+    proxy_command = "ssh -o ProxyCommand='ssh -i {} -W %h:%p {}@dlbox2.jsk.imi.i.u-tokyo.ac.jp'".format(
+        args.identity_file, args.username)
     ssh_target = '{}@{}'.format(args.username, args.ip)
-    ssh_command = "{} {}@{}".format(proxy_command, args.username, args.ip)
+    ssh_command = "{} -i {} {}@{}".format(proxy_command, args.identity_file,
+                                          args.username, args.ip)
 
     tmp_dir = osp.join('/tmp', 'project-t', '{}'.format(current_time_str()))
     a = run_command('{} mkdir -p {}'.format(ssh_command, tmp_dir), shell=True)
