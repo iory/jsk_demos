@@ -23,7 +23,6 @@ else
 fi
 
 
-xhost +local:root
 docker run --rm \
        -u "$(id -u $USER):$(id -g $USER)" \
        --userns=host \
@@ -36,7 +35,6 @@ docker run --rm \
        --volume="$HOME/.project_t:/home/user/.project_t:rw" \
        --volume="${DATASET_DIR}:/workspace/target_data:rw" \
        ${TTY_OPT} train-object-detection-from-images 'python -- generate_data.py --from-images-dir /workspace/target_data'
-xhost +local:docker
 
 message 32 "Done generating model file for pytorch object detection"
 message 32 " - ${DATASET_DIR}/generated_data/yolov7-seg-coco/weights/best.pt"
