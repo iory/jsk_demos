@@ -40,6 +40,12 @@ Images are sent to a remote server and object detection training is performed.
 python train.py yamagata_items
 ```
 
+If you want to specify the ssh identify file, specify it with the `-i` option.
+
+```
+python -- train.py -i ~/.ssh/id_rsa_target yamagata_items
+```
+
 After training, a file containing the trained model (`best-%Y-%m-%d-%H-%M-%S-%f.pt`) and class name information (`from_images_dir-%Y-%m-%d-%H-%M-%S-%f.yaml`) will be copied.
 
 
