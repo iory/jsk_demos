@@ -65,8 +65,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args.identity_file)
 
-    proxy_command = "ssh -o ProxyCommand='ssh -i {} -W %h:%p {}@dlbox2.jsk.imi.i.u-tokyo.ac.jp'".format(
-        args.identity_file, args.username)
+    proxy_command = "ssh -i {} -o ProxyCommand='ssh -i {} -W %h:%p {}@dlbox2.jsk.imi.i.u-tokyo.ac.jp'".format(
+        args.identity_file, args.identity_file, args.username)
     ssh_target = '{}@{}'.format(args.username, args.ip)
     ssh_command = "{} -i {} {}@{}".format(proxy_command, args.identity_file,
                                           args.username, args.ip)
