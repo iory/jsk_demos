@@ -41,10 +41,12 @@ if __name__ == '__main__':
 
     if len(args.from_images_dir) > 0:
         from remove_bg import remove_background
+
+        patterns = ["*.jpg", "*.JPG", "*.jpeg", "*.JPEG", "*.png", "*.PNG"]
         target = 'from_images_dir'
-        paths = list(sorted(Path(args.from_images_dir).glob('*/*.jpg'))) \
-            + list(sorted(Path(args.from_images_dir).glob('*/*.jpeg'))) \
-            + list(sorted(Path(args.from_images_dir).glob('*/*.png')))
+        paths = []
+        for pattern in patterns:
+            image_paths.extend(list(sorted(Path(args.from_images_dir).glob('*/{}'.format(pattern)))))
         rembg_outpath = outpath_base / 'preprocessing' / 'rembg'
         target_names = []
         print('Remove background from images')
