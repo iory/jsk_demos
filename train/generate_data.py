@@ -46,7 +46,7 @@ if __name__ == '__main__':
         target = 'from_images_dir'
         paths = []
         for pattern in patterns:
-            image_paths.extend(list(sorted(Path(args.from_images_dir).glob('*/{}'.format(pattern)))))
+            paths.extend(list(sorted(Path(args.from_images_dir).glob('*/{}'.format(pattern)))))
         rembg_outpath = outpath_base / 'preprocessing' / 'rembg'
         target_names = []
         print('Remove background from images')
