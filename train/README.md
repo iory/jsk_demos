@@ -76,3 +76,36 @@ Once the image is successfully built, you can execute the `run.sh` script, provi
 ```
 
 After running the command, the script will generate the required data and store the trained models in the `TARGET_DIRECTORY/generated_data` directory.
+
+
+## Run for ROS
+
+### Install
+
+```
+mkdir -p ~/jsk_teaching_object/src
+cd ~/jsk_teaching_object/src
+wstool init
+wstool merge https://raw.githubusercontent.com/iory/jsk_demos/teaching-object/jsk_teaching_object/noetic.rosinstall
+wstool update
+cd ../
+source /opt/ros/noetic/setup.bash
+rosdep update
+rosdep install -y -r --from-paths src --ignore-src
+catkin build jsk_teaching_object
+source devel/setup.bash
+```
+
+### Running a Model Trained with Webcam
+
+To execute a model trained with webcam, follow the steps below:
+
+Set the model_path parameter to the path of the trained model. In the example provided, it is set to $(pwd)/best.pt. Make sure to replace this with the actual path to your trained model.
+Specify the class_names parameter as a list of class names enclosed in square brackets.
+In the given example, the classes are ['ba25', 'fan', 'rau']. Modify this list according to the classes in your trained model (see, `from_images_dir-%Y-%m-%d-%H-%M-%S-%f.yaml`.)
+
+Here's an example command:
+
+```
+roslaunch jsk_teaching_object sample_foreground_detection_webcam.launch model_path:=$(pwd)/best.pt class_names:="['ba25', 'fan', 'rau']"
+```
