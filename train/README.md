@@ -46,7 +46,10 @@ If you want to specify the ssh identify file, specify it with the `-i` option.
 python -- train.py -i ~/.ssh/id_rsa_target yamagata_items
 ```
 
-After training, a file containing the trained model (`best-%Y-%m-%d-%H-%M-%S-%f.pt`) and class name information (`from_images_dir-%Y-%m-%d-%H-%M-%S-%f.yaml`) will be copied.
+After training, a file containing the trained model (`<IMAGE_DIRECTORY_NAME>-%Y-%m-%d-%H-%M-%S-%f.pt`),
+class name information (`<IMAGE_DIRECTORY_NAME>-%Y-%m-%d-%H-%M-%S-%f.yaml`),
+removed background images (`<IMAGE_DIRECTORY_NAME>-%Y-%m-%d-%H-%M-%S-%f-preprocessing`)
+and generated data (`<IMAGE_DIRECTORY_NAME>-%Y-%m-%d-%H-%M-%S-%f-generated_data.tar.gz`) will be copied.
 
 
 ## Execution in Local Environment (optional)
