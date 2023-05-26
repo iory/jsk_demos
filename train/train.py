@@ -100,7 +100,7 @@ if __name__ == '__main__':
     run_command(rsync_image_command, shell=True)
 
     saved_rembg_dir_name = '{}-{}-preprocessing'.format(osp.basename(source_image_dir), date)
-    rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
+    rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/preprocessing'.format(source_image_dir_in_remote),
         saved_rembg_dir_name)
