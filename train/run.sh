@@ -34,7 +34,7 @@ docker run --rm \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
        --volume="$HOME/.project_t:/home/user/.project_t:rw" \
        --volume="${DATASET_DIR}:/workspace/target_data:rw" \
-       ${TTY_OPT} train-object-detection-from-images 'python -- generate_data.py --from-images-dir /workspace/target_data'
+       ${TTY_OPT} train-object-detection-from-images 'python -- generate_data.py --from-images-dir /workspace/target_data --compress-annotation-data'
 
 message 32 "Done generating model file for pytorch object detection"
 message 32 " - ${DATASET_DIR}/generated_data/yolov7-seg-coco/weights/best.pt"

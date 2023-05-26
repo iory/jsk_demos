@@ -105,7 +105,15 @@ if __name__ == '__main__':
         ssh_target, '{}/generated_data/preprocessing'.format(source_image_dir_in_remote),
         saved_rembg_dir_name)
     run_command(rsync_image_command, shell=True)
+
+    saved_annotation_filename = '{}-{}-generated_data.tar.gz'.format(osp.basename(source_image_dir), date)
+    rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} ./{}'.format(
+        proxy_command,
+        ssh_target, '{}/generated_data/generated_data.tar.gz'.format(source_image_dir_in_remote),
+        saved_annotation_filename)
+    run_command(rsync_image_command, shell=True)
     print(Colors.green + "Done copying model file for pytorch object detection" + Colors.reset)
     print(Colors.green + " - {}".format('best-{}.pt'.format(date)) + Colors.reset)
     print(Colors.green + " - {}".format('from_images_dir-{}.yaml'.format(date)) + Colors.reset)
     print(Colors.green + " - {}".format(saved_rembg_dir_name) + Colors.reset)
+    print(Colors.green + " - {}".format(saved_annotation_filename) + Colors.reset)

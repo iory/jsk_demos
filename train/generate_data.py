@@ -12,6 +12,17 @@ from labelme_utils import labelme2coco
 from labelme_utils import get_class_names_from_labelme_jsons
 import subprocess
 from data import download_yolo7_segmentation
+import six
+
+
+def run_command(cmd, *args, **kwargs):
+    if kwargs.pop("capture_output", False):
+        kwargs["stdout"] = subprocess.PIPE
+        kwargs["stderr"] = subprocess.PIPE
+    if six.PY2:
+        return subprocess.check_call(cmd, *args, **kwargs)
+    else:
+        return subprocess.run(cmd, *args, **kwargs)
 
 
 if __name__ == '__main__':
@@ -25,6 +36,7 @@ if __name__ == '__main__':
     parser.add_argument('--max-scale', default=None)
     parser.add_argument('--target-image-dir', type=str)
     parser.add_argument('--from-images-dir', type=str, default='')
+    parser.add_argument('--compress-annotation-data', action='store_true')
     args = parser.parse_args()
 
     start_time = datetime.datetime.now()
@@ -126,6 +138,12 @@ names: [{}]""".format(outpath_base, outpath_base, outpath_base,
                    ", ".join(map(lambda x: "'{}'".format(x), class_names))))
         f.write('\n')
 
+    if args.compress_annotation_data:
+        print('compress annotation data')
+        compress_cmd = 'find {} -maxdepth 1 -type f \\( -name "*.jpg" -o -name "*.json" \\) -print | tar -czvf {}/generated_data.tar.gz -T -'.format(
+            outpath_base / 'images',
+            outpath_base)
+        run_command(compress_cmd, shell=True, capture_output=True)
 
     if args.no_train is False:
         create_venv = False
