@@ -88,15 +88,18 @@ if __name__ == '__main__':
         shell=True)
 
     date = current_time_str()
+    saved_weight_name = '{}-{}.pt'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/yolov7-seg-coco/weights/best.pt'.format(source_image_dir_in_remote),
-        'best-{}.pt'.format(date))
+        saved_weight_name)
     run_command(rsync_image_command, shell=True)
+
+    saved_yaml_name = '{}-{}.yaml'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/from_images_dir.yaml'.format(source_image_dir_in_remote),
-        'from_images_dir-{}.yaml'.format(date))
+        saved_yaml_name)
     run_command(rsync_image_command, shell=True)
 
     saved_rembg_dir_name = '{}-{}-preprocessing'.format(osp.basename(source_image_dir), date)
@@ -113,7 +116,7 @@ if __name__ == '__main__':
         saved_annotation_filename)
     run_command(rsync_image_command, shell=True)
     print(Colors.green + "Done copying model file for pytorch object detection" + Colors.reset)
-    print(Colors.green + " - {}".format('best-{}.pt'.format(date)) + Colors.reset)
-    print(Colors.green + " - {}".format('from_images_dir-{}.yaml'.format(date)) + Colors.reset)
+    print(Colors.green + " - {}".format(saved_weight_name) + Colors.reset)
+    print(Colors.green + " - {}".format(saved_yaml_name) + Colors.reset)
     print(Colors.green + " - {}".format(saved_rembg_dir_name) + Colors.reset)
     print(Colors.green + " - {}".format(saved_annotation_filename) + Colors.reset)
