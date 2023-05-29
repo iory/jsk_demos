@@ -14,6 +14,9 @@ import subprocess
 from data import download_yolo7_segmentation
 import six
 
+from pybsc.image_utils import rotate
+from pybsc.image_utils import create_tile_image
+
 
 def run_command(cmd, *args, **kwargs):
     if kwargs.pop("capture_output", False):
@@ -23,6 +26,7 @@ def run_command(cmd, *args, **kwargs):
         return subprocess.check_call(cmd, *args, **kwargs)
     else:
         return subprocess.run(cmd, *args, **kwargs)
+
 
 
 if __name__ == '__main__':
@@ -60,17 +64,44 @@ if __name__ == '__main__':
         for pattern in patterns:
             paths.extend(list(sorted(Path(args.from_images_dir).glob('*/{}'.format(pattern)))))
         rembg_outpath = outpath_base / 'preprocessing' / 'rembg'
+        rembg_org_img_outpath = outpath_base / 'preprocessing' / 'rembg_org'
         target_names = []
         print('Remove background from images')
         for path in tqdm(paths):
             try:
                 makedirs(rembg_outpath / path.parent.name)
-                out_img = remove_background(cv2.imread(str(path)))
+                makedirs(rembg_org_img_outpath / path.parent.name)
+                org_img = cv2.imread(str(path))
+                out_img, (x1, y1, x2, y2), angle = remove_background(
+                    org_img.copy(), return_info=True)
                 cv2.imwrite(str(rembg_outpath / path.parent.name / path.with_suffix('.png').name), out_img)
+                cv2.imwrite(
+                    str(rembg_org_img_outpath / path.parent.name / path.with_suffix('.jpg').name),
+                    rotate(org_img[y1:y2, x1:x2], angle=angle))
                 target_names.append(path.parent.name)
             except Exception as e:
                 print(str(e))
         target_names = sorted(list(set(target_names)))
+        # create tile image for summary.
+        tile_image_outpath = outpath_base / 'preprocessing' / 'tile_rembg'
+        makedirs(tile_image_outpath)
+        for target_name in target_names:
+            tile_img = create_tile_image(
+                list((rembg_outpath / target_name).glob('*.png')),
+                num_tiles_per_row=5)
+            tile_img.save(tile_image_outpath / '{}.png'.format(target_name))
+
+        tile_org_and_rembg_outpath = outpath_base / 'preprocessing' / 'tile_org_and_rembg'
+        makedirs(tile_org_and_rembg_outpath)
+        for target_name in target_names:
+            tile_org_and_rembg_img_paths = []
+            for a in (rembg_outpath / target_name).glob('*.png'):
+                tile_org_and_rembg_img_paths.append(
+                    rembg_org_img_outpath / target_name / a.with_suffix('.jpg').name)
+                tile_org_and_rembg_img_paths.append(a)
+            tile_img = create_tile_image(
+                tile_org_and_rembg_img_paths, num_tiles_per_row=6)
+            tile_img.save(tile_org_and_rembg_outpath / '{}.png'.format(target_name))
         cmd = 'python generate.py --out {} -n {} --image-width 300 --target-names {}'.format(
             outpath_base, n,
             ' '.join(target_names))

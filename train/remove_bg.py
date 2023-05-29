@@ -49,7 +49,8 @@ def get_orientation(pts, img):
     return angle
 
 
-def remove_background(img, path_name=None):
+def remove_background(img, path_name=None,
+                      return_info=False):
     img = remove(img)
 
     kernel = np.ones((21, 21))
@@ -92,6 +93,8 @@ def remove_background(img, path_name=None):
         cv2.imwrite(str(path_name), hoge_img)
     angle = np.rad2deg(angle)
     img = rotate(img, angle=angle)
+    if return_info:
+        return img, (x1, y1, x2, y2), angle
     return img
 
 
