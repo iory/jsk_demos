@@ -8,6 +8,7 @@ import cv2
 import numpy as np
 from pybsc.image_utils import rotate
 from rembg import remove
+from skimage import measure
 
 
 def draw_axis(img, p_, q_, colour, scale):
@@ -50,14 +51,20 @@ def get_orientation(pts, img):
 
 
 def remove_background(img, path_name=None,
-                      return_info=False):
+                      return_info=False,
+                      kernel_size=5,
+                      iterations=4):
     img = remove(img)
 
-    kernel = np.ones((21, 21))
+    kernel = np.ones((kernel_size, kernel_size))
     mask = 255 * np.array(img[..., 3] > 0, dtype=np.uint8)
-    img_dil = cv2.erode(mask, kernel, iterations=10)
-    img_opening = cv2.dilate(img_dil, kernel, iterations=10)
-    y, x = np.where(img_opening > 0)
+    img_dil = cv2.erode(mask, kernel, iterations=iterations)
+    img_opening = cv2.dilate(img_dil, kernel, iterations=iterations)
+    labels = measure.label(img_opening, background=0)
+    mask_area = [np.sum(labels == i) for i in range(1, np.max(labels) + 1)]
+    largest_mask_label = np.argmax(mask_area) + 1
+    final_mask = (labels == largest_mask_label).astype(np.uint8) * 255
+    y, x = np.where(final_mask > 0)
 
     x1 = np.min(x)
     x2 = np.max(x)
@@ -67,10 +74,6 @@ def remove_background(img, path_name=None,
 
     mask_copy = ((img[..., 3] > 0).copy())
     mask_copy = 255 * np.array(mask_copy, dtype=np.uint8)
-
-    img_dil = cv2.erode(mask_copy, kernel, iterations=10)
-    img_opening = cv2.dilate(img_dil, kernel, iterations=10)
-    mask_copy = img_opening
 
     contours, _ = cv2.findContours(
         mask_copy, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
