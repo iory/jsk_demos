@@ -89,6 +89,7 @@ if __name__ == '__main__':
                 ssh_command, source_image_dir_in_remote),
             shell=True)
     except KeyboardInterrupt:
+        print(Colors.red + "[KeyboardInterrupt] Stop training script." + Colors.reset)
         run_command(
             '''{} 'bash --login -c "kill.sh"' '''.format(
                 ssh_command), shell=True)
