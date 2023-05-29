@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import sys
 import os.path as osp
 import subprocess
 import datetime
@@ -82,10 +83,16 @@ if __name__ == '__main__':
 
     source_image_dir_in_remote = osp.join(tmp_dir, osp.basename(source_image_dir))
 
-    run_command(
-        '''{} 'bash --login -c "run.sh {}"' '''.format(
-            ssh_command, source_image_dir_in_remote),
-        shell=True)
+    try:
+        run_command(
+            '''{} 'bash --login -c "run.sh {}"' '''.format(
+                ssh_command, source_image_dir_in_remote),
+            shell=True)
+    except KeyboardInterrupt:
+        run_command(
+            '''{} 'bash --login -c "kill.sh"' '''.format(
+                ssh_command), shell=True)
+        sys.exit(1)
 
     date = current_time_str()
     saved_weight_name = '{}-{}.pt'.format(osp.basename(source_image_dir), date)

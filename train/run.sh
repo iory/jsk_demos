@@ -28,7 +28,7 @@ docker run --rm \
        --userns=host \
        --gpus all \
        --shm-size=1g \
-       --name $USER-train-pytorch-object-detection-${DATASET_NAME}-$$ \
+       --name $USER-train-pytorch-object-detection \
        --env="DISPLAY" \
        --env="QT_X11_NO_MITSHM=1" \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
