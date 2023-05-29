@@ -3,6 +3,7 @@ import argparse
 import shutil
 import datetime
 import cv2
+import numpy as np
 from tqdm import tqdm
 from eos import run_many
 from eos import makedirs
@@ -65,19 +66,36 @@ if __name__ == '__main__':
             paths.extend(list(sorted(Path(args.from_images_dir).glob('*/{}'.format(pattern)))))
         rembg_outpath = outpath_base / 'preprocessing' / 'rembg'
         rembg_org_img_outpath = outpath_base / 'preprocessing' / 'rembg_org'
+        img_and_rembg_outpath = outpath_base / 'preprocessing' / 'img_and_rembg'
         target_names = []
         print('Remove background from images')
         for path in tqdm(paths):
             try:
                 makedirs(rembg_outpath / path.parent.name)
                 makedirs(rembg_org_img_outpath / path.parent.name)
+                makedirs(img_and_rembg_outpath / path.parent.name)
                 org_img = cv2.imread(str(path))
-                out_img, (x1, y1, x2, y2), angle = remove_background(
+                out_img, (x1, y1, x2, y2), angle, mask = remove_background(
                     org_img.copy(), return_info=True)
                 cv2.imwrite(str(rembg_outpath / path.parent.name / path.with_suffix('.png').name), out_img)
                 cv2.imwrite(
                     str(rembg_org_img_outpath / path.parent.name / path.with_suffix('.jpg').name),
                     rotate(org_img[y1:y2, x1:x2], angle=angle))
+
+                rembg_org_size_img = org_img.copy()
+                if len(mask.shape) == 2:
+                    mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
+                rembg_org_size_img[mask == 0] = 0
+                if rembg_org_size_img.shape[2] == 3:
+                    rgb_image_np = np.dstack([rembg_org_size_img, np.ones((rembg_org_size_img.shape[0], rembg_org_size_img.shape[1])) * 255])
+                else:
+                    rgb_image_np = rembg_org_size_img
+                if org_img.shape[2] == 3:
+                    concatenated_images = np.concatenate((np.dstack([org_img, np.ones((org_img.shape[0], org_img.shape[1])) * 255]), rgb_image_np), axis=1)
+                else:
+                    concatenated_images = np.concatenate((org_img, rgb_image_np), axis=1)
+                cv2.imwrite(str(img_and_rembg_outpath / path.parent.name / path.with_suffix('.png').name),
+                            concatenated_images)
                 target_names.append(path.parent.name)
             except Exception as e:
                 print(str(e))

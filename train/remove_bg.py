@@ -65,15 +65,15 @@ def remove_background(img, path_name=None,
     y2 = np.max(y)
     img = img[y1:y2, x1:x2]
 
-    mask = ((img[..., 3] > 0).copy())
-    mask = 255 * np.array(mask, dtype=np.uint8)
+    mask_copy = ((img[..., 3] > 0).copy())
+    mask_copy = 255 * np.array(mask_copy, dtype=np.uint8)
 
-    img_dil = cv2.erode(mask, kernel, iterations=10)
+    img_dil = cv2.erode(mask_copy, kernel, iterations=10)
     img_opening = cv2.dilate(img_dil, kernel, iterations=10)
-    mask = img_opening
+    mask_copy = img_opening
 
     contours, _ = cv2.findContours(
-        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        mask_copy, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
     areas = [cv2.contourArea(c) for i, c in enumerate(contours)]
     contour = contours[np.argmax(areas)]
@@ -94,7 +94,7 @@ def remove_background(img, path_name=None,
     angle = np.rad2deg(angle)
     img = rotate(img, angle=angle)
     if return_info:
-        return img, (x1, y1, x2, y2), angle
+        return img, (x1, y1, x2, y2), angle, mask
     return img
 
 
