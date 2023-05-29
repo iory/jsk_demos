@@ -17,6 +17,8 @@ import six
 
 from pybsc.image_utils import rotate
 from pybsc.image_utils import create_tile_image
+from pybsc.image_utils import apply_mask
+from pybsc.image_utils import add_alpha_channel
 
 
 def run_command(cmd, *args, **kwargs):
@@ -83,17 +85,12 @@ if __name__ == '__main__':
                     rotate(org_img[y1:y2, x1:x2], angle=angle))
 
                 rembg_org_size_img = org_img.copy()
-                if len(mask.shape) == 2:
-                    mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
-                rembg_org_size_img[mask == 0] = 0
-                if rembg_org_size_img.shape[2] == 3:
-                    rgb_image_np = np.dstack([rembg_org_size_img, np.ones((rembg_org_size_img.shape[0], rembg_org_size_img.shape[1])) * 255])
-                else:
-                    rgb_image_np = rembg_org_size_img
+                rembg_org_size_img = apply_mask(rembg_org_size_img, mask)
                 if org_img.shape[2] == 3:
-                    concatenated_images = np.concatenate((np.dstack([org_img, np.ones((org_img.shape[0], org_img.shape[1])) * 255]), rgb_image_np), axis=1)
+                    concatenated_images = np.concatenate(
+                        (add_alpha_channel(org_img, alpha=255), rembg_org_size_img), axis=1)
                 else:
-                    concatenated_images = np.concatenate((org_img, rgb_image_np), axis=1)
+                    concatenated_images = np.concatenate((org_img, rembg_org_size_img), axis=1)
                 cv2.imwrite(str(img_and_rembg_outpath / path.parent.name / path.with_suffix('.png').name),
                             concatenated_images)
                 target_names.append(path.parent.name)
