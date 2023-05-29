@@ -83,6 +83,13 @@ if __name__ == '__main__':
 
     source_image_dir_in_remote = osp.join(tmp_dir, osp.basename(source_image_dir))
 
+    n_proc = run_command(
+        '''{} 'bash --login -c "check.sh"' '''.format(
+            ssh_command), shell=True, capture_output=True).stdout
+    if int(n_proc) > 0:
+        print(Colors.red + "Can't run it now because another training process is already running. Please wait for a while and execute." + Colors.reset)
+        sys.exit(1)
+
     try:
         run_command(
             '''{} 'bash --login -c "run.sh {}"' '''.format(
