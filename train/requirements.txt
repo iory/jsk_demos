@@ -9,7 +9,7 @@ labelme
 moviepy
 numpy<=1.23.5
 pandas
-pybsc>=0.1.43
+pybsc>=0.1.44
 pycocotools
 rectpack
 rembg

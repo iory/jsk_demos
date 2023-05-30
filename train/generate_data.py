@@ -19,6 +19,8 @@ from pybsc.image_utils import rotate
 from pybsc.image_utils import create_tile_image
 from pybsc.image_utils import apply_mask
 from pybsc.image_utils import add_alpha_channel
+from pybsc.image_utils import imread
+
 
 
 def run_command(cmd, *args, **kwargs):
@@ -76,7 +78,7 @@ if __name__ == '__main__':
                 makedirs(rembg_outpath / path.parent.name)
                 makedirs(rembg_org_img_outpath / path.parent.name)
                 makedirs(img_and_rembg_outpath / path.parent.name)
-                org_img = cv2.imread(str(path))
+                org_img = imread(str(path), color_type='bgra', clear_alpha=True)
                 out_img, (x1, y1, x2, y2), angle, mask = remove_background(
                     org_img.copy(), return_info=True)
                 cv2.imwrite(str(rembg_outpath / path.parent.name / path.with_suffix('.png').name), out_img)
@@ -85,7 +87,7 @@ if __name__ == '__main__':
                     rotate(org_img[y1:y2, x1:x2], angle=angle))
 
                 rembg_org_size_img = org_img.copy()
-                rembg_org_size_img = apply_mask(rembg_org_size_img, mask)
+                rembg_org_size_img = apply_mask(rembg_org_size_img, mask, use_alpha=True)
                 if org_img.shape[2] == 3:
                     concatenated_images = np.concatenate(
                         (add_alpha_channel(org_img, alpha=255), rembg_org_size_img), axis=1)
