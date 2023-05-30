@@ -93,7 +93,7 @@ def random_binpacking(pil_bg_img, img_paths, low=20, high=30, p=None,
             continue
 
         if np.random.uniform(0, 1.0) > 0.5:
-            aug = iaa.PerspectiveTransform(scale=(0.1, 0.15))
+            aug = iaa.PerspectiveTransform(scale=(0.1, 0.10), keep_size=False)
             _aug = aug._to_deterministic()
             pil_img = _aug.augment_image(np.array(pil_img, dtype=np.uint8))
             pil_img = Image.fromarray(pil_img)
