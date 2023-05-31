@@ -6,20 +6,15 @@ from eos import make_fancy_output_dir
 from eos import makedirs
 import numpy as np
 from PIL import Image
-from pybsc.imggen import generate_synthetic_texture
 from tqdm import tqdm
 
 from aug import random_binpacking
 from aug import random_crop_with_size
 from data import download_bg_dataset
 from data import download_items
-from labelme_utils import create_json
 from labelme_utils import create_instance_mask_json
-from labelme_utils import convert_coco2yolo
-from labelme_utils import labelme2coco
-from top_n_color import take_random_n_color
-
 from targets_info import *
+from top_n_color import take_random_n_color
 
 
 if __name__ == '__main__':

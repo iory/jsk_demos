@@ -1,26 +1,26 @@
-import multiprocessing
 import argparse
-import shutil
 import datetime
-import cv2
-import numpy as np
-from tqdm import tqdm
-from eos import run_many
-from eos import makedirs
+import multiprocessing
 from pathlib import Path
-from labelme_utils import convert_coco2yolo
-from labelme_utils import labelme2coco
-from labelme_utils import get_class_names_from_labelme_jsons
+import shutil
 import subprocess
-from data import download_yolo7_segmentation
-import six
 
-from pybsc.image_utils import rotate
-from pybsc.image_utils import create_tile_image
-from pybsc.image_utils import apply_mask
+import cv2
+from eos import makedirs
+from eos import run_many
+import numpy as np
 from pybsc.image_utils import add_alpha_channel
+from pybsc.image_utils import apply_mask
+from pybsc.image_utils import create_tile_image
 from pybsc.image_utils import imread
+from pybsc.image_utils import rotate
+import six
+from tqdm import tqdm
 
+from data import download_yolo7_segmentation
+from labelme_utils import convert_coco2yolo
+from labelme_utils import get_class_names_from_labelme_jsons
+from labelme_utils import labelme2coco
 
 
 def run_command(cmd, *args, **kwargs):

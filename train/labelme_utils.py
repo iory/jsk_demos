@@ -1,29 +1,22 @@
 import collections
+from collections import defaultdict
+import glob
+import json
+import os
 import os.path as osp
 from pathlib import Path
 import shutil
+import subprocess
 from typing import Dict
 from typing import List
-from collections import defaultdict
-import subprocess
 
-import glob
-import os
-import os.path as osp
-import sys
-
-import imgviz
-import numpy as np
-
-import labelme
-
-import json
 from eos import makedirs
-from eos import make_fancy_output_dir
 import funcy
 import imantics
+import imgviz
 from joblib import delayed
 from joblib import Parallel
+import labelme
 import numpy as np
 from PIL import Image
 from pybsc import load_json

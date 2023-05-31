@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import argparse
-import sys
+import datetime
 import os.path as osp
 import subprocess
-import datetime
+import sys
+
 import six
 
 

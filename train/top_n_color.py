@@ -1,12 +1,11 @@
-import random
 from pathlib import Path
+import random
 
 import numpy as np
-import PIL
-import scipy
-import scipy.cluster
 from pybsc import load_json
 from pybsc import save_json
+import scipy
+import scipy.cluster
 
 from aug import cached_imread
 
