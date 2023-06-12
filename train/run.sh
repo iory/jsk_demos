@@ -18,7 +18,7 @@ echo "Target Dir: ${DATASET_DIR}"
 
 batchsize=16
 epoch=10
-while getopts "b:" opt; do
+while getopts "b:e:" opt; do
     case $opt in
         b)
             batchsize=$OPTARG
@@ -33,7 +33,6 @@ while getopts "b:" opt; do
     esac
 done
 
-# batchsizeの値を表示する
 echo "Batch size: $batchsize"
 echo "Number of epochs: $epoch"
 
@@ -44,7 +43,7 @@ else
 fi
 
 
-cmd='python -- generate_data.py --from-images-dir /workspace/target_data -b $batchsize --epoch $epoch --compress-annotation-data'
+cmd="python generate_data.py --from-images-dir /workspace/target_data -b ${batchsize} --epoch ${epoch} --compress-annotation-data"
 docker run --rm \
        -u "$(id -u $USER):$(id -g $USER)" \
        --userns=host \

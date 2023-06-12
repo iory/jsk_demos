@@ -94,6 +94,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Image training Script")
     parser.add_argument('-u', '--username', type=str, default="thk")
     parser.add_argument("--ip", type=str, default='133.11.216.13', help="IP Address")
+    parser.add_argument("--epoch", type=int, default=10, help="Training epoch")
     parser.add_argument(
         "-i", '--identity-file', type=str,
         default=osp.join(osp.expanduser('~'), '.ssh', 'id_rsa'), help="SSH Identify File")
@@ -140,8 +141,8 @@ if __name__ == '__main__':
 
     try:
         run_command(
-            '''{} 'bash --login -c "run.sh {}"' '''.format(
-                ssh_command, source_image_dir_in_remote),
+            '''{} 'bash --login -c "run.sh {} -e {}"' '''.format(
+                ssh_command, source_image_dir_in_remote, args.epoch),
             shell=True)
     except KeyboardInterrupt:
         print(Colors.red + "[KeyboardInterrupt] Stop training script." + Colors.reset)
@@ -154,8 +155,8 @@ if __name__ == '__main__':
     if len(args.output) > 0:
         saved_weight_name = '{}.pt'.format(args.output)
     else:
-        saved_weight_name = '{}-{}.pt'.format(osp.basename(source_image_dir), date)
-    rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
+        saved_weight_name = './{}-{}.pt'.format(osp.basename(source_image_dir), date)
+    rsync_image_command = 'rsync -e "{}" --verbose {}:{} {}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/yolov7-seg-coco/weights/best.pt'.format(source_image_dir_in_remote),
         saved_weight_name)
@@ -164,8 +165,8 @@ if __name__ == '__main__':
     if len(args.output) > 0:
         saved_yaml_name = '{}.yaml'.format(args.output)
     else:
-        saved_yaml_name = '{}-{}.yaml'.format(osp.basename(source_image_dir), date)
-    rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
+        saved_yaml_name = './{}-{}.yaml'.format(osp.basename(source_image_dir), date)
+    rsync_image_command = 'rsync -e "{}" --verbose {}:{} {}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/from_images_dir.yaml'.format(source_image_dir_in_remote),
         saved_yaml_name)
@@ -174,8 +175,8 @@ if __name__ == '__main__':
     if len(args.output) > 0:
         saved_rembg_dir_name = '{}'.format(args.output)
     else:
-        saved_rembg_dir_name = '{}-{}-preprocessing'.format(osp.basename(source_image_dir), date)
-    rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} ./{}'.format(
+        saved_rembg_dir_name = './{}-{}-preprocessing'.format(osp.basename(source_image_dir), date)
+    rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} {}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/preprocessing'.format(source_image_dir_in_remote),
         saved_rembg_dir_name)
@@ -184,8 +185,8 @@ if __name__ == '__main__':
     if len(args.output) > 0:
         saved_annotation_filename = '{}.tar.gz'.format(args.output)
     else:
-        saved_annotation_filename = '{}-{}-generated_data.tar.gz'.format(osp.basename(source_image_dir), date)
-    rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} ./{}'.format(
+        saved_annotation_filename = './{}-{}-generated_data.tar.gz'.format(osp.basename(source_image_dir), date)
+    rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} {}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/generated_data.tar.gz'.format(source_image_dir_in_remote),
         saved_annotation_filename)

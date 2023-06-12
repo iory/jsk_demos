@@ -51,6 +51,9 @@ class name information (`<IMAGE_DIRECTORY_NAME>-%Y-%m-%d-%H-%M-%S-%f.yaml`),
 removed background images (`<IMAGE_DIRECTORY_NAME>-%Y-%m-%d-%H-%M-%S-%f-preprocessing`)
 and generated data (`<IMAGE_DIRECTORY_NAME>-%Y-%m-%d-%H-%M-%S-%f-generated_data.tar.gz`) will be copied.
 
+When you specify `--output` or `-o`, you can designate the name of the file for output.
+This option allows you to control where the results of your command are stored.
+Instead of outputting the results to the console, the results will be saved in the file you specify.
 
 ## Execution in Local Environment (optional)
 
