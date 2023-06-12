@@ -2,11 +2,45 @@
 
 import argparse
 import datetime
+import os
 import os.path as osp
 import subprocess
 import sys
 
 import six
+
+
+PY3 = (sys.version_info[0] == 3)
+PY2 = not PY3
+
+
+def makedirs(name, mode=0o777, exist_ok=True):
+    """An wrapper of os.makedirs that accepts exist_ok.
+
+    Parameters
+    ----------
+    name : str
+        path of directory
+    exist_ok : bool
+        if True, accepts the existence of the directory.
+
+    Examples
+    --------
+    >>> from eos import makedirs
+    >>> makedirs('/tmp/result_directory')
+    """
+    name = str(name)
+    if PY2:
+        try:
+            os.makedirs(name, mode)
+        except OSError:
+            if not (exist_ok and os.path.isdir(name)):
+                raise OSError(
+                    'Directory {} already exists. '
+                    'Set exist_ok = True if the directory can exist.'
+                    .format(name))
+    else:
+        os.makedirs(name, mode, exist_ok=exist_ok)
 
 
 class Colors(object):
@@ -63,15 +97,28 @@ if __name__ == '__main__':
     parser.add_argument(
         "-i", '--identity-file', type=str,
         default=osp.join(osp.expanduser('~'), '.ssh', 'id_rsa'), help="SSH Identify File")
+    parser.add_argument(
+        "-o", '--output', type=str,
+        default='', help="Output prefix filename.")
     parser.add_argument("image_directory", type=str, help="Image Directory")
     args = parser.parse_args()
-    print(args.identity_file)
+
+    if len(args.output) > 0:
+        args.output = args.output.rstrip('/')
+        makedirs(osp.dirname(args.output))
 
     proxy_command = "ssh -i {} -o ProxyCommand='ssh -i {} -W %h:%p {}@dlbox2.jsk.imi.i.u-tokyo.ac.jp'".format(
         args.identity_file, args.identity_file, args.username)
     ssh_target = '{}@{}'.format(args.username, args.ip)
     ssh_command = "{} -i {} {}@{}".format(proxy_command, args.identity_file,
                                           args.username, args.ip)
+
+    n_proc = run_command(
+        '''{} 'bash --login -c "check.sh"' '''.format(
+            ssh_command), shell=True, capture_output=True).stdout
+    if int(n_proc) > 0:
+        print(Colors.red + "Can't run it now because another training process is already running. Please wait for a while and execute." + Colors.reset)
+        sys.exit(1)
 
     tmp_dir = osp.join('/tmp', 'project-t', '{}'.format(current_time_str()))
     a = run_command('{} mkdir -p {}'.format(ssh_command, tmp_dir), shell=True)
@@ -104,28 +151,40 @@ if __name__ == '__main__':
         sys.exit(1)
 
     date = current_time_str()
-    saved_weight_name = '{}-{}.pt'.format(osp.basename(source_image_dir), date)
+    if len(args.output) > 0:
+        saved_weight_name = '{}.pt'.format(args.output)
+    else:
+        saved_weight_name = '{}-{}.pt'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/yolov7-seg-coco/weights/best.pt'.format(source_image_dir_in_remote),
         saved_weight_name)
     run_command(rsync_image_command, shell=True)
 
-    saved_yaml_name = '{}-{}.yaml'.format(osp.basename(source_image_dir), date)
+    if len(args.output) > 0:
+        saved_yaml_name = '{}.yaml'.format(args.output)
+    else:
+        saved_yaml_name = '{}-{}.yaml'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/from_images_dir.yaml'.format(source_image_dir_in_remote),
         saved_yaml_name)
     run_command(rsync_image_command, shell=True)
 
-    saved_rembg_dir_name = '{}-{}-preprocessing'.format(osp.basename(source_image_dir), date)
+    if len(args.output) > 0:
+        saved_rembg_dir_name = '{}'.format(args.output)
+    else:
+        saved_rembg_dir_name = '{}-{}-preprocessing'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/preprocessing'.format(source_image_dir_in_remote),
         saved_rembg_dir_name)
     run_command(rsync_image_command, shell=True)
 
-    saved_annotation_filename = '{}-{}-generated_data.tar.gz'.format(osp.basename(source_image_dir), date)
+    if len(args.output) > 0:
+        saved_annotation_filename = '{}.tar.gz'.format(args.output)
+    else:
+        saved_annotation_filename = '{}-{}-generated_data.tar.gz'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} ./{}'.format(
         proxy_command,
         ssh_target, '{}/generated_data/generated_data.tar.gz'.format(source_image_dir_in_remote),

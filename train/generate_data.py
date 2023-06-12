@@ -38,6 +38,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='data generator')
     parser.add_argument('-n', default=1000, type=int)
     parser.add_argument('-b', default=16, type=int)
+    parser.add_argument('--epoch', default=10, type=int)
     parser.add_argument('--target', default='fruit', type=str)
     parser.add_argument('-t', '--target-names', nargs='+')
     parser.add_argument('--no-train', action='store_true')
@@ -199,8 +200,10 @@ names: [{}]""".format(outpath_base, outpath_base, outpath_base,
         python_exe = 'python'
         if create_venv:
             python_exe = "{}/python".format(yolo7_dir)
-        train_cmd = '{} {}/segment/train.py --noval --noplots --data {}/{}.yaml --batch {} --weights "{}/yolov7-seg.pt" --cfg {}/models/segment/yolov7-seg.yaml --epochs 10 --name yolov7-seg-coco --img 300 --hyp hyp.scratch-high.yaml --project {} --noval --nosave'.format(
-            python_exe, yolo7_dir, outpath_base, target, batch_size, yolo7_dir, yolo7_dir, outpath_base)
+        train_cmd = '{} {}/segment/train.py --noval --noplots --data {}/{}.yaml --batch {} --weights "{}/yolov7-seg.pt" --cfg {}/models/segment/yolov7-seg.yaml --epochs {} --name yolov7-seg-coco --img 300 --hyp hyp.scratch-high.yaml --project {} --noval --nosave'.format(
+            python_exe, yolo7_dir, outpath_base, target, batch_size, yolo7_dir, yolo7_dir,
+            args.epoch,
+            outpath_base)
         subprocess.call(train_cmd, shell=True)
     end_time = datetime.datetime.now()
     print(end_time - start_time)

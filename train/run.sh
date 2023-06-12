@@ -16,6 +16,27 @@ if [ -z "${DATASET_DIR}" ]; then
 fi
 echo "Target Dir: ${DATASET_DIR}"
 
+batchsize=16
+epoch=10
+while getopts "b:" opt; do
+    case $opt in
+        b)
+            batchsize=$OPTARG
+            ;;
+        e)
+            epoch=$OPTARG
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# batchsizeの値を表示する
+echo "Batch size: $batchsize"
+echo "Number of epochs: $epoch"
+
 if [ -t 1 ]; then
     TTY_OPT='-ti'
 else
@@ -23,6 +44,7 @@ else
 fi
 
 
+cmd='python -- generate_data.py --from-images-dir /workspace/target_data -b $batchsize --epoch $epoch --compress-annotation-data'
 docker run --rm \
        -u "$(id -u $USER):$(id -g $USER)" \
        --userns=host \
@@ -34,7 +56,7 @@ docker run --rm \
        --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
        --volume="$HOME/.project_t:/home/user/.project_t:rw" \
        --volume="${DATASET_DIR}:/workspace/target_data:rw" \
-       ${TTY_OPT} train-object-detection-from-images 'python -- generate_data.py --from-images-dir /workspace/target_data --compress-annotation-data'
+       ${TTY_OPT} train-object-detection-from-images $cmd
 
 message 32 "Done generating model file for pytorch object detection"
 message 32 " - ${DATASET_DIR}/generated_data/yolov7-seg-coco/weights/best.pt"
