@@ -55,6 +55,20 @@ When you specify `--output` or `-o`, you can designate the name of the file for 
 This option allows you to control where the results of your command are stored.
 Instead of outputting the results to the console, the results will be saved in the file you specify.
 
+### File Transfer to Remote PC
+
+If you want to place a trained model directly on a remote PC, such as a robot,
+you can transfer and copy the file to that PC by specifying the `--output-username` and `--output-ip` options.
+The file will be transferred with the name given by the output prefix (specified with `--output`) and will have a `.pt` and `.yaml` extension.
+
+### Example
+
+To transfer a trained model file named `model.pt` to a remote robot with the IP address `192.168.0.100` and username `robotuser`, use the following command:
+
+```
+python -- train.py -i ~/.ssh/id_rsa_target yamagata_items --output-username robotuser --output-ip 192.168.0.100 --output model
+```
+
 ## Execution in Local Environment (optional)
 
 If you wish to execute the code in your local environment, please follow the instructions below:

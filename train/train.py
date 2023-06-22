@@ -6,6 +6,7 @@ import os
 import os.path as osp
 import subprocess
 import sys
+import tempfile
 
 import six
 
@@ -93,8 +94,16 @@ def run_command(cmd, *args, **kwargs):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Image training Script")
     parser.add_argument('-u', '--username', type=str, default="thk")
+    parser.add_argument('-bu', '--bastion-username', type=str, default="thk")
+    parser.add_argument('-bip', '--bastion-ip', type=str, default="dlbox2.jsk.imi.i.u-tokyo.ac.jp")
+    parser.add_argument('-oip', '--output-ip', type=str, default="",
+                        help='Specifies the IP address of the remote PC. '
+                        'This option is required if you wish to transfer the file.')
+    parser.add_argument('-ou', '--output-username', type=str, default="",
+                        help='Specifies the username for the remote PC. '
+                        'This option is required if you wish to transfer the file.')
     parser.add_argument("--ip", type=str, default='133.11.216.13', help="IP Address")
-    parser.add_argument("--epoch", type=int, default=10, help="Training epoch")
+    parser.add_argument('-e', "--epoch", type=int, default=10, help="Training epoch")
     parser.add_argument(
         "-i", '--identity-file', type=str,
         default=osp.join(osp.expanduser('~'), '.ssh', 'id_rsa'), help="SSH Identify File")
@@ -104,15 +113,23 @@ if __name__ == '__main__':
     parser.add_argument("image_directory", type=str, help="Image Directory")
     args = parser.parse_args()
 
-    if len(args.output) > 0:
-        args.output = args.output.rstrip('/')
-        makedirs(osp.dirname(args.output))
-
-    proxy_command = "ssh -i {} -o ProxyCommand='ssh -i {} -W %h:%p {}@dlbox2.jsk.imi.i.u-tokyo.ac.jp'".format(
-        args.identity_file, args.identity_file, args.username)
+    proxy_command = "ssh -i {} -o ProxyCommand='ssh -i {} -W %h:%p {}@{}'".format(
+        args.identity_file, args.identity_file, args.bastion_username,
+        args.bastion_ip)
     ssh_target = '{}@{}'.format(args.username, args.ip)
     ssh_command = "{} -i {} {}@{}".format(proxy_command, args.identity_file,
                                           args.username, args.ip)
+
+    output_to_remote = False
+    if len(args.output_ip) > 0 and len(args.output_username) > 0:
+        tmp_output = tempfile.TemporaryDirectory()
+        makedirs(osp.join(tmp_output.name, osp.dirname(args.output)))
+        output_to_remote_filename_pairs = []
+        output_to_remote = True
+
+    if output_to_remote is False and len(args.output) > 0:
+        args.output = args.output.rstrip('/')
+        makedirs(osp.dirname(args.output))
 
     n_proc = run_command(
         '''{} 'bash --login -c "check.sh"' '''.format(
@@ -129,7 +146,6 @@ if __name__ == '__main__':
         proxy_command,
         source_image_dir, ssh_target, tmp_dir)
     run_command(rsync_image_command, shell=True)
-
     source_image_dir_in_remote = osp.join(tmp_dir, osp.basename(source_image_dir))
 
     n_proc = run_command(
@@ -153,7 +169,12 @@ if __name__ == '__main__':
 
     date = current_time_str()
     if len(args.output) > 0:
-        saved_weight_name = '{}.pt'.format(args.output)
+        if output_to_remote:
+            saved_weight_name = osp.join(tmp_output.name, '{}.pt'.format(args.output))
+            output_to_remote_filename_pairs.append(
+                (saved_weight_name, '{}.pt'.format(args.output)))
+        else:
+            saved_weight_name = '{}.pt'.format(args.output)
     else:
         saved_weight_name = './{}-{}.pt'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} {}'.format(
@@ -163,7 +184,12 @@ if __name__ == '__main__':
     run_command(rsync_image_command, shell=True)
 
     if len(args.output) > 0:
-        saved_yaml_name = '{}.yaml'.format(args.output)
+        if output_to_remote:
+            saved_yaml_name = osp.join(tmp_output.name, '{}.yaml'.format(args.output))
+            output_to_remote_filename_pairs.append(
+                (saved_yaml_name, '{}.yaml'.format(args.output)))
+        else:
+            saved_yaml_name = '{}.yaml'.format(args.output)
     else:
         saved_yaml_name = './{}-{}.yaml'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} {}'.format(
@@ -173,7 +199,10 @@ if __name__ == '__main__':
     run_command(rsync_image_command, shell=True)
 
     if len(args.output) > 0:
-        saved_rembg_dir_name = '{}'.format(args.output)
+        if output_to_remote:
+            saved_rembg_dir_name = osp.join(tmp_output.name, '{}'.format(args.output))
+        else:
+            saved_rembg_dir_name = '{}'.format(args.output)
     else:
         saved_rembg_dir_name = './{}-{}-preprocessing'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} {}'.format(
@@ -183,7 +212,10 @@ if __name__ == '__main__':
     run_command(rsync_image_command, shell=True)
 
     if len(args.output) > 0:
-        saved_annotation_filename = '{}.tar.gz'.format(args.output)
+        if output_to_remote:
+            saved_annotation_filename = osp.join(tmp_output.name, '{}.tar.gz'.format(args.output))
+        else:
+            saved_annotation_filename = '{}.tar.gz'.format(args.output)
     else:
         saved_annotation_filename = './{}-{}-generated_data.tar.gz'.format(osp.basename(source_image_dir), date)
     rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} {}'.format(
@@ -196,3 +228,19 @@ if __name__ == '__main__':
     print(Colors.green + " - {}".format(saved_yaml_name) + Colors.reset)
     print(Colors.green + " - {}".format(saved_rembg_dir_name) + Colors.reset)
     print(Colors.green + " - {}".format(saved_annotation_filename) + Colors.reset)
+
+    if len(args.output_ip) > 0 and len(args.output_username) > 0:
+        out_ssh_target = "{}@{}".format(args.output_username, args.output_ip)
+
+        output_ssh_command = "ssh {}@{} 'mkdir -p {}'".format(
+            args.output_username, args.output_ip, osp.dirname(args.output.rstrip('/')))
+        run_command(output_ssh_command, shell=True)
+        dsts = []
+        for frm, dst in output_to_remote_filename_pairs:
+            rsync_file_command = 'rsync --verbose {} {}:{}'.format(
+                frm, out_ssh_target, dst)
+            run_command(rsync_file_command, shell=True)
+            dsts.append(dst)
+        print(Colors.green + "Done copying model file for pytorch object detection to remote PC" + Colors.reset)
+        for dst in dsts:
+            print(Colors.green + " - {}".format(dst) + Colors.reset)
