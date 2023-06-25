@@ -53,13 +53,38 @@ def get_orientation(pts, img):
 def remove_background(img, path_name=None,
                       return_info=False,
                       kernel_size=5,
-                      iterations=4):
+                      iterations=4,
+                      debug=False):
+    if debug is True:
+        from pathlib import Path
+        from eos import make_fancy_output_dir
+        from pybsc.image_utils import apply_mask
+        output_path = Path(make_fancy_output_dir('./remove_bg_debug', no_save=True))
+        debug_prefix = 1
+
     img = remove(img)
+
+    if debug is True:
+        cv2.imwrite(str(output_path / '{}-remove-bg.png'.format(debug_prefix)),
+                    img)
+        debug_prefix += 1
 
     kernel = np.ones((kernel_size, kernel_size))
     mask = 255 * np.array(img[..., 3] > 0, dtype=np.uint8)
     img_dil = cv2.erode(mask, kernel, iterations=iterations)
+
+    if debug is True:
+        cv2.imwrite(str(output_path / '{}-erode.png'.format(debug_prefix)),
+                    apply_mask(img, img_dil))
+        debug_prefix += 1
+
     img_opening = cv2.dilate(img_dil, kernel, iterations=iterations)
+
+    if debug is True:
+        cv2.imwrite(str(output_path / '{}-dilate.png'.format(debug_prefix)),
+                    apply_mask(img, img_opening))
+        debug_prefix += 1
+
     labels = measure.label(img_opening, background=0)
     mask_area = [np.sum(labels == i) for i in range(1, np.max(labels) + 1)]
     largest_mask_label = np.argmax(mask_area) + 1
@@ -92,10 +117,12 @@ def remove_background(img, path_name=None,
         int(np.argmax(areas)), (0, 0, 255), 3)
     angle = get_orientation(contour, hoge_img)
     angle = get_orientation(box.reshape(-1, 1, 2), hoge_img)
-    if path_name is not None:
-        cv2.imwrite(str(path_name), hoge_img)
     angle = np.rad2deg(angle)
     img = rotate(img, angle=angle)
+    if debug is True:
+        cv2.imwrite(str(output_path / '{}-rotated.png'.format(debug_prefix)),
+                    img)
+        debug_prefix += 1
     if return_info:
         return img, (x1, y1, x2, y2), angle, mask
     return img
@@ -110,6 +137,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='remove bg')
     parser.add_argument('targetpath', type=str)
+    parser.add_argument('--debug', action='store_true')
     args = parser.parse_args()
 
 
@@ -121,7 +149,8 @@ if __name__ == '__main__':
         print(path.name)
         try:
             makedirs(outpath / path.parent.name)
-            out_img = remove_background(cv2.imread(str(path)))
+            out_img = remove_background(cv2.imread(str(path)),
+                                        debug=args.debug)
 
             cv2.imwrite(str(outpath / path.parent.name / path.with_suffix('.png').name), out_img)
         except Exception as e:
