@@ -20,6 +20,7 @@ RUN echo "${USER_NAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${USER_NAME}
 RUN chmod u+s /usr/sbin/useradd \
     && chmod u+s /usr/sbin/groupadd
 
+RUN apt update && apt install -y libxml2-dev libxslt-dev python-dev
 COPY *.py /workspace/
 COPY requirements.txt /workspace/requirements.txt
 RUN pip install -U pip \
