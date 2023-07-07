@@ -1,5 +1,5 @@
-ARG PYTORCH="1.13.1"
-ARG CUDA="11.6"
+ARG PYTORCH="2.0.1"
+ARG CUDA="11.7"
 ARG CUDNN="8"
 
 FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
@@ -12,6 +12,10 @@ RUN if [ -e "/etc/apt/sources.list.d/cuda.list" ]; then \
 RUN if [ -e "/etc/apt/sources.list.d/nvidia-ml.list" ]; then \
         mv /etc/apt/sources.list.d/nvidia-ml.list /etc/apt/sources.list.d/nvidia-ml.list.save; \
     fi
+
+ENV TZ=Asia/Tokyo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN apt update && apt install -y sudo curl software-properties-common \
     libgl1-mesa-dev \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
