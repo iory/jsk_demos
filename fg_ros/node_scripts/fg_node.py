@@ -18,6 +18,7 @@ import rospy
 import sensor_msgs.msg
 import torch
 import torch.backends.cudnn as cudnn
+import torch.nn.functional as F
 
 from fg_ros.cfg import InstanceSegmentationConfig as Config
 
@@ -147,6 +148,7 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
         encoding = self.encoding
         im = bridge.imgmsg_to_cv2(
             msg, desired_encoding='bgr8')
+        org_h, org_w = im.shape[0], im.shape[1]
         model = self.model
         imgsz = self.imgsz
         device = self.device
@@ -184,6 +186,10 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
         if len(det):
             masks = process_mask(
                 proto[0], det[:, 6:], det[:, :4], im.shape[2:], upsample=True)  # HWC
+            masks = masks.unsqueeze(1)  # shape becomes (R, 1, H, W)
+            resized_masks = F.interpolate(masks, size=(org_h, org_w), mode='nearest')
+            masks = resized_masks.squeeze(1)
+
             _, H, W = masks.shape
             mask_indices = np.array(
                 np.arange(H * W).reshape(H, W), dtype=np.int32)
