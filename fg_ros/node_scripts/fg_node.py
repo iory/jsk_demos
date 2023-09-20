@@ -24,7 +24,7 @@ from fg_ros.cfg import InstanceSegmentationConfig as Config
 
 ROOT = Path(__file__).resolve().parent / 'fg_libs' / 'yolo7'
 if str(ROOT) not in sys.path:
-    sys.path.append(str(ROOT))
+    sys.path = [str(ROOT)] + sys.path
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))
 
 from models.common import DetectMultiBackend
