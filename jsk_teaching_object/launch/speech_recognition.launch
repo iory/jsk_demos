@@ -76,4 +76,9 @@
     <arg name="continuous" value="true" />
   </include>
 
+  <node name="boot_soundplay"
+        pkg="jsk_teaching_object" type="boot_soundplay.py"
+	      respawn="false" >
+  </node>
+
 </launch>
