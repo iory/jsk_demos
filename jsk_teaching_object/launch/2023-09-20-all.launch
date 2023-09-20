@@ -10,6 +10,17 @@
         output="screen" clear_params="true" >
     <rosparam subst_value="true" >
       video_device: $(arg video_device)
+      image_height: 1080
+      image_width: 1920
+    </rosparam>
+  </node>
+
+  <node name="remove_bg_node"
+        pkg="jsk_teaching_object" type="remove_bg_node.py"
+        output="screen"
+        respawn="true" >
+    <remap from="~input" to="$(arg input_image)" />
+    <rosparam subst_value="true">
     </rosparam>
   </node>
 

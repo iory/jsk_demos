@@ -7,9 +7,9 @@ Panels:
         - /Global Options1
         - /TF1/Frames1
         - /Training1
-        - /Training1/CapturedImage1
         - /Training1/RemoveBG1
         - /Training1/GeneratedImages1
+        - /Training1/CapturedImage1
       Splitter Ratio: 0.5
     Tree Height: 1900
   - Class: rviz/Selection
@@ -92,21 +92,8 @@ Visualization Manager:
       Displays:
         - Class: jsk_rviz_plugin/OverlayImage
           Enabled: true
-          Name: CapturedImage
-          Topic: /show_image_publisher/output
-          Value: true
-          alpha: 1
-          height: 128
-          keep aspect ratio: true
-          left: 800
-          overwrite alpha value: false
-          top: 16
-          transport hint: raw
-          width: 1000
-        - Class: jsk_rviz_plugin/OverlayImage
-          Enabled: true
           Name: RemoveBG
-          Topic: /usb_cam/image_raw
+          Topic: /remove_bg_node/output/image/debug
           Value: true
           alpha: 1
           height: 128
@@ -115,18 +102,31 @@ Visualization Manager:
           overwrite alpha value: false
           top: 50
           transport hint: raw
-          width: 800
+          width: 1000
         - Class: jsk_rviz_plugin/OverlayImage
           Enabled: true
           Name: GeneratedImages
-          Topic: /images_publisher/output
+          Topic: /show_image_publisher/output
           Value: true
           alpha: 1
           height: 128
           keep aspect ratio: true
-          left: 1800
+          left: 1000
           overwrite alpha value: false
           top: 16
+          transport hint: raw
+          width: 1000
+        - Class: jsk_rviz_plugin/OverlayImage
+          Enabled: true
+          Name: CapturedImage
+          Topic: /usb_cam/image_raw
+          Value: true
+          alpha: 1
+          height: 128
+          keep aspect ratio: true
+          left: 0
+          overwrite alpha value: false
+          top: 800
           transport hint: raw
           width: 1000
       Enabled: true
