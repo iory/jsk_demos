@@ -40,6 +40,8 @@
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>opencv_apps</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>google_cloud_texttospeech</exec_depend>
+  <exec_depend>ros_speech_recognition</exec_depend>
   <!-- ALPHABETICAL ORDER -->
 
   <export>

@@ -1,4 +1,14 @@
+extendedos
+gdown
 moviepy
+numba==0.56.4
+numpy==1.23.5
+openai
+opencv-python
+pillow==9.4.0
 pybsc
+rembg
+ros-speak
+shapely
 torch
 torchvision
