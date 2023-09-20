@@ -25,13 +25,13 @@
     </rosparam>
   </node>
 
-  <node name="register_object"
-        pkg="jsk_teaching_object" type="register_object.py" >
-    <remap from="~image" to="$(arg input_image)" />
-    <rosparam subst_value="true">
-      root_image_path: $(arg root_image_path)
-    </rosparam>
-  </node>
+  <!-- <node name="register_object" -->
+  <!--       pkg="jsk_teaching_object" type="register_object.py" > -->
+  <!--   <remap from="~image" to="$(arg input_image)" /> -->
+  <!--   <rosparam subst_value="true"> -->
+  <!--     root_image_path: $(arg root_image_path) -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
 
   <node name="show_image_publisher"
         pkg="jsk_teaching_object" type="show_image_publisher.py"
@@ -53,11 +53,11 @@
         required="true">
     <remap from="~input" to="$(arg input_image)" />
     <rosparam subst_value="true">
-      model_path: /home/iory/Downloads/2023-09-19/thk2/2023-09-19-mechanical-objects.pt
+      model_path: /home/iory/Downloads/2023-09-19/2023-09-20-train/best.pt
       score_thresh: 0.4
       nms_thresh: 0.45
       device: $(arg device)
-      class_names: ['lmガイド', 'カップリング', 'スライダー', 'ベース', 'ホルダーa', 'ボールねじ', 'モーター']
+      class_names: ['lmガイド', 'others', 'カップリング', 'スライダー', 'ベース', 'ホルダーa', 'ボールねじ', 'モーター']
     </rosparam>
   </node>
 

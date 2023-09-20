@@ -5,7 +5,7 @@
   <arg name="audio_topic" default="/input_audio" doc="Name of audio topic captured from microphone" />
   <arg name="depth" default="16" doc="Bit depth of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
   <arg name="sample_rate" default="16000" doc="Frame rate of audio topic and microphone. '$ pactl list short sinks' to check your hardware"/>
-  <arg name="n_channel" default="2" doc="Number of channels of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
+  <arg name="n_channel" default="1" doc="Number of channels of audio topic and microphone. '$ pactl list short sinks' to check your hardware" />
   <arg name="sound_play_respawn" default="true" />
 
   <arg name="credential" default="$(optenv GOOGLE_APPLICATION_CREDENTIALS /etc/opt/jsk/robot/google-speech-recognition.json)"
@@ -15,6 +15,7 @@
   <!-- audio capture from microphone -->
   <node name="audio_capture"
         pkg="audio_capture" type="audio_capture"
+        clear_params="true"
         respawn="true">
     <remap from="audio" to="$(arg raw_audio_topic)" />
     <rosparam subst_value="true">
@@ -23,7 +24,7 @@
       depth: $(arg depth)
       sample_rate: $(arg sample_rate)
     </rosparam>
-    <param name="device" command="rosrun jsk_teaching_object identify_input_audio_device.py sof input" />
+    <!-- <param name="device" command="rosrun jsk_teaching_object identify_input_audio_device.py sof input" /> -->
   </node>
 
   <node name="sound_play_jp"
@@ -64,7 +65,7 @@
     <param name="wait" value="true" />
   </node>
 
-  <include file="$(find ros_speech_recognition)/launch/speech_recognition.launch" >
+  <include file="$(find jsk_teaching_object)/launch/ros_speech_recognition.launch" >
     <arg name="n_channel" value="$(arg n_channel)" />
     <arg name="depth" value="$(arg depth)" />
     <arg name="sample_rate" value="$(arg sample_rate)" />
