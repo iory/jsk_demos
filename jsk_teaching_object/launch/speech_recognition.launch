@@ -12,12 +12,6 @@
        doc="Credential json path for Google Cloud Text-to-Speech
             (default: $GOOGLE_APPLICATION_CREDENTIALS or /etc/opt/jsk/robot/google-speech-recognition.json)" />
 
-  <arg name="default_speaker" default="2"
-       doc="Default speaker for VOICEVOX" />
-  <arg name="cpu_num_threads" default="20"
-       doc="Number of cpu threads" />
-
-
   <!-- audio capture from microphone -->
   <node name="audio_capture"
         pkg="audio_capture" type="audio_capture"
