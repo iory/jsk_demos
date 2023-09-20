@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
+import threading
 from enum import IntEnum
 import os
+import os.path as osp
 from pathlib import Path
 
+import yaml
 import cv2
 import openai
 from openai.openai_object import OpenAIObject
@@ -14,6 +17,33 @@ from eos import current_time_str
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 
 from jsk_teaching_object.topic_subscriber import ImageSubscriber
+from jsk_teaching_object.remote import train_in_remote
+from jsk_teaching_object.update_model_client import update_model
+
+
+def write_names_from_yaml(yaml_file_path, output_file_path):
+    with open(yaml_file_path, 'r') as yaml_file:
+        data = yaml.safe_load(yaml_file)
+        names = data.get('names', [])
+
+    with open(output_file_path, 'w') as output_file:
+        for name in names:
+            output_file.write(name + '\n')
+
+
+def train(image_directory):
+    filename = '{}.pt'.format(current_time_str())
+    saved_weight_filepath, saved_yaml_name = train_in_remote(
+        image_directory=str(image_directory),
+        output=osp.join(osp.expanduser('~'), 'dataset', '2023-09-21', filename))
+    rospy.loginfo('Model saved {}'.format(saved_weight_filepath))
+
+    yaml_path = Path(saved_yaml_name)
+    txt_path = yaml_path.with_suffix('.txt')
+    write_names_from_yaml(yaml_path, txt_path)
+    update_model('/fg_node/update_model',
+                 saved_weight_filepath,
+                 txt_path)
 
 
 class STATE(IntEnum):
@@ -37,6 +67,7 @@ class RegisterObject(object):
 
         self.speech_msg = None
         self.state = STATE.START
+        self.state = STATE.UPDATE_MODEL
 
         self.speech_sub = rospy.Subscriber(
             "/speech_to_text", SpeechRecognitionCandidates,
@@ -221,6 +252,11 @@ A: 1
 
     def update_model(self):
         self.speak('物体を学習します。時間がかかりますがお待ちください。')
+        tmp_path = '/home/iory/src/github.com/jsk-ros-pkg/jsk_demos/train/tiny_yamagata_items'
+        t = threading.Thread(target=train, args=(tmp_path,))
+        # t = threading.Thread(target=train, args=(self.root_image_path,))
+        t.start()
+        # t.join()
         self.state = STATE.START
 
     def current_state(self):
