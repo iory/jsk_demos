@@ -2,12 +2,18 @@
 
 from enum import IntEnum
 import os
+from pathlib import Path
 
+import cv2
 import openai
 from openai.openai_object import OpenAIObject
 from ros_speak import speak_jp
 import rospy
+from eos import makedirs
+from eos import current_time_str
 from speech_recognition_msgs.msg import SpeechRecognitionCandidates
+
+from jsk_teaching_object.topic_subscriber import ImageSubscriber
 
 
 class STATE(IntEnum):
@@ -23,6 +29,11 @@ class RegisterObject(object):
 
     def __init__(self):
         openai.api_key = os.environ['OPENAI_KEY']
+
+        self.root_image_path = Path(rospy.get_param('~root_image_path'))
+        makedirs(self.root_image_path)
+        self.image_subscriber = ImageSubscriber('~image')
+        self.current_label_name = None
 
         self.speech_msg = None
         self.state = STATE.START
@@ -51,9 +62,9 @@ class RegisterObject(object):
                 break
         return res
 
-    def speak(self, msg):
+    def speak(self, msg, wait=True):
         rospy.loginfo(msg)
-        speak_jp(msg, wait=True)
+        speak_jp(msg, wait=wait)
 
     def start(self):
         self.speak('物品を登録しますか。')
@@ -80,7 +91,7 @@ class RegisterObject(object):
         self.state = STATE.WAIT_LABEL
 
     def reconfirm(self, label_name):
-        self.speak('これは「{}」ですか'.format(label_name))
+        self.speak('これは「{}」という名前ですか？'.format(label_name))
         base = "あなたは日本語の対話システムです。システム(あなた)の「これは{}ですね」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、合っている場合には1を合ってない場合には2を、良くわからない返答の場合には3を返してください。".format(label_name)
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
@@ -94,11 +105,12 @@ class RegisterObject(object):
                 answer = res.get('choices')[0].get('text').lstrip().rstrip()
                 rospy.loginfo(answer)
                 if answer.lower() == '1':
-                    self.speak('これは「{}」ですね'.format(label_name))
+                    self.speak('これは「{}」という名前ですね'.format(label_name))
+                    self.current_label_name = label_name
                     self.state = STATE.SAVE_PHOTO
                     break
                 elif answer.lower() == '3':
-                    self.speak('これは「{}」ですか'.format(label_name))
+                    self.speak('これは「{}」という名前ですか？'.format(label_name))
                 else:
                     self.state = STATE.WAIT_LABEL
                     break
@@ -142,7 +154,20 @@ class RegisterObject(object):
                 rospy.loginfo(answer)
 
                 if answer.lower() == '1':
-                    self.speak('写真を撮ります')
+                    self.image_subscriber.msg = None
+                    self.speak('画像を撮影しますね')
+                    self.speak('さん、にー、いち')
+                    self.speak('package://jsk_teaching_object/sound/camera.wav',
+                               wait=True)
+
+                    img = self.image_subscriber.take_image('bgra8')
+                    if img is None:
+                        self.speak('画像が取得できませんでした。画像トピックを確認してください。',
+                                   wait=True)
+                        continue
+                    makedirs(self.root_image_path / self.current_label_name)
+                    cv2.imwrite(str(self.root_image_path / self.current_label_name / '{}.png'.format(current_time_str())), img)
+                    self.speak('画像を保存しました', wait=True)
                     self.speak('続いてどうしますか。')
                 elif answer.lower() == '2':
                     self.speak('写真を撮るのを終了します')

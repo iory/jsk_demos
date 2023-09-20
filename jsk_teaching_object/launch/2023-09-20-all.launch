@@ -1,0 +1,43 @@
+<launch>
+
+  <arg name="gui" default="true" />
+  <arg name="video_device" default="/dev/video4" />
+  <arg name="input_image" default="/usb_cam/image_raw" />
+  <arg name="root_image_path" default="/home/iory/dataset/project_t/2023-09-20" />
+
+  <node name="usb_cam"
+        pkg="usb_cam" type="usb_cam_node"
+        output="screen" clear_params="true" >
+    <rosparam subst_value="true" >
+      video_device: $(arg video_device)
+    </rosparam>
+  </node>
+
+  <node name="register_object"
+        pkg="jsk_teaching_object" type="register_object.py" >
+    <remap from="~image" to="$(arg input_image)" />
+    <rosparam subst_value="true">
+      root_image_path: $(arg root_image_path)
+    </rosparam>
+  </node>
+
+  <node name="show_image_publisher"
+        pkg="jsk_teaching_object" type="show_image_publisher.py"
+        clear_params="true"
+        respawn="true" >
+    <rosparam subst_value="true">
+      root_image_path: $(arg root_image_path)
+    </rosparam>
+  </node>
+
+  <include file="$(find jsk_teaching_object)/launch/speech_recognition.launch" >
+  </include>
+
+  <group if="$(arg gui)" >
+    <node name="$(anon rviz)"
+          pkg="rviz" type="rviz"
+          args="-d $(find jsk_teaching_object)/launch/config/2023-09-20.rviz" >
+    </node>
+  </group>
+
+</launch>
