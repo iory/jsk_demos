@@ -129,7 +129,7 @@ class RegisterObject(object):
     def reconfirm(self, label_name):
         self.speak('これは「{}」という名前ですか？'.format(label_name))
         base = "あなたは日本語の対話システムです。システム(あなた)の「これは{}ですね」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、合っている場合には1を合ってない場合には2を、良くわからない返答の場合には3を返してください。".format(label_name)
-        base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4を返してください'
+        base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4を返してください。ユーザーが終了してというような場合には5を返してください。'
 
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
@@ -142,7 +142,10 @@ class RegisterObject(object):
                 res = self.request(prompt)
                 answer = res.get('choices')[0].get('text').lstrip().rstrip()
                 rospy.loginfo(answer)
-                if answer.lower() == '4':
+                if answer.lower() == '5':
+                    self.state = STATE.START
+                    break
+                elif answer.lower() == '4':
                     self.speak('これは「{}」という名前ですか？'.format(label_name))
                     continue
                 elif answer.lower() == '1':
@@ -162,7 +165,7 @@ class RegisterObject(object):
         self.speech_msg = None
 
         base = "あなたは日本語の対話システムです。システム(あなた)の「ラベル名を教えてください。」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、「ラベル名」に該当する文字列のみを返してください。これはマイクですという場合には「マイク」という文字列のみを返してください。"
-        base += 'ユーザーがラベル名を言っていない場合には3を返してください。'
+        base += 'ユーザーがラベル名を言っていない場合には3を返してください。ユーザーが終了してというような場合には5を返してください。'
         # base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4という文字のみを返してください。'
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
@@ -174,7 +177,10 @@ class RegisterObject(object):
                 rospy.loginfo(prompt)
                 res = self.request(prompt)
                 answer = res.get('choices')[0].get('text').lstrip().rstrip()
-                if answer == '3':
+                if answer == '5':
+                    self.state = STATE.START
+                    break
+                elif answer == '3':
                     self.speak('ラベル名を教えてください。')
                     continue
                 rospy.loginfo(answer)

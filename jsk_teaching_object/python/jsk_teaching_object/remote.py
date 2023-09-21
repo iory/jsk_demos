@@ -16,7 +16,7 @@ from pybsc import run_command
 def run_ssh_task(
         image_directory,
         username="iory", bastion_username="iory", bastion_ip="dlbox2.jsk.imi.i.u-tokyo.ac.jp",
-        output_ip="", output_username="", ip='133.11.216.103', epoch=1,
+        output_ip="", output_username="", ip='133.11.216.78', epoch=1,
         identity_file=osp.join(osp.expanduser('~'), '.ssh', 'id_rsa'), output='',
         batchsize=16,
 ):
@@ -75,7 +75,7 @@ def watchdog(bastion_username, bastion_ip, username, ip, remote_file_path, ident
 def kill_tmux_session(
         session_name, remote_file_path,
         username="iory", bastion_username="iory", bastion_ip="dlbox2.jsk.imi.i.u-tokyo.ac.jp",
-        output_ip="", output_username="", ip='133.11.216.103',
+        output_ip="", output_username="", ip='133.11.216.78',
         identity_file=osp.join(osp.expanduser('~'), '.ssh', 'id_rsa'),
 ):
     proxy_command = "ssh -i {} -o ProxyCommand='ssh -i {} -W %h:%p {}@{}'".format(
@@ -91,7 +91,7 @@ def train_in_remote(
         bastion_username = 'iory',
         bastion_ip = 'dlbox2.jsk.imi.i.u-tokyo.ac.jp',
         username = 'iory',
-        ip = '133.11.216.103',
+        ip = '133.11.216.78',
         output='',
         output_ip='',
         output_username='',
@@ -156,5 +156,5 @@ if __name__ == '__main__':
     with measure():
         filename = '{}.pt'.format(current_time_str())
         saved_weight_filepath, saved_yaml_name = train_in_remote(
-            image_directory='/home/iory/src/github.com/jsk-ros-pkg/jsk_demos/train/tiny_yamagata_items',
+            image_directory='/home/iory/Downloads/2023-09-19/backupdata',
             output=osp.join(osp.expanduser('~'), 'dataset', '2023-09-21', filename))
