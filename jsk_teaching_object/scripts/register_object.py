@@ -44,7 +44,7 @@ def train(image_directory):
     update_model('/fg_node/update_model',
                  saved_weight_filepath,
                  txt_path)
-    speak_jp('モデルの更新を行いました。')
+    speak_jp('モデルの更新を行いました。', wait=True)
 
 
 class STATE(IntEnum):
@@ -160,7 +160,7 @@ class RegisterObject(object):
         self.speak('ラベル名を教えてください。')
         self.speech_msg = None
 
-        base = "あなたは日本語の対話システムです。システム(あなた)の「ラベル名を教えてください。」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、「ラベル名」に該当する文字列のみを返してください。"
+        base = "あなたは日本語の対話システムです。システム(あなた)の「ラベル名を教えてください。」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、「ラベル名」に該当する文字列のみを返してください。これはマイクですという場合には「マイク」という文字列のみを返してください。"
         base += 'ユーザーがラベル名を言っていない場合には3を返してください。'
         # base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4という文字のみを返してください。'
         rate = rospy.Rate(10)
@@ -206,7 +206,7 @@ class RegisterObject(object):
                     self.image_subscriber.msg = None
                     self.speak('画像を撮影しますね')
                     self.speak('さん、にーー、いち')
-                    speak_jp('package://rostwitter/resource/camera.wav', wait=False)
+                    speak_jp('package://rostwitter/resource/camera.wav', wait=True)
 
                     img = self.image_subscriber.take_image('bgra8')
                     if img is None:
@@ -214,7 +214,7 @@ class RegisterObject(object):
                                    wait=True)
                         continue
                     makedirs(self.root_image_path / self.current_label_name)
-                    cv2.imwrite(str(self.root_image_path / self.current_label_name / '{}.png'.format(current_time_str())), img)
+                    cv2.imwrite(str(self.root_image_path / self.current_label_name / '{}.jpg'.format(current_time_str())), img)
                     self.speak('画像を保存しました', wait=True)
                     self.speak('続いてどうしますか。')
                 elif answer.lower() == '2':
@@ -272,10 +272,10 @@ A: 1
             rate.sleep()
 
     def update_model(self):
-        self.speak('物体を学習します。時間がかかりますがお待ちください。')
-        tmp_path = '/home/iory/src/github.com/jsk-ros-pkg/jsk_demos/train/tiny_yamagata_items'
-        t = threading.Thread(target=train, args=(tmp_path,))
-        # t = threading.Thread(target=train, args=(self.root_image_path,))
+        self.speak('物体を学習します。時間がかかりますがお待ちください。', wait=True)
+        # tmp_path = '/home/iory/src/github.com/jsk-ros-pkg/jsk_demos/train/tiny_yamagata_items'
+        # t = threading.Thread(target=train, args=(tmp_path,))
+        t = threading.Thread(target=train, args=(self.root_image_path,))
         t.start()
         # t.join()
         self.state = STATE.START

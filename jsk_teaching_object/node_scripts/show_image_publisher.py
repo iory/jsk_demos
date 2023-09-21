@@ -28,6 +28,7 @@ from pybsc.image_utils import squared_padding_image
 from functools import lru_cache
 
 import gdown
+from pybsc.image_utils import imread
 
 from jsk_teaching_object.put_text import put_text_to_image
 
@@ -35,7 +36,7 @@ from jsk_teaching_object.put_text import put_text_to_image
 @lru_cache(maxsize=None)
 def cached_imread(img_path, image_width=500):
     return squared_padding_image(
-        cv2.imread(img_path, cv2.IMREAD_UNCHANGED), image_width)
+        imread(img_path, 'bgra'), image_width)
 
 
 class ShowImagePublisher(object):
@@ -65,7 +66,7 @@ class ShowImagePublisher(object):
         with self.lock:
             if self.root_image_path is not None:
                 target_names = sorted(list(
-                    set([path.parent.name for path in sorted(self.root_image_path.glob('*/*.png'))])))
+                    set([path.parent.name for path in sorted(self.root_image_path.glob('*/*.jpg'))])))
                 canvas = np.zeros((2500, 2500, 4), dtype=np.uint8)
                 for i in range(5):
                     for j in range(5):
@@ -73,7 +74,7 @@ class ShowImagePublisher(object):
                             break
                         target_name = target_names[i * 5 + j]
                         img = cached_imread(
-                            str(sorted(list((self.root_image_path / target_names[i * 5 + j]).glob('*.png')))[0]), 500)
+                            str(sorted(list((self.root_image_path / target_names[i * 5 + j]).glob('*.jpg')))[0]), 500)
                         color = (127, 127, 127, 255)
                         img = put_text_to_image(
                             img, target_name, self.pos, self.font_path,
@@ -108,14 +109,14 @@ class ShowImagePublisher(object):
 
         with self.lock:
             target_names = sorted(list(
-                set([path.parent.name for path in sorted(self.root_image_path.glob('*/*.png'))])))
+                set([path.parent.name for path in sorted(self.root_image_path.glob('*/*.jpg'))])))
             canvas = np.zeros((2500, 2500, 4), dtype=np.uint8)
             for i in range(5):
                 for j in range(5):
                     if i * 5 + j >= len(target_names):
                         break
                     target_name = target_names[i * 5 + j]
-                    filenames = sorted(list((self.root_image_path / target_names[i * 5 + j]).glob('*.png')))
+                    filenames = sorted(list((self.root_image_path / target_names[i * 5 + j]).glob('*.jpg')))
                     self.cnt[target_name] = (self.cnt[target_name] + 1) % len(filenames)
                     img = cached_imread(str(filenames[self.cnt[target_name]]), 500)
                     color = (127, 127, 127, 255)
