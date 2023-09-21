@@ -8,86 +8,9 @@ import tempfile
 import time
 
 import six
-
-
-PY3 = (sys.version_info[0] == 3)
-PY2 = not PY3
-
-
-def makedirs(name, mode=0o777, exist_ok=True):
-    """An wrapper of os.makedirs that accepts exist_ok.
-
-    Parameters
-    ----------
-    name : str
-        path of directory
-    exist_ok : bool
-        if True, accepts the existence of the directory.
-
-    Examples
-    --------
-    >>> from eos import makedirs
-    >>> makedirs('/tmp/result_directory')
-    """
-    name = str(name)
-    if PY2:
-        try:
-            os.makedirs(name, mode)
-        except OSError:
-            if not (exist_ok and os.path.isdir(name)):
-                raise OSError(
-                    'Directory {} already exists. '
-                    'Set exist_ok = True if the directory can exist.'
-                    .format(name))
-    else:
-        os.makedirs(name, mode, exist_ok=exist_ok)
-
-
-class Colors(object):
-
-    bold = '\033[1m'
-    underlined = '\033[4m'
-
-    black = '\033[30m'
-    red = '\033[31m'
-    green = '\033[32m'
-    yellow = '\033[33m'
-    blue = '\033[34m'
-    magenta = '\033[35m'
-    cyan = '\033[36m'
-    lightgray = '\033[37m'
-    darkgray = '\033[90m'
-    lightred = '\033[91m'
-    lightgreen = '\033[92m'
-    lightyellow = '\033[93m'
-    lightblue = '\033[94m'
-    lightmagenta = '\033[95m'
-    lightcyan = '\033[96m'
-
-    background_black = '\033[40m'
-    background_red = '\033[41m'
-    background_green = '\033[42m'
-    background_yellow = '\033[43m'
-    background_blue = '\033[44m'
-    background_magenta = '\033[45m'
-    background_cyan = '\033[46m'
-
-    reset = '\033[0m'
-
-
-def current_time_str(time_format='%Y-%m-%d-%H-%M-%S-%f'):
-    time_str = datetime.datetime.now().strftime(time_format)
-    return time_str
-
-
-def run_command(cmd, *args, **kwargs):
-    if kwargs.pop("capture_output", False):
-        kwargs["stdout"] = subprocess.PIPE
-        kwargs["stderr"] = subprocess.PIPE
-    if six.PY2:
-        return subprocess.check_call(cmd, *args, **kwargs)
-    else:
-        return subprocess.run(cmd, *args, **kwargs)
+from eos import makedirs
+from eos import current_time_str
+from pybsc import run_command
 
 
 def run_ssh_task(
@@ -150,7 +73,6 @@ def watchdog(bastion_username, bastion_ip, username, ip, remote_file_path, ident
         else:
             print(f'waiting for the file {remote_file_path} to be created on the remote server.')
         time.sleep(poll_interval)
-
 
 
 def kill_tmux_session(
