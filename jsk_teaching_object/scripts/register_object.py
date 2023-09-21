@@ -145,7 +145,7 @@ class RegisterObject(object):
                     self.speak('これは「{}」という名前ですか？'.format(label_name))
                     continue
                 elif answer.lower() == '1':
-                    self.speak('これは「{}」という名前ですね'.format(label_name))
+                    self.speak('ありがとうございます。「{}」ですね'.format(label_name))
                     self.current_label_name = label_name
                     self.state = STATE.SAVE_PHOTO
                     break
@@ -185,7 +185,7 @@ class RegisterObject(object):
         self.speak('物体の画像を撮ります。物体を置いてください。準備ができたら画像を撮るよう言ってください')
         self.speech_msg = None
 
-        base = 'あなたは日本語の対話システムです。システム(あなた)の「続いて画像を撮影しますか？」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、ユーザーが画像の撮影を続けると判断した場合は「"1"」を、ユーザーが画像の撮影を終了する場合は「"2"」を、ユーザーのメッセージが撮影の続行に関係のない答えならば「"3"」を返答してください。A:のあとに続く回答を["1", "2", "3"]のどれかのみから選んで返答してください。あなたの返答は1文字のみです。 Example 1: User: 続けて A: 1 Example 2: User: 終了 A: 2 Example 3: User: 今日は良い天気です A: 3 Example 4: User: めちゃあつい A: 3 Example 5: User: foo A: 3 Example 6: User: 撮影して A: 1 Example 7: User: 止めて A: 2 '
+        base = 'あなたは日本語の対話システムです。システム(あなた)の「続いて画像を撮影しますか？」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、ユーザーが画像の撮影を続けると判断した場合は「"1"」を、ユーザーが画像の撮影を終了する場合は「"2"」を、ユーザーのメッセージが撮影の続行に関係のない答えならば「"3"」を返答してください。A:のあとに続く回答を["1", "2", "3"]のどれかのみから選んで返答してください。あなたの返答は1文字のみです。 Example 1: User: 続けて A: 1 Example 2: User: 終了 A: 2 Example 3: User: 今日は良い天気です A: 3 Example 4: User: めちゃあつい A: 3 Example 5: User: foo A: 3 Example 6: User: 撮影して A: 1 Example 7: User: 止めて A: 2 Example 8: User: とって A: 1 '
         base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4を返してください'
         base += 'ユーザーの回答は以下です。 User: {} あなたの回答を[1, 2, 3, 4]のどれかで返してください。 A:'
         rate = rospy.Rate(10)
@@ -205,9 +205,8 @@ class RegisterObject(object):
                 elif answer.lower() == '1':
                     self.image_subscriber.msg = None
                     self.speak('画像を撮影しますね')
-                    self.speak('さん、にー、いち')
-                    self.speak('package://rostwitter/sound/camera.wav',
-                               wait=True)
+                    self.speak('さん、にーー、いち')
+                    speak_jp('package://rostwitter/resource/camera.wav', wait=False)
 
                     img = self.image_subscriber.take_image('bgra8')
                     if img is None:
