@@ -37,7 +37,6 @@ def run_ssh_task(
 
     project_id = current_time_str()
     tmp_dir = osp.join('/tmp', 'project-t', '{}'.format(project_id))
-    print('tmp_dir = {}'.format(tmp_dir))
     a = run_command('{} mkdir -p {}'.format(ssh_command, tmp_dir), shell=True)
 
     source_image_dir = image_directory.rstrip('/')
@@ -47,10 +46,8 @@ def run_ssh_task(
     source_image_dir_in_remote = osp.join(tmp_dir, osp.basename(source_image_dir))
 
     session_name = project_id
-    print(ssh_command + ' ' + ' '.join(["tmux", "new-session", "-d", "-s", session_name]))
     run_command(ssh_command + ' ' + ' '.join(["tmux", "new-session", "-d", "-s", session_name]), shell=True)
     command = f'cd /home/iory/src/github.com/iory/jsk_demos/train && python generate_data.py --from-images-dir {source_image_dir_in_remote} -b {batchsize} --epoch {epoch} --compress-annotation-data'
-    print(ssh_command + ' ' + ' '.join(["tmux", "send-keys", "-t", session_name, "'{}'".format(command), "Enter"]))
     run_command(ssh_command + ' ' + '"' + ' '.join(["tmux", "send-keys", "-t", session_name, "'{}'".format(command), "Enter"]) + '"', shell=True)
     return source_image_dir_in_remote, session_name
 
@@ -161,4 +158,3 @@ if __name__ == '__main__':
         saved_weight_filepath, saved_yaml_name = train_in_remote(
             image_directory='/home/iory/src/github.com/jsk-ros-pkg/jsk_demos/train/tiny_yamagata_items',
             output=osp.join(osp.expanduser('~'), 'dataset', '2023-09-21', filename))
-        print(saved_weight_filepath, saved_yaml_name)
