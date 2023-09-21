@@ -68,7 +68,6 @@ class RegisterObject(object):
 
         self.speech_msg = None
         self.state = STATE.START
-        # self.state = STATE.UPDATE_MODEL
 
         self.speech_sub = rospy.Subscriber(
             "/speech_to_text", SpeechRecognitionCandidates,
@@ -103,7 +102,7 @@ class RegisterObject(object):
         self.speech_msg = None
 
         base = "あなたは日本語の対話システムです。システム(あなた)の「物品を登録しますか？」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、ユーザーが物品の登録をすると判断した場合は「1」を、そうでないならば「2」を返答してください。"
-        base += 'ユーザーがもう一度言ってほしいと聞き返した場合には4を返してください'
+        base += 'ユーザーがもう一度言ってほしいと聞き返した場合には4を返してください。ユーザーが物体の学習をしてほしいと言った場合には5を返してください。'
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             if self.speech_msg is not None:
@@ -117,6 +116,8 @@ class RegisterObject(object):
                 rospy.loginfo(answer)
                 if answer == '4':
                     self.speak('物品を登録しますか。')
+                elif answer == '5':
+                    self.update_model()
                 elif answer == '1':
                     self.speak('物品を登録しますね')
                     break

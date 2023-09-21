@@ -11,6 +11,7 @@ Panels:
         - /Training1/GeneratedImages1
         - /Training1/CapturedImage1
         - /Training1/OverlayImage1
+        - /OverlayText1
       Splitter Ratio: 0.5
     Tree Height: 1900
   - Class: rviz/Selection
@@ -145,6 +146,27 @@ Visualization Manager:
           width: 1000
       Enabled: true
       Name: Training
+    - Align Bottom: false
+      Background Alpha: 0.800000011920929
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.800000011920929
+      Foreground Color: 25; 255; 240
+      Invert Shadow: false
+      Name: OverlayText
+      Overtake BG Color Properties: false
+      Overtake FG Color Properties: false
+      Overtake Position Properties: true
+      Topic: /publish_text
+      Value: true
+      font: DejaVu Sans Mono
+      height: 1000
+      left: 100
+      line width: 2
+      text size: 50
+      top: 1400
+      width: 2000
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -173,7 +195,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 51456128
+      Distance: 64546568
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
