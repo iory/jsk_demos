@@ -44,6 +44,7 @@ def train(image_directory):
     update_model('/fg_node/update_model',
                  saved_weight_filepath,
                  txt_path)
+    speak_jp('モデルの更新を行いました。')
 
 
 class STATE(IntEnum):
@@ -67,7 +68,7 @@ class RegisterObject(object):
 
         self.speech_msg = None
         self.state = STATE.START
-        self.state = STATE.UPDATE_MODEL
+        # self.state = STATE.UPDATE_MODEL
 
         self.speech_sub = rospy.Subscriber(
             "/speech_to_text", SpeechRecognitionCandidates,

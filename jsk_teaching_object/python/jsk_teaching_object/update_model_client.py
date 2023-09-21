@@ -2,8 +2,8 @@ import rospy
 import actionlib
 import actionlib_msgs.msg
 
-from jsk_teaching_object.msg import UpdateModelAction
-from jsk_teaching_object.msg import UpdateModelGoal
+from fg_ros.msg import UpdateModelAction
+from fg_ros.msg import UpdateModelGoal
 
 
 _update_model_clients = {}
@@ -26,7 +26,12 @@ def update_model(topic_name, model_path, class_name_path,
     goal.model_path = model_path
     print(model_path)
     print(class_name_path)
-    goal.class_name_path = class_name_path
+    class_names = []
+    with open(class_name_path, 'r') as f:
+        for line in f.readlines():
+            class_names.append(line.strip())
+
+    goal.class_names = class_names
     _update_model_clients[topic_name] = client
     client.send_goal(goal)
 

@@ -98,7 +98,7 @@ class ForegroundSegmentationNode(ConnectionBasedTransport):
         rospy.loginfo('update model action started.')
 
     def update_model_action(self, goal):
-        self.load_model(goal.model_path, goal.class_name_path)
+        self.load_model(goal.model_path, goal.class_names)
         self.update_model_server.set_succeeded(UpdateModelResult())
 
     def load_model(self, model_path, class_names):

@@ -4,6 +4,7 @@
   <arg name="device" default="0" />
   <arg name="video_device" default="/dev/video4" />
   <arg name="input_image" default="/usb_cam/image_raw" />
+  <!-- <arg name="root_image_path" default="/home/iory/dataset/project_t/2023-09-20" /> -->
   <arg name="root_image_path" default="/home/iory/dataset/project_t/2023-09-20" />
 
   <node name="usb_cam"
