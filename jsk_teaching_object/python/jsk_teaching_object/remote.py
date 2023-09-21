@@ -233,8 +233,10 @@ def train_in_remote(
 
 
 if __name__ == '__main__':
-    filename = '{}.pt'.format(current_time_str())
-    saved_weight_filepath, saved_yaml_name = train_in_remote(
-        image_directory='/home/iory/src/github.com/jsk-ros-pkg/jsk_demos/train/tiny_yamagata_items',
-        output=osp.join(osp.expanduser('~'), 'dataset', '2023-09-21', filename))
-    print(saved_weight_filepath, saved_yaml_name)
+    from eos import measure
+    with measure():
+        filename = '{}.pt'.format(current_time_str())
+        saved_weight_filepath, saved_yaml_name = train_in_remote(
+            image_directory='/home/iory/src/github.com/jsk-ros-pkg/jsk_demos/train/tiny_yamagata_items',
+            output=osp.join(osp.expanduser('~'), 'dataset', '2023-09-21', filename))
+        print(saved_weight_filepath, saved_yaml_name)
