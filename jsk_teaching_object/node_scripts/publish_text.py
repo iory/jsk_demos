@@ -8,6 +8,7 @@ import readline
 import rospy
 import sys
 import std_msgs.msg
+from collections import deque
 
 from sound_play.msg import SoundRequest
 from std_msgs.msg import ColorRGBA
@@ -38,13 +39,25 @@ text.fg_color = ColorRGBA(25 / 255.0, 1.0, 240.0 / 255.0, 1.0)
 text.bg_color = ColorRGBA(0.0, 0.0, 0.0, 0.2)
 
 
+history = deque(maxlen=4)
+
 def speech_cb(msg):
+    global history
     global pub
     if isinstance(msg, SoundRequestActionGoal):
         return speech_cb(msg.goal.sound_request)
     if msg.sound != SoundRequest.SAY:
         return
-    text.text = 'robot: {}'.format(msg.arg)
+    history.append('robot: {}'.format(msg.arg))
+    text.text = '\n'.join(list(history))
+    pub.publish(text)
+
+
+def speech_recognition_cb(msg):
+    global history
+    global pub
+    history.append('person: {}'.format(msg.transcript[0]))
+    text.text = '\n'.join(list(history))
     pub.publish(text)
 
 
@@ -63,6 +76,11 @@ def subscribe():
     for name, type in t:
         sub = rospy.Subscriber(name, SoundRequestActionGoal, speech_cb)
         subs.append(sub)
+    subs.append(
+        rospy.Subscriber(
+            '/speech_to_text', SpeechRecognitionCandidates,
+            callback=speech_recognition_cb,
+            queue_size=1))
     return subs
 
 
