@@ -24,7 +24,7 @@
       depth: $(arg depth)
       sample_rate: $(arg sample_rate)
     </rosparam>
-    <!-- <param name="device" command="rosrun jsk_teaching_object identify_input_audio_device.py sof input" /> -->
+    <param name="device" value="plughw:3,0" />
   </node>
 
   <node name="sound_play_jp"

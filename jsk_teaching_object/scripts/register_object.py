@@ -103,18 +103,21 @@ class RegisterObject(object):
         self.speech_msg = None
 
         base = "あなたは日本語の対話システムです。システム(あなた)の「物品を登録しますか？」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、ユーザーが物品の登録をすると判断した場合は「1」を、そうでないならば「2」を返答してください。"
+        base += 'ユーザーがもう一度言ってほしいと聞き返した場合には4を返してください'
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             if self.speech_msg is not None:
                 input_text = self.speech_msg.transcript[0]
                 self.speech_msg = None
-                prompt = base + 'User: "{}" あなたの回答を[1, 2]のどれかのみで返してください。 A: '.format(input_text)
+                prompt = base + 'User: "{}" あなたの回答を[1, 2, 4]のどれかのみで返してください。 A: '.format(input_text)
                 prompt = " ".join(prompt.split("\n"))
                 rospy.loginfo(prompt)
                 res = self.request(prompt)
                 answer = res.get('choices')[0].get('text').lstrip()
                 rospy.loginfo(answer)
-                if answer == '1':
+                if answer == '4':
+                    self.speak('物品を登録しますか。')
+                elif answer == '1':
                     self.speak('物品を登録しますね')
                     break
                 else:
@@ -125,6 +128,8 @@ class RegisterObject(object):
     def reconfirm(self, label_name):
         self.speak('これは「{}」という名前ですか？'.format(label_name))
         base = "あなたは日本語の対話システムです。システム(あなた)の「これは{}ですね」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、合っている場合には1を合ってない場合には2を、良くわからない返答の場合には3を返してください。".format(label_name)
+        base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4を返してください'
+
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             if self.speech_msg is not None:
@@ -136,7 +141,10 @@ class RegisterObject(object):
                 res = self.request(prompt)
                 answer = res.get('choices')[0].get('text').lstrip().rstrip()
                 rospy.loginfo(answer)
-                if answer.lower() == '1':
+                if answer.lower() == '4':
+                    self.speak('これは「{}」という名前ですか？'.format(label_name))
+                    continue
+                elif answer.lower() == '1':
                     self.speak('これは「{}」という名前ですね'.format(label_name))
                     self.current_label_name = label_name
                     self.state = STATE.SAVE_PHOTO
@@ -153,6 +161,8 @@ class RegisterObject(object):
         self.speech_msg = None
 
         base = "あなたは日本語の対話システムです。システム(あなた)の「ラベル名を教えてください。」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、「ラベル名」に該当する文字列のみを返してください。"
+        base += 'ユーザーがラベル名を言っていない場合には3を返してください。'
+        # base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4という文字のみを返してください。'
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             if self.speech_msg is not None:
@@ -163,16 +173,21 @@ class RegisterObject(object):
                 rospy.loginfo(prompt)
                 res = self.request(prompt)
                 answer = res.get('choices')[0].get('text').lstrip().rstrip()
+                if answer == '3':
+                    self.speak('ラベル名を教えてください。')
+                    continue
                 rospy.loginfo(answer)
                 self.reconfirm(answer)
                 break
             rate.sleep()
 
     def save_photo(self):
-        self.speak('物体の画像を撮ります。物体を置いてください。')
+        self.speak('物体の画像を撮ります。物体を置いてください。準備ができたら画像を撮るよう言ってください')
         self.speech_msg = None
 
-        base = 'あなたは日本語の対話システムです。システム(あなた)の「続いて画像を撮影しますか？」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、ユーザーが画像の撮影を続けると判断した場合は「"1"」を、ユーザーが画像の撮影を終了する場合は「"2"」を、ユーザーのメッセージが撮影の続行に関係のない答えならば「"3"」を返答してください。A:のあとに続く回答を["1", "2", "3"]のどれかのみから選んで返答してください。あなたの返答は1文字のみです。 Example 1: User: 続けて A: 1 Example 2: User: 終了 A: 2 Example 3: User: 今日は良い天気です A: 3 Example 4: User: めちゃあつい A: 3 Example 5: User: foo A: 3 Example 6: User: 撮影して A: 1 Example 7: User: 止めて A: 2 ユーザーの回答は以下です。 User: {} あなたの回答を[1, 2, 3]のどれかで返してください。 A:'
+        base = 'あなたは日本語の対話システムです。システム(あなた)の「続いて画像を撮影しますか？」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、ユーザーが画像の撮影を続けると判断した場合は「"1"」を、ユーザーが画像の撮影を終了する場合は「"2"」を、ユーザーのメッセージが撮影の続行に関係のない答えならば「"3"」を返答してください。A:のあとに続く回答を["1", "2", "3"]のどれかのみから選んで返答してください。あなたの返答は1文字のみです。 Example 1: User: 続けて A: 1 Example 2: User: 終了 A: 2 Example 3: User: 今日は良い天気です A: 3 Example 4: User: めちゃあつい A: 3 Example 5: User: foo A: 3 Example 6: User: 撮影して A: 1 Example 7: User: 止めて A: 2 '
+        base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4を返してください'
+        base += 'ユーザーの回答は以下です。 User: {} あなたの回答を[1, 2, 3, 4]のどれかで返してください。 A:'
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             if self.speech_msg is not None:
@@ -185,11 +200,13 @@ class RegisterObject(object):
                 answer = res.get('choices')[0].get('text').lstrip().rstrip()
                 rospy.loginfo(answer)
 
-                if answer.lower() == '1':
+                if answer.lower() == '4':
+                    self.speak('物体の画像を撮ります。物体を置いてください。準備ができたら画像を撮るよう言ってください')
+                elif answer.lower() == '1':
                     self.image_subscriber.msg = None
                     self.speak('画像を撮影しますね')
                     self.speak('さん、にー、いち')
-                    self.speak('package://jsk_teaching_object/sound/camera.wav',
+                    self.speak('package://rostwitter/sound/camera.wav',
                                wait=True)
 
                     img = self.image_subscriber.take_image('bgra8')
@@ -214,6 +231,7 @@ class RegisterObject(object):
         self.speech_msg = None
 
         base = 'あなたは日本語の対話システムです。システム(あなた)の「他の物体を登録しますか？」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、ユーザーが他の物体を登録すると判断した場合は「"1"」を、ユーザーが終了する場合は「"2"」を、ユーザがモデルを学習する場合には「"2"」を、ユーザーのメッセージが続行に関係のない答えならば「"3"」を返答してください。'
+        base += 'ユーザーがもう一度言ってほしいというようなことを聞き返した場合には4を返してください'
         base += """
 Example 1:
 User: いいえ
@@ -239,7 +257,10 @@ A: 1
                 answer = res.get('choices')[0].get('text').lstrip().rstrip()
                 rospy.loginfo(answer)
 
-                if answer.lower() == '1':
+                if answer.lower() == '4':
+                    self.speak('他の物体を登録しますか？')
+                    continue
+                elif answer.lower() == '1':
                     self.speak('分かりました。')
                     self.state = STATE.WAIT_LABEL
                     break
