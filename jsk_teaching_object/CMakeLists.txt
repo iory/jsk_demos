@@ -22,7 +22,7 @@ add_custom_target(${PROJECT_NAME}_install_trained_data ALL COMMAND python$ENV{RO
 
 add_action_files(
   DIRECTORY action
-  FILES UpdateModel.action
+  FILES UpdateModel.action TakeImagePhoto.action TakeAction.action
 )
 
 catkin_python_setup()

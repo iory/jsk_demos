@@ -19,6 +19,8 @@ from speech_recognition_msgs.msg import SpeechRecognitionCandidates
 from jsk_teaching_object.topic_subscriber import ImageSubscriber
 from jsk_teaching_object.remote import train_in_remote
 from jsk_teaching_object.update_model_client import update_model
+from jsk_teaching_object.take_image_photo_client import take_image_photo
+from jsk_teaching_object.take_action_client import take_action
 
 
 def write_names_from_yaml(yaml_file_path, output_file_path):
@@ -102,19 +104,22 @@ class RegisterObject(object):
         self.speech_msg = None
 
         base = "あなたは日本語の対話システムです。システム(あなた)の「物品を登録しますか？」というメッセージに対してユーザーが返答します。ユーザーの返答を受け取り、ユーザーが物品の登録をすると判断した場合は「1」を、そうでないならば「2」を返答してください。"
-        base += 'ユーザーがもう一度言ってほしいと聞き返した場合には4を返してください。ユーザーが物体の学習をしてほしいと言った場合には5を返してください。'
+        base += 'ユーザーがもう一度言ってほしいと聞き返した場合には4を返してください。ユーザーが物体の学習をしてほしいと言った場合には5を返してください。ユーザーが「認識して」などの認識結果を見せるように言った場合には6を返してください。'
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             if self.speech_msg is not None:
                 input_text = self.speech_msg.transcript[0]
                 self.speech_msg = None
-                prompt = base + 'User: "{}" あなたの回答を[1, 2, 4]のどれかのみで返してください。 A: '.format(input_text)
+                prompt = base + 'User: "{}" あなたの回答を[1, 2, 4, 5, 6]のどれかのみで返してください。 A: '.format(input_text)
                 prompt = " ".join(prompt.split("\n"))
                 rospy.loginfo(prompt)
                 res = self.request(prompt)
                 answer = res.get('choices')[0].get('text').lstrip()
                 rospy.loginfo(answer)
-                if answer == '4':
+                if answer == '6':
+                    self.speak('認識結果を見せますね。')
+                    take_action('/r8_5_look_server/take_action', wait=True)
+                elif answer == '4':
                     self.speak('物品を登録しますか。')
                 elif answer == '5':
                     self.update_model()
@@ -215,19 +220,28 @@ class RegisterObject(object):
                     self.speak('物体の画像を撮ります。物体を置いてください。準備ができたら画像を撮るよう言ってください')
                 elif answer.lower() == '1':
                     self.image_subscriber.msg = None
-                    self.speak('画像を撮影しますね')
-                    self.speak('さん、にーー、いち')
-                    speak_jp('package://rostwitter/resource/camera.wav', wait=True)
 
-                    img = self.image_subscriber.take_image('bgra8')
-                    if img is None:
-                        self.speak('画像が取得できませんでした。画像トピックを確認してください。',
-                                   wait=True)
-                        continue
-                    makedirs(self.root_image_path / self.current_label_name)
-                    cv2.imwrite(str(self.root_image_path / self.current_label_name / '{}.jpg'.format(current_time_str())), img)
-                    self.speak('画像を保存しました', wait=True)
-                    self.speak('続いてどうしますか。')
+                    take_image_photo(
+                        '/r8_5_look_server/take_image_photo',
+                        '/usb_cam/image_raw',
+                        str(self.root_image_path / self.current_label_name),
+                        wait=True)
+
+                    # self.speak('画像を撮影しますね')
+                    # self.speak('さん、にーー、いち')
+                    # speak_jp('package://rostwitter/resource/camera.wav', wait=True)
+
+                    # img = self.image_subscriber.take_image('bgra8')
+                    # if img is None:
+                    #     self.speak('画像が取得できませんでした。画像トピックを確認してください。',
+                    #                wait=True)
+                    #     continue
+                    # makedirs(self.root_image_path / self.current_label_name)
+                    # cv2.imwrite(str(self.root_image_path / self.current_label_name / '{}.jpg'.format(current_time_str())), img)
+                    # self.speak('画像を保存しました', wait=True)
+                    # self.speak('続いてどうしますか。')
+                    self.state = STATE.ASK_CONTINUE
+                    break
                 elif answer.lower() == '2':
                     self.speak('写真を撮るのを終了します')
                     self.state = STATE.ASK_CONTINUE
@@ -254,6 +268,10 @@ A: 2
 Example 3:
 User: 登録します
 A: 1
+
+Example 4:
+User: 学習して
+A: 2
         """
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
