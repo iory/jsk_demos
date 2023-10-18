@@ -87,6 +87,10 @@ class LookObject(object):
             auto_start=True)
         rospy.loginfo('take action action server started.')
 
+    def speak_jp(self, *args, **kwargs):
+        # return speak_jp(*args, **kwargs)
+        pass
+
     def take_image_photo_action(self, goal):
         self.look(topic_name=goal.image_topic_name,
                   save_path=goal.save_path)
@@ -103,16 +107,16 @@ class LookObject(object):
 
         r.reset_pose()
         r.l_zaxis_joint.joint_angle(0.1)
-        ri.zmove_client(r.l_zaxis_joint.joint_angle(),
-                        r.r_zaxis_joint.joint_angle(),
-                        5.0)
         ri.angle_vector(r.angle_vector(), 5)
-        speak_jp('画像を撮影するために見回します。', wait=False)
+        ri.zmove_client(r.r_zaxis_joint.joint_angle(),
+                        r.l_zaxis_joint.joint_angle(),
+                        5.0)
+        self.speak_jp('画像を撮影するために見回します。', wait=False)
 
         radius = 0.2
         m = trimesh.creation.icosphere(subdivisions=2, radius=radius)
         sphere = MeshLink(m)
-        sphere.translate((-0.5, -0.2, 0.8))
+        sphere.translate((-0.5, -0.2, 1.2))
         self.object_center_coords.newcoords(sphere.copy_worldcoords())
 
         avs = []
@@ -143,8 +147,9 @@ class LookObject(object):
                 translation_axis=True,
                 thre=100,
                 stop=500,
-                move_target=r.rarm_end_coords)
+                move_target=r.rarm_hand_camera_end_coords)
             if ret is not False:
+                r.r_finger_upper_joint.joint_angle(-np.pi / 2.0)
                 avs.append((r.angle_vector(),
                             surface_point.worldpos()))
 
@@ -154,14 +159,20 @@ class LookObject(object):
             r.angle_vector(av)
             if self.debug:
                 v.redraw()
-            ri.zmove_client(r.l_zaxis_joint.joint_angle(),
-                            r.r_zaxis_joint.joint_angle(),
-                            3.0)                
-            ri.angle_vector(r.angle_vector(), 3)
+            fastest_time = ri.angle_vector_duration(
+                ri.angle_vector(),
+                r.angle_vector(),
+                controller_type=None)
+            fastest_time = max(fastest_time, 1.0)
+            rospy.loginfo('Send angle vector {} sec'.format(fastest_time))
+            ri.angle_vector(r.angle_vector(), fastest_time)
+            ri.zmove_client(r.r_zaxis_joint.joint_angle(),
+                            r.l_zaxis_joint.joint_angle(),
+                            fastest_time)
             ri.wait_interpolation()
+            rospy.sleep(2.0)
             if topic_name is not None and save_path is not None:
-                rospy.sleep(1.0)
-                speak_jp('package://rostwitter/resource/camera.wav', wait=False)
+                self.speak_jp('package://rostwitter/resource/camera.wav', wait=False)
                 img = sub.take_image()
                 imwrite(
                     Path(save_path) / '{}.jpg'.format(current_time_str()),
@@ -169,8 +180,8 @@ class LookObject(object):
         if topic_name is not None and save_path is not None:
             del sub
 
-        speak_jp('画像を撮影し終わりました。', wait=True)
-        speak_jp('初期姿勢に戻ります。', wait=False)
+        self.speak_jp('画像を撮影し終わりました。', wait=True)
+        self.speak_jp('初期姿勢に戻ります。', wait=False)
 
         r.reset_pose()
         ri.angle_vector(r.angle_vector(), 5)
@@ -191,10 +202,15 @@ class LookObject(object):
         r.l_wrist_r_joint.joint_angle(np.pi / 2.0)
         r.l_wrist_p_joint.joint_angle(0.0)
 
-        ri.zmove_client(r.l_zaxis_joint.joint_angle(),
-                        r.r_zaxis_joint.joint_angle(),
-                        5.0)
-        ri.angle_vector(r.angle_vector(), 5.0)
+        fastest_time = ri.angle_vector_duration(
+            ri.angle_vector(),
+            r.angle_vector(),
+            controller_type=None)
+        rospy.loginfo('Send angle vector {} sec'.format(fastest_time))
+        ri.angle_vector(r.angle_vector(), fastest_time)
+        ri.zmove_client(r.r_zaxis_joint.joint_angle(),
+                        r.l_zaxis_joint.joint_angle(),
+                        fastest_time)
         ri.wait_interpolation()
 
         self.take_image_photo_server.set_succeeded(
@@ -204,5 +220,4 @@ class LookObject(object):
 if __name__ == '__main__':
     rospy.init_node('r8_5_look_server')
     act = LookObject()  # NOQA
-    act.look()
     rospy.spin()

@@ -16,7 +16,7 @@ from pybsc import run_command
 def run_ssh_task(
         image_directory,
         username="iory", bastion_username="iory", bastion_ip="dlbox2.jsk.imi.i.u-tokyo.ac.jp",
-        output_ip="", output_username="", ip='133.11.216.78', epoch=1,
+        output_ip="", output_username="", ip='133.11.216.78', epoch=10,
         identity_file=osp.join(osp.expanduser('~'), '.ssh', 'id_rsa'), output='',
         batchsize=16,
 ):
