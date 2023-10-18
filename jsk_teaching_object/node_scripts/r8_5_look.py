@@ -103,6 +103,9 @@ class LookObject(object):
 
         r.reset_pose()
         r.l_zaxis_joint.joint_angle(0.1)
+        ri.zmove_client(r.l_zaxis_joint.joint_angle(),
+                        r.r_zaxis_joint.joint_angle(),
+                        5.0)
         ri.angle_vector(r.angle_vector(), 5)
         speak_jp('画像を撮影するために見回します。', wait=False)
 
@@ -151,6 +154,9 @@ class LookObject(object):
             r.angle_vector(av)
             if self.debug:
                 v.redraw()
+            ri.zmove_client(r.l_zaxis_joint.joint_angle(),
+                            r.r_zaxis_joint.joint_angle(),
+                            3.0)                
             ri.angle_vector(r.angle_vector(), 3)
             ri.wait_interpolation()
             if topic_name is not None and save_path is not None:
@@ -185,7 +191,10 @@ class LookObject(object):
         r.l_wrist_r_joint.joint_angle(np.pi / 2.0)
         r.l_wrist_p_joint.joint_angle(0.0)
 
-        ri.angle_vector(r.angle_vector())
+        ri.zmove_client(r.l_zaxis_joint.joint_angle(),
+                        r.r_zaxis_joint.joint_angle(),
+                        5.0)
+        ri.angle_vector(r.angle_vector(), 5.0)
         ri.wait_interpolation()
 
         self.take_image_photo_server.set_succeeded(
@@ -195,4 +204,5 @@ class LookObject(object):
 if __name__ == '__main__':
     rospy.init_node('r8_5_look_server')
     act = LookObject()  # NOQA
+    act.look()
     rospy.spin()
