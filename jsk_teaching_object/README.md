@@ -73,3 +73,21 @@ roslaunch jsk_teaching_object sample_edgetpu_detection_with_depth_filter.launch
 ```
 roslaunch jsk_teaching_object sample_foreground_detection.launch
 ```
+
+## Run for r8
+
+```
+roscore
+```
+
+```
+roslaunch r8_5 bringup_minimum.launch
+```
+
+```
+roslaunch jsk_teaching_object 2023-09-20-all.launch
+```
+
+```
+roslaunch jsk_teaching_object register_object.launch
+```
