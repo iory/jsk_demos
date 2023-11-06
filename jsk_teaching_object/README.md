@@ -18,6 +18,20 @@ catkin build jsk_teaching_object
 source devel/setup.bash
 ```
 
+### for r8 demo
+
+```bash
+mkdir -p ~/ros/r8/src/jsk-ros-pkg
+cd  ~/ros/r8/src/jsk-ros-pkg
+cd  ~/ros/r8/src/
+cp ~/ros/r8/src/jsk-ros-pkg/jsk_demos/jsk_teaching_object/jsk_r8.rosinstall.noetic .rosinstall
+wstool update -t .
+source /opt/ros/$ROS_DISTRO/setup.bash
+rosdep install -y -r --from-paths . --ignore-src
+cd ../
+catkin build jsk_teaching_object r8_5
+source ~/ros/r8/devel/setup.bash
+```
 
 ## Training
 
