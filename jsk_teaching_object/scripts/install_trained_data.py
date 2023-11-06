@@ -72,6 +72,13 @@ def main():
         md5='6d608067400c314223d66c5a7819e88c',
     )
 
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/yolo7/2023-09-19-mechanical-objects.pt',
+        url='https://drive.google.com/uc?id=1dhpCT1wXNuppZ0mmEUWSupBPMQkHV-it',  # NOQA
+        md5='732b8ac8e62b2071edb01f392054449c',
+    )
+
 
 if __name__ == '__main__':
     main()
