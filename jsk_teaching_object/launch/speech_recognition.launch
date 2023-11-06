@@ -1,5 +1,6 @@
 <launch>
 
+  <arg name="device" default="plughw:2,0" />
   <arg name="raw_audio_topic" default="/audio" doc="Name of audio topic captured from microphone" />
   <arg name="dummy_audio_topic" default="/dummy_audio" doc="Dummy audio" />
   <arg name="audio_topic" default="/input_audio" doc="Name of audio topic captured from microphone" />
@@ -24,7 +25,7 @@
       depth: $(arg depth)
       sample_rate: $(arg sample_rate)
     </rosparam>
-    <param name="device" value="plughw:2,0" />
+    <param name="device" value="$(arg device)" />
   </node>
 
   <node name="sound_play_jp"
