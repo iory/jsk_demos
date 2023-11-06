@@ -21,6 +21,7 @@ source devel/setup.bash
 ### for r8 demo
 
 ```bash
+pip3 install gdown
 mkdir -p ~/ros/r8/src/jsk-ros-pkg
 cd  ~/ros/r8/src/jsk-ros-pkg
 git clone https://github.com/iory/jsk_demos -b teaching-object-2023-09-20
@@ -40,6 +41,10 @@ source ~/ros/r8/devel/setup.bash
 sudo cp $(rospack find r8_5)/udev/99-usb-serial.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules
 sudo udevadm trigger
+sudo mkdir -p /etc/opt/teaching-object/
+sudo chmod 777 /etc/opt/teaching-object/
+roscd r8_5/model/
+xacro r8_5.urdf.xacro > r8_5.urdf
 ```
 
 ## Training

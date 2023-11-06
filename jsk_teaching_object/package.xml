@@ -37,6 +37,7 @@
   <exec_depend>jsk_data</exec_depend>
   <exec_depend>jsk_perception</exec_depend>
   <exec_depend>jsk_recognition_msgs</exec_depend>
+  <exec_depend>jsk_rviz_plugins</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>opencv_apps</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
