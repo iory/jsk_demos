@@ -27,6 +27,11 @@ cd  ~/ros/r8/src/
 cp ~/ros/r8/src/jsk-ros-pkg/jsk_demos/jsk_teaching_object/jsk_r8.rosinstall.noetic .rosinstall
 wstool update -t .
 source /opt/ros/$ROS_DISTRO/setup.bash
+cd ~/ros/r8/src/jsk-ros-pkg/jsk_demos/jsk_teaching_object
+rosdep install -y -r --from-paths . --ignore-src
+cd ~/ros/r8/src/jsk-ros-pkg/jsk_demos/fg_ros
+rosdep install -y -r --from-paths . --ignore-src
+cd ~/ros/r8/src/seed-solutions
 rosdep install -y -r --from-paths . --ignore-src
 cd ../
 catkin build jsk_teaching_object r8_5
