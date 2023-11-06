@@ -23,6 +23,7 @@ source devel/setup.bash
 ```bash
 mkdir -p ~/ros/r8/src/jsk-ros-pkg
 cd  ~/ros/r8/src/jsk-ros-pkg
+git clone https://github.com/iory/jsk_demos -b teaching-object-2023-09-20
 cd  ~/ros/r8/src/
 cp ~/ros/r8/src/jsk-ros-pkg/jsk_demos/jsk_teaching_object/jsk_r8.rosinstall.noetic .rosinstall
 wstool update -t .
@@ -33,9 +34,12 @@ cd ~/ros/r8/src/jsk-ros-pkg/jsk_demos/fg_ros
 rosdep install -y -r --from-paths . --ignore-src
 cd ~/ros/r8/src/seed-solutions
 rosdep install -y -r --from-paths . --ignore-src
-cd ../
+cd ~/ros/r8
 catkin build jsk_teaching_object r8_5
 source ~/ros/r8/devel/setup.bash
+sudo cp $(rospack find r8_5)/udev/99-usb-serial.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+sudo udevadm trigger
 ```
 
 ## Training

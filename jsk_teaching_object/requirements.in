@@ -13,3 +13,6 @@ ros-speak
 shapely
 torch
 torchvision
+git+https://github.com/iory/scikit-robot.git@dae#egg=scikit-robot
+git+https://github.com/iory/r8_5_interface.git@master#egg=r8_5_interface
+git+https://github.com/iory/trimesh.git@dae#egg=trimesh
