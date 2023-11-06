@@ -21,6 +21,7 @@ source devel/setup.bash
 ### for r8 demo
 
 ```bash
+sudo apt install -y ros-noetic-rqt-joint-trajectory-controller ros-noetic-joint-trajectory-controller libsdl2-dev libsdl2-2.0-0 qtmultimedia5-dev libqt5serialport5-dev
 pip3 install gdown
 mkdir -p ~/ros/r8/src/jsk-ros-pkg
 cd  ~/ros/r8/src/jsk-ros-pkg
