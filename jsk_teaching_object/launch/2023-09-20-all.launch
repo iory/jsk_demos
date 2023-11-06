@@ -112,6 +112,11 @@
     </rosparam>
   </node>
 
+  <node name="r8_5_look"
+        pkg="jsk_teaching_object" type="r8_5_look.py"
+        output="screen">
+  </node>
+
   <group if="$(arg gui)" >
     <node name="$(anon rviz)"
           pkg="rviz" type="rviz"
