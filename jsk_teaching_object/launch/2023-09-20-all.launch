@@ -112,7 +112,7 @@
     </rosparam>
   </node>
 
-  <node name="r8_5_look"
+  <node name="r8_5_look_server"
         pkg="jsk_teaching_object" type="r8_5_look.py"
         output="screen">
   </node>
