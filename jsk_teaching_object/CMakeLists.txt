@@ -56,9 +56,9 @@ file(GLOB SCRIPT_PROGRAMS scripts/*.py)
 catkin_install_python(
   PROGRAMS ${SCRIPT_PROGRAMS}
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts/)
-file(GLOB SCRIPTS_FILES node_scripts/*.py)
+file(GLOB NODE_SCRIPTS_FILES node_scripts/*.py)
 catkin_install_python(
-  PROGRAMS ${SCRIPTS_FILES}
+  PROGRAMS ${NODE_SCRIPTS_FILES}
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
