@@ -9,9 +9,9 @@ rarm:
   - r_wrist_r_joint: rarm-wrist-r
 
 rarm-end-coords:
-  parent: r_hand_link
+  parent: r_hand_y_link
   translate: [-0.02, 0.0, 0.0]
-  rotate: [0, 1, 0, 180]
+  rotate: [0, 0, 1, 180]
 
 larm:
   - l_zaxis_joint: larm-torso-z
@@ -24,9 +24,9 @@ larm:
   - l_wrist_r_joint: larm-wrist-r
 
 larm-end-coords:
-  parent: l_hand_link
+  parent: l_hand_y_link
   translate: [-0.02, 0.0, 0.0]
-  rotate: [0, 1, 0, 180]
+  rotate: [0, 0, 1, 180]
 
 angle-vector:
   init-pose: [100, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
