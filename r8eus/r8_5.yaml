@@ -1,0 +1,33 @@
+rarm:
+  - r_zaxis_joint: rarm-torso-z
+  - r_shoulder_y_joint: rarm-shoulder-y
+  - r_elbow_p1_joint: rarm-elbow-p
+  - r_elbow_p2_joint: rarm-elbow-r
+  - r_upper_arm_y_joint: rarm-elbow-y
+  - r_wrist_y_joint: rarm-wrist-y
+  - r_wrist_p_joint: rarm-wrist-p
+  - r_wrist_r_joint: rarm-wrist-r
+
+rarm-end-coords:
+  parent: r_hand_link
+  translate: [-0.02, 0.0, 0.0]
+  rotate: [0, 1, 0, 180]
+
+larm:
+  - l_zaxis_joint: larm-torso-z
+  - l_shoulder_y_joint: larm-shoulder-y
+  - l_elbow_p1_joint: larm-elbow-p
+  - l_elbow_p2_joint: larm-elbow-r
+  - l_upper_arm_y_joint: larm-elbow-y
+  - l_wrist_y_joint: larm-wrist-y
+  - l_wrist_p_joint: larm-wrist-p
+  - l_wrist_r_joint: larm-wrist-r
+
+larm-end-coords:
+  parent: l_hand_link
+  translate: [-0.02, 0.0, 0.0]
+  rotate: [0, 1, 0, 180]
+
+angle-vector:
+  init-pose: [100, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  reset-pose: [750, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 750, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
