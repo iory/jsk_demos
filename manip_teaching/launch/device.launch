@@ -1,0 +1,9 @@
+<launch>
+
+  <include file="$(find manip_teaching)/launch/launch_d405.launch" >
+  </include>
+
+  <include file="$(find manip_teaching)/launch/launch_t265.launch" >
+  </include>
+
+</launch>
