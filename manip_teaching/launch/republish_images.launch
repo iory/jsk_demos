@@ -19,11 +19,24 @@
   <arg if="$(arg use_throttled_image)"
        name="throttled" value="/throttled" />
 
+  <node name="d405_register"
+        pkg="nodelet" type="nodelet"
+        args="standalone depth_image_proc/register"
+        clear_params="true">
+    <remap from="rgb/camera_info"   to="/remote/color/camera_info"/>
+    <remap from="depth/camera_info" to="/remote/depth/camera_info"/>
+    <remap from="depth/image_rect"  to="/remote/depth/image_rect_raw"/>
+
+    <remap from="depth_registered/image_rect"  to="/remote/aligned_depth_to_color/image_raw"/>
+    <remap from="depth_registered/camera_info"  to="/remote/aligned_depth_to_color/camera_info"/>
+  </node>
+
+
   <!-- publishing is delayed because the computation load of png's compression processing
        is too large for the default compression ratio. As a result,
        it is inferred that synchronization problems occur when creating point clouds. -->
   <group ns="$(arg to_camera)" >
-    <group ns="$(arg depth_registered)" >
+    <group ns="$(arg depth)" >
       <group ns="image_rect" >
         <param name="compressed/format" value="png" />
         <param name="compressed/png_level" value="1" />
@@ -37,16 +50,16 @@
 
       <node name="relay_info"
 	          pkg="topic_tools" type="relay"
-	          args="/$(arg camera)/$(arg depth_registered)/camera_info$(arg throttled)
+	          args="/$(arg camera)/$(arg depth)/camera_info$(arg throttled)
 	                camera_info">
       </node>
       <node name="republish_imnage"
             pkg="image_transport" type="republish"
 	          args="compressedDepth raw">
-        <remap from="in" to="/$(arg camera)/$(arg depth_registered)/image_raw$(arg throttled)"/>
-        <remap from="out" to="image_raw" />
+        <remap from="in" to="/$(arg camera)/$(arg depth)/image_rect_raw$(arg throttled)"/>
+        <remap from="out" to="image_rect_raw" />
       </node>
-    </group> <!-- end of $(arg depth_registered) ns -->
+    </group> <!-- end of $(arg depth) ns -->
     <group ns="$(arg rgb)" >
       <node name="relay_info"
 	          pkg="topic_tools" type="relay"
@@ -72,6 +85,7 @@
     <arg name="rgb" value="$(arg rgb)" />
     <arg name="depth_registered" value="$(arg depth_registered)" />
     <arg name="depth_registered_filtered" value="$(arg depth_registered_filtered)" />
+    <arg name="depth_processing" value="false" />
   </include>
 
 </launch>
