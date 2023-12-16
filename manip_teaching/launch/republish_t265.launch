@@ -1,0 +1,60 @@
+<launch>
+
+  <arg name="camera" default="t265"
+       doc="namespace of input topics" />
+  <arg name="to_camera" default="remote"
+       doc="namespace of republished topics" />
+
+  <arg name="use_throttled_image" default="false" />
+  <arg unless="$(arg use_throttled_image)"
+       name="throttled" value="" />
+  <arg if="$(arg use_throttled_image)"
+       name="throttled" value="/throttled" />
+
+  <!-- publishing is delayed because the computation load of png's compression processing
+       is too large for the default compression ratio. As a result,
+       it is inferred that synchronization problems occur when creating point clouds. -->
+  <group ns="$(arg to_camera)" >
+    <group ns="fisheye1" >
+      <node name="relay_info"
+	          pkg="topic_tools" type="relay"
+	          args="/$(arg camera)/fisheye1/camera_info$(arg throttled)
+	                camera_info">
+      </node>
+      <node name="republish_image"
+            pkg="image_transport" type="republish"
+	          args="compressed raw">
+        <remap from="in" to="/$(arg camera)/fisheye1/image_raw$(arg throttled)"/>
+        <remap from="out" to="image_raw" />
+      </node>
+
+      <node name="rectify_image"
+            pkg="nodelet" type="nodelet"
+            args="standalone image_proc/rectify" >
+        <remap from="image_mono" to="image_raw" />
+      </node>
+    </group> <!-- end of fisheye1 ns -->
+
+    <group ns="fisheye2" >
+      <node name="relay_info"
+	          pkg="topic_tools" type="relay"
+	          args="/$(arg camera)/fisheye2/camera_info$(arg throttled)
+	                camera_info">
+      </node>
+      <node name="republish_image"
+            pkg="image_transport" type="republish"
+	          args="compressed raw">
+        <remap from="in" to="/$(arg camera)/fisheye2/image_raw$(arg throttled)"/>
+        <remap from="out" to="image_raw" />
+      </node>
+
+      <node name="rectify_image"
+            pkg="nodelet" type="nodelet"
+            args="standalone image_proc/rectify" >
+        <remap from="image_mono" to="image_raw" />
+      </node>
+    </group> <!-- end of fisheye2 ns -->
+
+  </group> <!-- end of camera ns -->
+
+</launch>

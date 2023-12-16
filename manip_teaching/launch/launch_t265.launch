@@ -8,4 +8,23 @@
     <arg name="enable_fisheye2" value="true" />
   </include>
 
+  <group ns="$(arg camera)" >
+    <group ns="fisheye1" >
+      <group ns="image_raw" >
+        <rosparam param="disable_pub_plugins">
+          - 'image_transport/compressedDepth'
+          - 'image_transport/theora'
+        </rosparam>
+      </group>
+    </group>  <!-- end of fisheye1 ns -->
+    <group ns="fisheye2" >
+      <group ns="image_raw" >
+        <rosparam param="disable_pub_plugins">
+          - 'image_transport/compressedDepth'
+          - 'image_transport/theora'
+        </rosparam>
+      </group>
+    </group>  <!-- end of fisheye2 ns -->
+  </group>
+
 </launch>
