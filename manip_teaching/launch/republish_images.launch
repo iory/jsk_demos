@@ -1,5 +1,7 @@
 <launch>
 
+  <arg name="gui" default="true" />
+
   <arg name="camera" default="d405"
        doc="namespace of input topics" />
   <arg name="to_camera" default="remote"
@@ -87,5 +89,12 @@
     <arg name="depth_registered_filtered" value="$(arg depth_registered_filtered)" />
     <arg name="depth_processing" value="false" />
   </include>
+
+  <group if="$(arg gui)" >
+    <node name="$(anon rviz)"
+          pkg="rviz" type="rviz"
+          args="-d $(find manip_teaching)/config/default.rviz" >
+    </node>
+  </group>
 
 </launch>
