@@ -2,7 +2,7 @@
 
   <arg name="camera" default="t265" />
 
-  <include file="$(find realsense_camera)/launch/rs_t265.launch" >
+  <include file="$(find realsense2_camera)/launch/rs_t265.launch" >
     <arg name="camera" value="$(arg camera)" />
     <arg name="enable_fisheye1" value="true" />
     <arg name="enable_fisheye2" value="true" />

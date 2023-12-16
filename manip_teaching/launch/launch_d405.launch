@@ -2,7 +2,7 @@
 
   <arg name="camera" default="d405" />
 
-  <include file="$(find realsense_camera)/launch/rs_camera.launch" >
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch" >
     <arg name="camera" value="$(arg camera)" />
     <arg name="enable_infra1" value="false" />
     <arg name="enable_infra2" value="false" />
