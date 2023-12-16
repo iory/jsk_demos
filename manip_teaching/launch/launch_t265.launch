@@ -31,6 +31,7 @@
     <group ns="fisheye1" >
       <node name="rectify_image"
             pkg="nodelet" type="nodelet"
+            respawn="true"
             args="load image_proc/rectify /t265/realsense2_camera_manager" >
         <remap from="image_mono" to="image_raw" />
       </node>
@@ -39,6 +40,7 @@
     <group ns="fisheye2" >
       <node name="rectify_image"
             pkg="nodelet" type="nodelet"
+            respawn="true"
             args="load image_proc/rectify /t265/realsense2_camera_manager" >
         <remap from="image_mono" to="image_raw" />
       </node>
