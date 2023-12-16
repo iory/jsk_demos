@@ -1,7 +1,7 @@
 <launch>
 
   <group ns="d405_checkerdetector" clear_params="true">
-    <param name="display" type="int" value="1"/>
+    <param name="display" type="int" value="0"/>
     <param name="board_type" value="chess" />
     <!-- board0 -->
     <param name="rect0_size_x" type="double" value="0.030"/>
@@ -10,7 +10,7 @@
     <param name="grid0_size_y" type="int" value="6"/>
     <param name="type0" type="string" value="d405_chessboard"/>
 
-    <param name="use_P"              value="true" /> <!-- if you use rectified image, use_P should be true -->
+    <param name="use_P"              value="false" /> <!-- if you use rectified image, use_P should be true -->
     <param name="invert_color"       value="false" /> <!-- invert white and black -->
     <param name="message_throttle"   value="1" />
     <param name="queue_size"         value="1" />
@@ -20,8 +20,8 @@
           type="checkerboard_detector" respawn="false" output="screen">
       <!-- <remap from="camera_info" to="/remote/fisheye1/camera_info"/> -->
       <!-- <remap from="image" to="/remote/fisheye1/image_rect"/> -->
-      <remap from="camera_info" to="/remote/color/camera_info"/>
-      <remap from="image" to="/remote/color/image_rect_color"/>
+      <remap from="camera_info" to="/d405/color/camera_info"/>
+      <remap from="image" to="/d405/color/image_raw"/>
     </node>
 
     <node name="objectdetection_tf_publisher"
@@ -33,7 +33,7 @@
   </group>
 
   <group ns="t265_checkerdetector" clear_params="true">
-    <param name="display" type="int" value="1"/>
+    <param name="display" type="int" value="0"/>
     <param name="board_type" value="chess" />
     <!-- board0 -->
     <param name="rect0_size_x" type="double" value="0.030"/>
@@ -50,8 +50,8 @@
 
     <node pkg="checkerboard_detector" name="checkerboard_detector"
           type="checkerboard_detector" respawn="false" output="screen">
-      <remap from="camera_info" to="/remote/fisheye1/camera_info"/>
-      <remap from="image" to="/remote/fisheye1/image_rect"/>
+      <remap from="camera_info" to="/t265/fisheye1/camera_info"/>
+      <remap from="image" to="/t265/fisheye1/image_rect"/>
     </node>
 
     <node name="objectdetection_tf_publisher"
