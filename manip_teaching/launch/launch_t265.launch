@@ -27,4 +27,23 @@
     </group>  <!-- end of fisheye2 ns -->
   </group>
 
+  <group ns="$(arg camera)" >
+    <group ns="fisheye1" >
+      <node name="rectify_image"
+            pkg="nodelet" type="nodelet"
+            args="load image_proc/rectify /t265/realsense2_camera_manager" >
+        <remap from="image_mono" to="image_raw" />
+      </node>
+    </group> <!-- end of fisheye1 ns -->
+
+    <group ns="fisheye2" >
+      <node name="rectify_image"
+            pkg="nodelet" type="nodelet"
+            args="load image_proc/rectify /t265/realsense2_camera_manager" >
+        <remap from="image_mono" to="image_raw" />
+      </node>
+    </group> <!-- end of fisheye2 ns -->
+
+  </group> <!-- end of camera ns -->
+
 </launch>
