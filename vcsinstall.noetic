@@ -1,0 +1,17 @@
+repositories:
+  jsk_demos:
+    type: git
+    url: https://github.com/iory/jsk_demos
+    version: manip-teaching
+  realsense-ros:
+    type: git
+    url: https://github.com/IntelRealSense/realsense-ros
+    version: ros1-legacy
+  ros-perception/image_pipeline:
+    type: git
+    url: https://github.com/ros-perception/image_pipeline
+    version: noetic
+  ros-perception/image_transport_plugins:
+    type: git
+    url: https://github.com/ros-perception/image_transport_plugins
+    version: noetic-devel
