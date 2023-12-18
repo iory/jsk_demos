@@ -2,7 +2,7 @@
 
   <arg name="camera" default="t265" />
   <arg name="enable_fisheye1" default="false" />
-  <arg name="enable_fisheye1" default="false" />
+  <arg name="enable_fisheye2" default="false" />
 
   <include file="$(find manip_teaching)/launch/rs_t265.launch" >
     <arg name="camera" value="$(arg camera)" />
