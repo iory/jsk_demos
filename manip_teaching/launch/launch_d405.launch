@@ -8,7 +8,8 @@
               -0.0005371544465914706 -0.001783615531099514 0.005907839284016769 0.9999807957434713
               t265_link d405_link 100" />
 
-  <include file="$(find realsense2_camera)/launch/rs_camera.launch" >
+  <include file="$(find manip_teaching)/launch/rs_camera.launch" >
+    <arg name="respawn" value="true" />
     <arg name="camera" value="$(arg camera)" />
     <arg name="enable_infra1" value="false" />
     <arg name="enable_infra2" value="false" />
