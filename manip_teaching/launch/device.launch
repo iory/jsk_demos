@@ -6,4 +6,8 @@
   <include file="$(find manip_teaching)/launch/launch_t265.launch" >
   </include>
 
+  <node name="publish_battery"
+        pkg="manip_teaching" type="publish_battery.py" >
+  </node>
+
 </launch>

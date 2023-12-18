@@ -1,11 +1,13 @@
 <launch>
 
   <arg name="camera" default="t265" />
+  <arg name="enable_fisheye1" default="false" />
+  <arg name="enable_fisheye1" default="false" />
 
   <include file="$(find manip_teaching)/launch/rs_t265.launch" >
     <arg name="camera" value="$(arg camera)" />
-    <arg name="enable_fisheye1" value="true" />
-    <arg name="enable_fisheye2" value="true" />
+    <arg name="enable_fisheye1" value="$(arg enable_fisheye1)" />
+    <arg name="enable_fisheye2" value="$(arg enable_fisheye2)" />
   </include>
 
   <group ns="$(arg camera)" >
@@ -28,7 +30,7 @@
   </group>
 
   <group ns="$(arg camera)" >
-    <group ns="fisheye1" >
+    <group if="$(arg enable_fisheye1)" ns="fisheye1" >
       <node name="rectify_image"
             pkg="nodelet" type="nodelet"
             respawn="true"
@@ -37,7 +39,7 @@
       </node>
     </group> <!-- end of fisheye1 ns -->
 
-    <group ns="fisheye2" >
+    <group if="$(arg enable_fisheye2)" ns="fisheye2" >
       <node name="rectify_image"
             pkg="nodelet" type="nodelet"
             respawn="true"
