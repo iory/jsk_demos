@@ -17,7 +17,7 @@ class VacuumPressure(object):
             return f.read()
 
     def publish_pressure(self):
-        pressure = self.read_pressure()
+        pressure = float(self.read_pressure())
         pressure_msg = Float32(data=pressure)
         self.pub.publish(pressure_msg)
 
