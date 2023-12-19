@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import Int16
+from std_msgs.msg import Float32
 
 
 class VacuumPressure(object):
@@ -10,15 +10,15 @@ class VacuumPressure(object):
         self.adc1_path = '/sys/bus/platform/drivers/meson-saradc/ff809000.adc/iio:device0/in_voltage1_mean_raw'
         # ROS publisher
         rospy.sleep(1.0)
-        self.pub = rospy.Publisher('vacuum_pressure', Int16, queue_size=10)
+        self.pub = rospy.Publisher('vacuum_pressure', Float32, queue_size=10)
 
     def read_pressure(self):
         with open(self.adc1_path) as f:
             return f.read()
 
     def publish_pressure(self):
-        pressure = int(self.read_pressure())
-        pressure_msg = Int16(data=pressure)
+        pressure = self.read_pressure()
+        pressure_msg = Float32(data=pressure)
         self.pub.publish(pressure_msg)
 
 
