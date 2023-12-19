@@ -10,4 +10,8 @@
         pkg="manip_teaching" type="publish_battery.py" >
   </node>
 
+  <node name="vacuum_pressure"
+        pkg="manip_teaching" type="vacuum_pressure.py" >
+  </node>
+
 </launch>
