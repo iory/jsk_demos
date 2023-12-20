@@ -8,6 +8,9 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
+        - /TFTrajectory1
+        - /Camera1
+        - /Camera1/Visibility1
       Splitter Ratio: 0.5
     Tree Height: 228
   - Class: rviz/Selection
@@ -161,7 +164,7 @@ Visualization Manager:
       color: 25; 255; 240
       duration: 4
       frame: suction_frame
-      line_width: 0.009999999776482582
+      line_width: 0.004000000189989805
     - Class: rviz/Camera
       Enabled: true
       Image Rendering: background and overlay
@@ -174,12 +177,12 @@ Visualization Manager:
       Value: true
       Visibility:
         Battery: true
-        D405PointCloud2: true
+        D405PointCloud2: false
         D405_Color: true
         Grid: true
         Plotter2D: true
-        RobotModel: true
-        TF: true
+        RobotModel: false
+        TF: false
         TFTrajectory: true
         Value: true
       Zoom Factor: 1
@@ -280,7 +283,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.672308325767517
+      Distance: 1.9671858549118042
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -296,9 +299,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.1402033567428589
+      Pitch: 0.6252032518386841
       Target Frame: <Fixed Frame>
-      Yaw: 1.5795085430145264
+      Yaw: 4.2745137214660645
     Saved: ~
 Window Geometry:
   Camera:
