@@ -73,6 +73,8 @@ Visualization Manager:
           Value: false
         d405_link:
           Value: false
+        map:
+          Value: true
         suction_frame:
           Value: true
         t265_accel_frame:
@@ -96,24 +98,25 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        t265_odom_frame:
-          t265_pose_frame:
-            t265_link:
-              d405_link:
-                d405_color_frame:
-                  d405_color_optical_frame:
+        map:
+          t265_odom_frame:
+            t265_pose_frame:
+              t265_link:
+                d405_link:
+                  d405_color_frame:
+                    d405_color_optical_frame:
+                      {}
+                  d405_depth_frame:
+                    d405_depth_optical_frame:
+                      {}
+                  suction_frame:
                     {}
-                d405_depth_frame:
-                  d405_depth_optical_frame:
+                t265_accel_frame:
+                  t265_accel_optical_frame:
                     {}
-                suction_frame:
-                  {}
-              t265_accel_frame:
-                t265_accel_optical_frame:
-                  {}
-              t265_gyro_frame:
-                t265_gyro_optical_frame:
-                  {}
+                t265_gyro_frame:
+                  t265_gyro_optical_frame:
+                    {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -283,7 +286,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.9671858549118042
+      Distance: 0.9643800854682922
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -299,9 +302,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6252032518386841
+      Pitch: 0.5952032208442688
       Target Frame: <Fixed Frame>
-      Yaw: 4.2745137214660645
+      Yaw: 5.674511432647705
     Saved: ~
 Window Geometry:
   Camera:
