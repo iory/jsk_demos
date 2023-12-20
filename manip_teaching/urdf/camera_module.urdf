@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<robot name="camera_module">
+  <link name="suction_frame">
+    <visual>
+      <origin xyz="-0.1 0.013 0.06" rpy="1.5707963267948966 0 1.5707963267948966"/>
+      <geometry>
+        <mesh filename="package://manip_teaching/urdf/camera_module.dae"/>
+      </geometry>
+    </visual>
+  </link>
+</robot>

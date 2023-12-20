@@ -34,6 +34,8 @@
     <remap from="depth_registered/camera_info"  to="/remote/aligned_depth_to_color/camera_info"/>
   </node>
 
+  <include file="$(find manip_teaching)/launch/robot.launch" >
+  </include>
 
   <!-- publishing is delayed because the computation load of png's compression processing
        is too large for the default compression ratio. As a result,
