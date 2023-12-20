@@ -8,7 +8,6 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
-        - /TFTrajectory1
       Splitter Ratio: 0.5
     Tree Height: 228
   - Class: rviz/Selection
@@ -204,9 +203,9 @@ Visualization Manager:
       med color change threthold: 0
       min value: 0
       show caption: true
-      size: 400
+      size: 200
       text size: 14
-      top: 400
+      top: 600
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
@@ -214,19 +213,19 @@ Visualization Manager:
       Show Value: true
       Topic: /vacuum_pressure
       Value: true
-      auto color change: false
-      auto scale: true
+      auto color change: true
+      auto scale: false
       background color: 0; 0; 0
       backround alpha: 0
       border: true
       foreground alpha: 0.699999988079071
-      foreground color: 25; 255; 240
+      foreground color: 239; 41; 41
       height: 200
       left: 400
       linewidth: 1
-      max color: 255; 0; 0
-      max value: 1
-      min value: -1
+      max color: 32; 242; 255
+      max value: 380
+      min value: 300
       show caption: true
       text size: 12
       top: 16
@@ -281,7 +280,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.1488618850708008
+      Distance: 1.672308325767517
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -297,9 +296,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4452033042907715
+      Pitch: 0.1402033567428589
       Target Frame: <Fixed Frame>
-      Yaw: 1.1945019960403442
+      Yaw: 1.5795085430145264
     Saved: ~
 Window Geometry:
   Camera:
