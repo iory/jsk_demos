@@ -22,6 +22,11 @@
   <arg if="$(arg use_throttled_image)"
        name="throttled" value="/throttled" />
 
+  <node name="suction_data_collector"
+        pkg="manip_teaching" type="suction_data_collector.py"
+        clear_params="true">
+  </node>
+
   <node name="d405_register"
         pkg="nodelet" type="nodelet"
         args="standalone depth_image_proc/register"
