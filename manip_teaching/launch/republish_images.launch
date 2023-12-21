@@ -24,7 +24,8 @@
 
   <node name="suction_data_collector"
         pkg="manip_teaching" type="suction_data_collector.py"
-        clear_params="true">
+        clear_params="true"
+        respawn="true" >
   </node>
 
   <node name="d405_register"
