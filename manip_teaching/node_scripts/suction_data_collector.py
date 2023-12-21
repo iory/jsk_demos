@@ -95,7 +95,7 @@ class DataCollector(object):
                 img_msg = bridge.cv2_to_imgmsg(img, encoding='bgr8')
                 prev_img_path = current_img_path
             if img_msg is not None:
-                img_msg.header.stam = rospy.Time.now()
+                img_msg.header.stamp = rospy.Time.now()
                 pub.publish(img_msg)
 
     def img_callback(self, msg):
