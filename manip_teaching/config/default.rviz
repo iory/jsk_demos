@@ -8,9 +8,11 @@ Panels:
         - /Status1
         - /TF1/Frames1
         - /TFTrajectory1
+        - /Battery1
         - /Pressure1
         - /OverlayCamera1/Visibility1
         - /OverlayImage1
+        - /Blur1
       Splitter Ratio: 0.5
     Tree Height: 627
   - Class: rviz/Selection
@@ -134,7 +136,7 @@ Visualization Manager:
       foreground alpha: 0.699999988079071
       foreground alpha 2: 0.4000000059604645
       foreground color: 25; 255; 240
-      left: 850
+      left: 1080
       max color: 255; 0; 0
       max color change threthold: 0
       max value: 100
@@ -202,6 +204,7 @@ Visualization Manager:
       Unreliable: false
       Value: false
       Visibility:
+        "": true
         Battery: true
         D405PointCloud2: false
         D405_Color: true
@@ -227,6 +230,7 @@ Visualization Manager:
       Value: true
       Visibility:
         Battery: false
+        Blur: true
         Camera: false
         D405PointCloud2: false
         D405_Color: true
@@ -262,6 +266,31 @@ Visualization Manager:
       top: 400
       transport hint: raw
       width: 500
+    - Buffer length: 100
+      Class: jsk_rviz_plugin/Plotter2D
+      Enabled: true
+      Name: Blur
+      Show Value: true
+      Topic: /blur
+      Value: true
+      auto color change: true
+      auto scale: false
+      background color: 0; 0; 0
+      backround alpha: 0
+      border: true
+      foreground alpha: 0.699999988079071
+      foreground color: 255; 0; 0
+      height: 200
+      left: 850
+      linewidth: 1
+      max color: 32; 242; 255
+      max value: 200
+      min value: 0
+      show caption: true
+      text size: 12
+      top: 16
+      update interval: 0.03999999910593033
+      width: 200
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

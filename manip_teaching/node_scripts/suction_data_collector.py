@@ -72,6 +72,9 @@ class DataCollector(object):
             callback=self.vacuum_callback
         )
 
+        self.blur_pub = rospy.Publisher('blur', std_msgs.msg.Float32,
+                                        queue_size=1)
+
         self.suctioned = False
         self.tf_buffer = tf2_ros.Buffer(rospy.Duration(30.0))
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
@@ -101,7 +104,8 @@ class DataCollector(object):
     def img_callback(self, msg):
         img = decompresse_imgmsg(msg)
         _, score = estimate_blur(img)
-        if score < 100:
+        self.blur_pub.publish(std_msgs.msg.Float32(data=float(score)))
+        if score < 50:
             return
         with self.lock:
             self.queue.append(msg)
@@ -130,7 +134,7 @@ class DataCollector(object):
     def save_image(self):
         target_time_stamps = []
         points_list = []
-        for timestep in [3, 4, 5]:
+        for timestep in [2, 3, 4, 5]:
             target_time_stamp = self.suctioned_time_stamp - rospy.Duration(timestep)
             world_to_suction_frame_transform = self.get_pose(
                 't265_odom_frame',
@@ -158,12 +162,16 @@ class DataCollector(object):
         points_list = np.array(points_list)
         with self.lock:
             timestamps = np.array(self.stamp_queue)
+            if len(timestamps) == 0:
+                rospy.logwarn('failed to save image. no images.')
+                return
             indices = get_timestamp_indices_wrt_base(
                 timestamps,
                 target_time_stamps,
                 style='closest')
 
             diff = timestamps[indices] - target_time_stamps
+            diff = np.abs(diff)
             points_list = points_list[diff < 0.1]
             indices = indices[diff < 0.1]
             imgs = [self.queue[idx] for idx in indices]
