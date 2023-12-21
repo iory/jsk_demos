@@ -1,0 +1,28 @@
+<launch>
+
+  <node name="rosbag_record"
+        pkg="rosbag" type="record"
+        args="
+              /t265/accel/imu_info
+              /t265/accel/metadata
+              /t265/accel/sample
+              /t265/gyro/imu_info
+              /t265/gyro/metadata
+              /t265/gyro/sample
+              /t265/odom/metadata
+              /t265/odom/sample
+              /d405/color/image_raw/compressed
+              /d405/color/camera_info
+              /d405/color/metadata
+              /d405/depth/camera_info
+              /d405/depth/image_rect_raw/compressedDepth
+              /d405/depth/metadata
+              /d405/extrinsics/depth_to_color
+              /tf
+              /tf_static
+              /vacuum_pressure
+              /visualization/battery/value
+              ">
+  </node>
+
+</launch>
