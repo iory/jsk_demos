@@ -1,6 +1,6 @@
 <launch>
 
-  <node name="rosbag_record"
+  <node name="$(anon rosbag_record)"
         pkg="rosbag" type="record"
         args="
               /t265/accel/imu_info
