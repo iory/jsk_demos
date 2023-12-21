@@ -24,6 +24,7 @@
 
   <node name="suction_data_collector"
         pkg="manip_teaching" type="suction_data_collector.py"
+        output="screen"
         clear_params="true"
         respawn="true" >
   </node>
