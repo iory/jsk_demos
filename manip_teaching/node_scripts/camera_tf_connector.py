@@ -8,7 +8,6 @@ import tf
 import tf2_ros
 import skrobot
 
-from skrobot.coordinates.quaternion import Quaternion
 from tf2_msgs.msg import TFMessage
 from geometry_msgs.msg import TransformStamped
 from geometry_msgs.msg import *
