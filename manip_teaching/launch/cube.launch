@@ -1,0 +1,19 @@
+<launch>
+
+  <arg name="gui" default="true" />
+
+  <param name="cube_description"
+         command="xacro $(find manip_teaching)/urdf/cube.urdf" />
+  <node name="robot_state_publisher_azure"
+        pkg="robot_state_publisher" type="robot_state_publisher">
+      <remap from="robot_description" to="cube_description" />
+  </node>
+
+  <group if="$(arg gui)" >
+    <node name="$(anon rviz)"
+          pkg="rviz" type="rviz"
+          args="-d $(find manip_teaching)/config/cube.rviz" >
+    </node>
+  </group>
+
+</launch>

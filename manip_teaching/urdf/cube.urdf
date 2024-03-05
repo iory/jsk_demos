@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<robot name="cube">
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://manip_teaching/urdf/cube.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="kjs_19_0_frame"></link>
+  <joint name="kjs_19_0_joint" type="fixed"><origin rpy="0 0 0" xyz="0.04 0.007 0.011"/><parent link="base_link"/><child link="kjs_19_0_frame"/> </joint>
+  <link name="kjs_19_1_frame"></link>
+  <joint name="kjs_19_1_joint" type="fixed"><origin rpy="0 0 0" xyz="0.04 -0.007 0.011"/><parent link="base_link"/><child link="kjs_19_1_frame"/> </joint>
+  <link name="kjs_19_2_frame"></link>
+  <joint name="kjs_19_2_joint" type="fixed"><origin rpy="0 0 0" xyz="0.04 -0.007 -0.003"/><parent link="base_link"/><child link="kjs_19_2_frame"/> </joint>
+  <link name="kjs_19_3_frame"></link>
+  <joint name="kjs_19_3_joint" type="fixed"><origin rpy="0 0 0" xyz="0.04 0.007 -0.003"/><parent link="base_link"/><child link="kjs_19_3_frame"/> </joint>
+
+  <link name="kjs_20_0_frame"></link>
+  <joint name="kjs_20_0_joint" type="fixed"><origin rpy="0 3.141592653589793 0" xyz="-0.04 0.007 0.011"/><parent link="base_link"/><child link="kjs_20_0_frame"/> </joint>
+  <link name="kjs_20_1_frame"></link>
+  <joint name="kjs_20_1_joint" type="fixed"><origin rpy="0 3.141592653589793 0" xyz="-0.04 -0.007 0.011"/><parent link="base_link"/><child link="kjs_20_1_frame"/> </joint>
+  <link name="kjs_20_2_frame"></link>
+  <joint name="kjs_20_2_joint" type="fixed"><origin rpy="0 3.141592653589793 0" xyz="-0.04 -0.007 -0.003"/><parent link="base_link"/><child link="kjs_20_2_frame"/> </joint>
+  <link name="kjs_20_3_frame"></link>
+  <joint name="kjs_20_3_joint" type="fixed"><origin rpy="0 3.141592653589793 0" xyz="-0.04 0.007 -0.003"/><parent link="base_link"/><child link="kjs_20_3_frame"/> </joint>
+
+  <link name="kjs_21_0_frame"></link>
+  <joint name="kjs_21_0_joint" type="fixed"><origin rpy="0 1.5707963267948966 0" xyz="0.006 0.007 -0.04"/><parent link="base_link"/><child link="kjs_21_0_frame"/> </joint>
+  <link name="kjs_21_1_frame"></link>
+  <joint name="kjs_21_1_joint" type="fixed"><origin rpy="0 1.5707963267948966 0" xyz="-0.008 -0.007 -0.04"/><parent link="base_link"/><child link="kjs_21_1_frame"/> </joint>
+  <link name="kjs_21_2_frame"></link>
+  <joint name="kjs_21_2_joint" type="fixed"><origin rpy="0 1.5707963267948966 0" xyz="0.006 -0.007 -0.04"/><parent link="base_link"/><child link="kjs_21_2_frame"/> </joint>
+  <link name="kjs_21_3_frame"></link>
+  <joint name="kjs_21_3_joint" type="fixed"><origin rpy="0 1.5707963267948966 0" xyz="-0.008 0.007 -0.04"/><parent link="base_link"/><child link="kjs_21_3_frame"/> </joint>
+
+  <link name="kjs_22_3_frame"></link>
+  <joint name="kjs_22_3_joint" type="fixed"><origin rpy="0 0 -1.5707963267948966" xyz="0.006 -0.04 0.01"/><parent link="base_link"/><child link="kjs_22_3_frame"/> </joint>
+  <link name="kjs_22_0_frame"></link>
+  <joint name="kjs_22_0_joint" type="fixed"><origin rpy="0 0 -1.5707963267948966" xyz="-0.009 -0.04 0.01"/><parent link="base_link"/><child link="kjs_22_0_frame"/> </joint>
+  <link name="kjs_22_1_frame"></link>
+  <joint name="kjs_22_1_joint" type="fixed"><origin rpy="0 0 -1.5707963267948966" xyz="-0.009 -0.04 -0.002"/><parent link="base_link"/><child link="kjs_22_1_frame"/> </joint>
+  <link name="kjs_22_2_frame"></link>
+  <joint name="kjs_22_2_joint" type="fixed"><origin rpy="0 0 -1.5707963267948966" xyz="0.006 -0.04 -0.002"/><parent link="base_link"/><child link="kjs_22_2_frame"/> </joint>
+
+  <link name="kjs_23_0_frame"></link>
+  <joint name="kjs_23_0_joint" type="fixed"><origin rpy="0 0 1.5707963267948966" xyz="-0.009 0.04 -0.002"/><parent link="base_link"/><child link="kjs_23_0_frame"/> </joint>
+  <link name="kjs_23_1_frame"></link>
+  <joint name="kjs_23_1_joint" type="fixed"><origin rpy="0 0 1.5707963267948966" xyz="-0.009 0.04 0.01"/><parent link="base_link"/><child link="kjs_23_1_frame"/> </joint>
+  <link name="kjs_23_2_frame"></link>
+  <joint name="kjs_23_2_joint" type="fixed"><origin rpy="0 0 1.5707963267948966" xyz="0.006 0.04 0.01"/><parent link="base_link"/><child link="kjs_23_2_frame"/> </joint>
+  <link name="kjs_23_3_frame"></link>
+  <joint name="kjs_23_3_joint" type="fixed"><origin rpy="0 0 1.5707963267948966" xyz="0.006 0.04 -0.002"/><parent link="base_link"/><child link="kjs_23_3_frame"/> </joint>
+
+  <link name="kjs_24_0_frame"></link>
+  <joint name="kjs_24_0_joint" type="fixed"><origin rpy="0 -1.5707963267948966 0" xyz="-0.01 -0.007 0.004"/><parent link="base_link"/><child link="kjs_24_0_frame"/> </joint>
+  <link name="kjs_24_1_frame"></link>
+  <joint name="kjs_24_1_joint" type="fixed"><origin rpy="0 -1.5707963267948966 0" xyz="0.006 -0.007 0.004"/><parent link="base_link"/><child link="kjs_24_1_frame"/> </joint>
+  <link name="kjs_24_2_frame"></link>
+  <joint name="kjs_24_2_joint" type="fixed"><origin rpy="0 -1.5707963267948966 0" xyz="0.006 0.007 0.004"/><parent link="base_link"/><child link="kjs_24_2_frame"/> </joint>
+  <link name="kjs_24_3_frame"></link>
+  <joint name="kjs_24_3_joint" type="fixed"><origin rpy="0 -1.5707963267948966 0" xyz="-0.01 0.007 0.004"/><parent link="base_link"/><child link="kjs_24_3_frame"/> </joint>
+
+
+</robot>
