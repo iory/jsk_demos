@@ -141,6 +141,9 @@ class DataCollector(object):
                 'suction_frame',
                 self.suctioned_time_stamp)
             if world_to_suction_frame_transform is None:
+                rospy.logwarn('Failed to get {} to {} transform'
+                              .format('t265_odom_frame',
+                                      'suction_frame'))
                 continue
 
             world_to_camera_transform = self.get_pose(
@@ -148,6 +151,9 @@ class DataCollector(object):
                 'd405_color_optical_frame',
                 target_time_stamp)
             if world_to_camera_transform is None:
+                rospy.logwarn('Failed to get {} to {} transform'
+                              .format('t265_odom_frame',
+                                      'd405_color_optical_frame'))
                 continue
             point_in_camera = world_to_camera_transform.inverse_transform_vector(
                 world_to_suction_frame_transform.worldpos())
