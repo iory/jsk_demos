@@ -19,8 +19,8 @@
   </group>
 
   <group if="$(arg use_pad)" >
-    <node name="vacuum_pressure"
-          pkg="manip_teaching" type="pseudo_vacuum_publisher.py"
+    <node name="pseudo_vacuum_pressure"
+          pkg="manip_teaching" type="pseudo_vacuum_by_button.py"
           output="screen" >
     </node>
   </group>
