@@ -1,5 +1,7 @@
 <launch>
 
+  <arg name="use_pad" default="false" />
+
   <include file="$(find manip_teaching)/launch/launch_d405.launch" >
   </include>
 
@@ -10,8 +12,17 @@
         pkg="manip_teaching" type="publish_battery.py" >
   </node>
 
-  <node name="vacuum_pressure"
-        pkg="manip_teaching" type="vacuum_pressure.py" >
-  </node>
+  <group unless="$(arg use_pad)" >
+    <node name="vacuum_pressure"
+          pkg="manip_teaching" type="vacuum_pressure.py" >
+    </node>
+  </group>
+
+  <group if="$(arg use_pad)" >
+    <node name="vacuum_pressure"
+          pkg="manip_teaching" type="pseudo_vacuum_publisher.py"
+          output="screen" >
+    </node>
+  </group>
 
 </launch>
