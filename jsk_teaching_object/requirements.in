@@ -1,5 +1,5 @@
 gdown
-git+https://github.com/iory/scikit-robot.git@master#egg=scikit-robot
+scikit-robot
 paramiko
 matplotlib
 moviepy
