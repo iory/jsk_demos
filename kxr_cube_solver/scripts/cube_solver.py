@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import rospy
 from kxr_cube_solver.srv import SendCommand, SendCommandRequest
 from sensor_msgs.msg import Image
@@ -12,6 +13,26 @@ import kociemba
 import random
 from threading import Thread
 from ros_speak import speak_jp
+from ros_speak import speak_en
+
+
+valid_language = ['jp', 'en']
+
+
+tips = {
+    'ja': ("ルービックキューブは今年で５０周年です。",
+           "ルービックキューブはどんな状態からでも20手以内で解けることが知られています。",
+           "ルービックキューブを解くアルゴリズムは複数あるのですが、私はコシエンバのアルゴリズムを使っています。",
+           "人間によるルービックキューブの世界最速記録は3.13秒です。",
+           "ロボットによる最速記録はなんと0.38秒です。でも手が6本必要です。",
+           "ガンロボットは5本の手で5秒以内でルービックキューブを解くことができます。1万円くらいで買えます。"),
+    'en': ("The Rubik's Cube is celebrating its 50th anniversary this year.",
+           "It is known that a Rubik's Cube can be solved in 20 moves or less from any scrambled position.",
+           "There are multiple algorithms to solve the Rubik's Cube, but I use the Kociemba algorithm.",
+           "The world record for the fastest human solution of a Rubik's Cube is 3.13 seconds.",
+           "The fastest robot record is an astonishing 0.38 seconds, but it requires 6 hands.",
+           "The Gan robot can solve a Rubik's Cube in under 5 seconds with 5 hands, and it costs around 10,000 yen."),
+}
 
 
 def send_command(robot):
@@ -54,18 +75,14 @@ class CubeSolverFSM(object):
         self.vision = vision.cubeDetector()
         self.faceDetectionCount = 0
         self.maxFaceDetectionCount = 10
-        self.tips = ("ルービックキューブは今年で５０周年です。",
-                     "ルービックキューブはどんな状態からでも20手以内で解けることが知られています。",
-                     "ルービックキューブを解くアルゴリズムは複数あるのですが、私はコシエンバのアルゴリズムを使っています。",
-                     "人間によるルービックキューブの世界最速記録は3.13秒です。",
-                     "ロボットによる最速記録はなんと0.38秒です。でも手が6本必要です。",
-                     "ガンロボットは5本の手で5秒以内でルービックキューブを解くことができます。1万円くらいで買えます。")
-        self.tips = ("The Rubik's Cube is celebrating its 50th anniversary this year.",
-                     "It is known that a Rubik's Cube can be solved in 20 moves or less from any scrambled position.",
-                     "There are multiple algorithms to solve the Rubik's Cube, but I use the Kociemba algorithm.",
-                     "The world record for the fastest human solution of a Rubik's Cube is 3.13 seconds.",
-                     "The fastest robot record is an astonishing 0.38 seconds, but it requires 6 hands.",
-                     "The Gan robot can solve a Rubik's Cube in under 5 seconds with 5 hands, and it costs around 10,000 yen.")
+
+        self.lang = rospy.get_param('~language', 'jp')
+        if not self.lang in valid_language:
+            rospy.logerr(
+                'Invalid language {}.'.format(self.lang)
+                ' You can use {}.'.format(valid_language))
+            sys.exit(1)
+
         self.tipsIndex = 0
         self.speakProc = None
         self.moveProc = None
@@ -73,10 +90,16 @@ class CubeSolverFSM(object):
     def isSpeaking(self):
         return self.speakProc.is_alive()
 
-    def speak(self, msg, wait=True):
+    def speak(self, msg_jp, msg_en, wait=True):
         rospy.loginfo('Speak "{}"'.format(msg))
-        self.speakProc = Thread(target=speak_jp,
-                                args=(msg, 'robotsound_jp', 1, wait))
+        if self.lang == 'jp':
+            self.speakProc = Thread(
+                target=speak_jp,
+                args=(msg, 'robotsound_jp', 1, wait))
+        elif self.lang == 'en':
+            self.speakProc = Thread(
+                target=speak_en,
+                args=(msg_en, 'robotsound', 1, wait))
         self.speakProc.start()
 
     def move(self):
@@ -97,15 +120,15 @@ class CubeSolverFSM(object):
             if self.start:
                 self.robot.initDemo()
                 self.move()
-                # self.speak("ルービックキューブを手の上に置いてください。")
-                self.speak("Please place the Rubik's Cube on your hand.")
+                self.speak("ルービックキューブを手の上に置いてください。",
+                           "Please place the Rubik's Cube on your hand.")
                 self.start = False
             elif not self.isMoving():
                 self.finish = True
         if self.state == "start":
             if self.start:
-                # self.speak("まずは、ルービックキューブの状態を見てみます。")
-                self.speak("First, let's take a look at the state of the Rubik's Cube.")
+                self.speak("まずは、ルービックキューブの状態を見てみます。",
+                           "First, let's take a look at the state of the Rubik's Cube.")
                 self.robot.startDemo()
                 self.move()
                 self.vision.initFaces()
@@ -149,12 +172,13 @@ class CubeSolverFSM(object):
                 if not self.isSpeaking():
                     r = random.random()
                     if r > 0.5:
-                        if self.tipsIndex < len(self.tips):
-                            self.speak(self.tips[self.tipsIndex])
+                        if self.tipsIndex < len(tips):
+                            self.speak(tips['ja'][self.tipsIndex],
+                                       tips['en'][self.tipsIndex])
                             self.tipsIndex += 1
                         else:
-                            # self.speak("あと"+str(len(self.solveOperations)-self.index)+"手です。")
-                            self.speak("There are "+str(len(self.solveOperations)-self.index)+" moves left.")
+                            self.speak("あと"+str(len(self.solveOperations)-self.index)+"手です。",
+                                       "There are "+str(len(self.solveOperations)-self.index)+" moves left.")
                 # self.robot.adjustPosition()
                 # self.move()
                 self.robot.solveOneStep(self.solveOperations[self.index])
@@ -164,8 +188,7 @@ class CubeSolverFSM(object):
                 self.finish = True
         elif self.state == "end":
             if not self.finish:
-                # self.speak("完成しました")
-                self.speak("It's completed.")
+                self.speak("完成しました", "It's completed.")
                 self.robot.finishDemo()
                 send_command(self.robot)
                 self.autoTransition = False
@@ -203,21 +226,23 @@ class CubeSolverFSM(object):
                     except ValueError as e:
                         print(e)
                         print("detected cube state is invalid, rescan is necessary")
-                        # self.speak("見間違えたみたいです。もう一回みてみますね。")
-                        self.speak("It seems I made a mistake. Let me check again.")
+                        self.speak("見間違えたみたいです。もう一回みてみますね。",
+                                   "It seems I made a mistake. Let me check again.")
                         self.index = 0
                         self.start = True
                         valid = False
                     if valid:
                         self.solveOperations = s.split(' ')
                         print("solution:",self.solveOperations)
-                        # self.speak("解き方がわかりました｡"+str(len(self.solveOperations))+"手で解けます。")
-                        self.speak("I have figured out the solution. It can be solved in "+str(len(self.solveOperations))+" moves.")
+                        self.speak(
+                            "解き方がわかりました｡"+str(len(self.solveOperations))+"手で解けます。",
+                            "I have figured out the solution. It can be solved in "+str(len(self.solveOperations))+" moves.")
                         self.transitTo("solve", len(self.solveOperations)-1)
                 else:
                     print("detected cube state is invalid, rescan is necessary")
-                    # self.speak("見間違えたみたいです。もう一回みてみますね。")
-                    self.speak("It seems I made a mistake. Let me check again.")
+                    self.speak(
+                        "見間違えたみたいです。もう一回みてみますね。",
+                        "It seems I made a mistake. Let me check again.")
                     self.index = 0
                     self.start = True
             else:

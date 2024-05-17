@@ -15,10 +15,12 @@
   <depend>message_generation</depend>
   <depend>sgd_msgs</depend>
 
+  <exec_depend>stereo_image_sandbox</exec_depend>
+  <exec_depend>kxreus</exec_depend>
+  <exec_depend>kxr_controller</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
-
   </export>
 </package>
