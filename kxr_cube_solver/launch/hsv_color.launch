@@ -11,9 +11,12 @@
   <arg name="queue_size" default="3" doc="Specigy queue_size of input image subscribers" />
   <arg name="gui" default="true"/>
 
+  <arg name="MANAGER" default="/camera/realsense2_camera" />
+
   <group ns="red" >
     <node name="hsv_color_filter"
-          pkg="opencv_apps" type="hsv_color_filter"
+          pkg="nodelet" type="nodelet"
+          args="load opencv_apps/hsv_color_filter $(arg MANAGER)"
           output="screen">
       <remap from="image" to="$(arg image)" />
       <param name="use_camera_info" value="false" />
@@ -26,11 +29,25 @@
       <param name="v_limit_max" value="$(arg v_limit_max)" />
       <param name="v_limit_min" value="$(arg v_limit_min)" />
     </node>
+
+    <node name="apply_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_perception/ApplyMaskImage $(arg MANAGER)"
+          respawn="true" >
+      <remap from="~input" to="$(arg image)" />
+      <remap from="~input/mask" to="hsv_color_filter/image" />
+      <rosparam>
+        approximate_sync: false
+        clip: false
+      </rosparam>
+    </node>
+
   </group>
 
   <group ns="orange" >
     <node name="hsv_color_filter"
-          pkg="opencv_apps" type="hsv_color_filter"
+          pkg="nodelet" type="nodelet"
+          args="load opencv_apps/hsv_color_filter $(arg MANAGER)"
           output="screen">
       <remap from="image" to="$(arg image)" />
       <param name="use_camera_info" value="false" />
@@ -43,11 +60,25 @@
       <param name="v_limit_max" value="$(arg v_limit_max)" />
       <param name="v_limit_min" value="$(arg v_limit_min)" />
     </node>
+
+    <node name="apply_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_perception/ApplyMaskImage $(arg MANAGER)"
+          respawn="true" >
+      <remap from="~input" to="$(arg image)" />
+      <remap from="~input/mask" to="hsv_color_filter/image" />
+      <rosparam>
+        approximate_sync: false
+        clip: false
+      </rosparam>
+    </node>
+
   </group>
 
   <group ns="blue" >
     <node name="hsv_color_filter"
-          pkg="opencv_apps" type="hsv_color_filter"
+          pkg="nodelet" type="nodelet"
+          args="load opencv_apps/hsv_color_filter $(arg MANAGER)"
           output="screen">
       <remap from="image" to="$(arg image)" />
       <param name="use_camera_info" value="false" />
@@ -60,11 +91,25 @@
       <param name="v_limit_max" value="$(arg v_limit_max)" />
       <param name="v_limit_min" value="$(arg v_limit_min)" />
     </node>
+
+    <node name="apply_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_perception/ApplyMaskImage $(arg MANAGER)"
+          respawn="true" >
+      <remap from="~input" to="$(arg image)" />
+      <remap from="~input/mask" to="hsv_color_filter/image" />
+      <rosparam>
+        approximate_sync: false
+        clip: false
+      </rosparam>
+    </node>
+
   </group>
 
   <group ns="yellow" >
     <node name="hsv_color_filter"
-          pkg="opencv_apps" type="hsv_color_filter"
+          pkg="nodelet" type="nodelet"
+          args="load opencv_apps/hsv_color_filter $(arg MANAGER)"
           output="screen">
       <remap from="image" to="$(arg image)" />
       <param name="use_camera_info" value="false" />
@@ -77,12 +122,26 @@
       <param name="v_limit_max" value="$(arg v_limit_max)" />
       <param name="v_limit_min" value="$(arg v_limit_min)" />
     </node>
+
+    <node name="apply_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_perception/ApplyMaskImage $(arg MANAGER)"
+          respawn="true" >
+      <remap from="~input" to="$(arg image)" />
+      <remap from="~input/mask" to="hsv_color_filter/image" />
+      <rosparam>
+        approximate_sync: false
+        clip: false
+      </rosparam>
+    </node>
+
   </group>
 
 
   <group ns="green" >
     <node name="hsv_color_filter"
-          pkg="opencv_apps" type="hsv_color_filter"
+          pkg="nodelet" type="nodelet"
+          args="load opencv_apps/hsv_color_filter $(arg MANAGER)"
           output="screen">
       <remap from="image" to="$(arg image)" />
       <param name="use_camera_info" value="false" />
@@ -95,11 +154,25 @@
       <param name="v_limit_max" value="$(arg v_limit_max)" />
       <param name="v_limit_min" value="$(arg v_limit_min)" />
     </node>
+
+    <node name="apply_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_perception/ApplyMaskImage $(arg MANAGER)"
+          respawn="true" >
+      <remap from="~input" to="$(arg image)" />
+      <remap from="~input/mask" to="hsv_color_filter/image" />
+      <rosparam>
+        approximate_sync: false
+        clip: false
+      </rosparam>
+    </node>
+
   </group>
 
   <group ns="white" >
     <node name="hsv_color_filter"
-          pkg="opencv_apps" type="hsv_color_filter"
+          pkg="nodelet" type="nodelet"
+          args="load opencv_apps/hsv_color_filter $(arg MANAGER)"
           output="screen">
       <remap from="image" to="$(arg image)" />
       <param name="use_camera_info" value="false" />
@@ -111,6 +184,18 @@
       <param name="s_limit_min" value="$(arg s_limit_min)" />
       <param name="v_limit_max" value="$(arg v_limit_max)" />
       <param name="v_limit_min" value="$(arg v_limit_min)" />
+    </node>
+
+    <node name="apply_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_perception/ApplyMaskImage $(arg MANAGER)"
+          respawn="true" >
+      <remap from="~input" to="$(arg image)" />
+      <remap from="~input/mask" to="hsv_color_filter/image" />
+      <rosparam>
+        approximate_sync: false
+        clip: false
+      </rosparam>
     </node>
   </group>
 
@@ -119,7 +204,7 @@
         output="screen">
     <remap from="~output" to="~output" />
     <rosparam subst_value="true">
-      input_topics: [/red/hsv_color_filter/image, /orange/hsv_color_filter/image, /blue/hsv_color_filter/image, /green/hsv_color_filter/image, /yellow/hsv_color_filter/image, /white/hsv_color_filter/image, ]
+      input_topics: [/red/apply_mask_image/output, /orange/apply_mask_image/output, /blue/apply_mask_image/output, /green/apply_mask_image/output, /yellow/apply_mask_image/output, /white/apply_mask_image/output, ]
       shape: [2, 3]
       no_sync: true
       draw_topic_name: true
