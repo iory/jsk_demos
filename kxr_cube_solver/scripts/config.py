@@ -3,12 +3,12 @@ roi_center_x = 420
 roi_center_y = 230
 
 # colors in BGR
-colors = [('green',  (65,135,25)),
-          ('orange', (30,75,250)),
-          ('white',  (150,155,160)),
-          ('blue',   (125,75,0)),
-          ('red',    (40, 20, 180)),
-          ('yellow', (25,165,175))]
+colors = [('green',  (0, 60, 0)),
+          ('orange', (0, 20, 90)),
+          ('white',  (60, 60, 60)),
+          ('blue',   (30, 20, 0)),
+          ('red',    (0, 0, 70)),
+          ('yellow', (0, 56, 79))]
 
 color2index = {
     c[0]: i for i, c in enumerate(colors)

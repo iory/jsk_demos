@@ -1,5 +1,3 @@
-#!/usr/bin/env roseus
-
 (load "package://kxreus/euslisp/kxr-interface.l")
 (ros::roseus-add-srvs "kxr_cube_solver")
 
@@ -102,15 +100,12 @@
 
   (gripper-angle :rarm 33)
   (gripper-angle :larm 33)
-  (send *robot* :larm :move-end-pos #f(5 0 0) :world :rotation-axis nil)
   (send *ri* :angle-vector (send *robot* :angle-vector) 3000)
   (send *ri* :wait-interpolation)
-
-
-  ;; (send *robot* :angle-vector (send *ri* :state :potentio-vector))
-  ;; (send *robot* :larm :move-end-pos #f(5 0 0) :world)
-  ;; (send *ri* :angle-vector (send *robot* :angle-vector) 500)
-  ;; (send *ri* :wait-interpolation)
+  (send *robot* :angle-vector (send *ri* :state :potentio-vector))
+  (send *robot* :larm :move-end-pos #f(5 0 0) :world)
+  (send *ri* :angle-vector (send *robot* :angle-vector) 500)
+  (send *ri* :wait-interpolation)
   )
 
 
@@ -128,12 +123,4 @@
     (ros::spin-once) ;; need to execute callbacks
     (ros::sleep)))
 
-
-(defun demo()
-  (kxr-init :create-viewer nil)
-  (start-command-server))
-
-
-(ros::rate 10)
-(ros::advertise-service "~send_command" kxr_cube_solver::SendCommand #'command-callback)
-(demo)
+(kxr-init :create-viewer t)

@@ -159,9 +159,9 @@ class cubeSolver:
     def lookAt(self, faceId):
         if faceId == 'D':
             self.gripperL.release()
-            self.gripperR.rotate(95)
+            self.gripperR.rotate(90)
         elif faceId == 'U':
-            self.gripperR.rotate(-185)
+            self.gripperR.rotate(-180)
         elif faceId == 'L':
             self.gripperR.rotate(90)
             self.gripperL.grasp()
