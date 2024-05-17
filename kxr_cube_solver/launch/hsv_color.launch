@@ -1,0 +1,138 @@
+<launch>
+
+  <!-- <arg name="image" default="/camera/color/image_raw" doc="The image topic. Should be remapped to the name of the real image topic." /> -->
+  <arg name="image" default="/kinect_head/rgb/image_raw" doc="The image topic. Should be remapped to the name of the real image topic." />
+
+  <arg name="h_limit_max" default="250" doc="The maximum allowed field value Hue" />
+  <arg name="h_limit_min" default="0" doc="The minimum allowed field value Hue" />
+  <arg name="s_limit_max" default="255" doc="The maximum allowed field value Saturation" />
+  <arg name="s_limit_min" default="150" doc="The minimum allowed field value Saturation" />
+  <arg name="v_limit_max" default="255" doc="The maximum allowed field value Value" />
+  <arg name="v_limit_min" default="50" doc="The minimum allowed field value Value" />
+  <arg name="queue_size" default="3" doc="Specigy queue_size of input image subscribers" />
+  <arg name="gui" default="true"/>
+
+  <group ns="red" >
+    <node name="hsv_color_filter"
+          pkg="opencv_apps" type="hsv_color_filter"
+          output="screen">
+      <remap from="image" to="$(arg image)" />
+      <param name="use_camera_info" value="false" />
+      <param name="debug_view" value="false" />
+      <param name="queue_size" value="$(arg queue_size)" />
+      <param name="h_limit_max" value="$(arg h_limit_max)" />
+      <param name="h_limit_min" value="$(arg h_limit_min)" />
+      <param name="s_limit_max" value="$(arg s_limit_max)" />
+      <param name="s_limit_min" value="$(arg s_limit_min)" />
+      <param name="v_limit_max" value="$(arg v_limit_max)" />
+      <param name="v_limit_min" value="$(arg v_limit_min)" />
+    </node>
+  </group>
+
+  <group ns="orange" >
+    <node name="hsv_color_filter"
+          pkg="opencv_apps" type="hsv_color_filter"
+          output="screen">
+      <remap from="image" to="$(arg image)" />
+      <param name="use_camera_info" value="false" />
+      <param name="debug_view" value="false" />
+      <param name="queue_size" value="$(arg queue_size)" />
+      <param name="h_limit_max" value="$(arg h_limit_max)" />
+      <param name="h_limit_min" value="$(arg h_limit_min)" />
+      <param name="s_limit_max" value="$(arg s_limit_max)" />
+      <param name="s_limit_min" value="$(arg s_limit_min)" />
+      <param name="v_limit_max" value="$(arg v_limit_max)" />
+      <param name="v_limit_min" value="$(arg v_limit_min)" />
+    </node>
+  </group>
+
+  <group ns="blue" >
+    <node name="hsv_color_filter"
+          pkg="opencv_apps" type="hsv_color_filter"
+          output="screen">
+      <remap from="image" to="$(arg image)" />
+      <param name="use_camera_info" value="false" />
+      <param name="debug_view" value="false" />
+      <param name="queue_size" value="$(arg queue_size)" />
+      <param name="h_limit_max" value="$(arg h_limit_max)" />
+      <param name="h_limit_min" value="$(arg h_limit_min)" />
+      <param name="s_limit_max" value="$(arg s_limit_max)" />
+      <param name="s_limit_min" value="$(arg s_limit_min)" />
+      <param name="v_limit_max" value="$(arg v_limit_max)" />
+      <param name="v_limit_min" value="$(arg v_limit_min)" />
+    </node>
+  </group>
+
+  <group ns="yellow" >
+    <node name="hsv_color_filter"
+          pkg="opencv_apps" type="hsv_color_filter"
+          output="screen">
+      <remap from="image" to="$(arg image)" />
+      <param name="use_camera_info" value="false" />
+      <param name="debug_view" value="false" />
+      <param name="queue_size" value="$(arg queue_size)" />
+      <param name="h_limit_max" value="$(arg h_limit_max)" />
+      <param name="h_limit_min" value="$(arg h_limit_min)" />
+      <param name="s_limit_max" value="$(arg s_limit_max)" />
+      <param name="s_limit_min" value="$(arg s_limit_min)" />
+      <param name="v_limit_max" value="$(arg v_limit_max)" />
+      <param name="v_limit_min" value="$(arg v_limit_min)" />
+    </node>
+  </group>
+
+
+  <group ns="green" >
+    <node name="hsv_color_filter"
+          pkg="opencv_apps" type="hsv_color_filter"
+          output="screen">
+      <remap from="image" to="$(arg image)" />
+      <param name="use_camera_info" value="false" />
+      <param name="debug_view" value="false" />
+      <param name="queue_size" value="$(arg queue_size)" />
+      <param name="h_limit_max" value="$(arg h_limit_max)" />
+      <param name="h_limit_min" value="$(arg h_limit_min)" />
+      <param name="s_limit_max" value="$(arg s_limit_max)" />
+      <param name="s_limit_min" value="$(arg s_limit_min)" />
+      <param name="v_limit_max" value="$(arg v_limit_max)" />
+      <param name="v_limit_min" value="$(arg v_limit_min)" />
+    </node>
+  </group>
+
+  <group ns="white" >
+    <node name="hsv_color_filter"
+          pkg="opencv_apps" type="hsv_color_filter"
+          output="screen">
+      <remap from="image" to="$(arg image)" />
+      <param name="use_camera_info" value="false" />
+      <param name="debug_view" value="false" />
+      <param name="queue_size" value="$(arg queue_size)" />
+      <param name="h_limit_max" value="$(arg h_limit_max)" />
+      <param name="h_limit_min" value="$(arg h_limit_min)" />
+      <param name="s_limit_max" value="$(arg s_limit_max)" />
+      <param name="s_limit_min" value="$(arg s_limit_min)" />
+      <param name="v_limit_max" value="$(arg v_limit_max)" />
+      <param name="v_limit_min" value="$(arg v_limit_min)" />
+    </node>
+  </group>
+
+  <node name="tile_image"
+        pkg="jsk_perception" type="tile_image.py"
+        output="screen">
+    <remap from="~output" to="~output" />
+    <rosparam subst_value="true">
+      input_topics: [/red/hsv_color_filter/image, /orange/hsv_color_filter/image, /blue/hsv_color_filter/image, /green/hsv_color_filter/image, /yellow/hsv_color_filter/image, /white/hsv_color_filter/image, ]
+      shape: [2, 3]
+      no_sync: true
+      draw_topic_name: true
+    </rosparam>
+  </node>
+
+  <!-- visualize resutls -->
+  <group if="$(arg gui)" >
+    <node name="image_view01"
+          pkg="image_view" type="image_view">
+      <remap from="image" to="tile_image/output" />
+    </node>
+  </group>
+
+</launch>
