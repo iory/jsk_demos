@@ -1,0 +1,31 @@
+<launch>
+
+  <arg name="image_topic_name" default="/camera/color/image_raw"/>
+  <!-- <arg name="image_topic_name" default="/usb_cam/image_raw"/> -->
+
+  <!-- <arg name="video_device" default="/dev/video0" /> -->
+
+  <!-- <node name="usb_cam" -->
+  <!--       pkg="usb_cam" type="usb_cam_node" -->
+  <!--       output="screen" > -->
+  <!--   <rosparam subst_value="true" > -->
+  <!--     video_device: $(arg video_device) -->
+  <!--     pixel_format: yuyv -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
+
+  <node name="kxr_command_server"
+        pkg="kxr_cube_solver" type="command-server.l"
+        output="screen" >
+  </node>
+
+  <!-- <node name="cube_solver" -->
+  <!--       pkg="kxr_cube_solver" type="cube_solver.py" -->
+  <!--       output="screen"> -->
+  <!--   <remap from="~image_in" to="$(arg image_topic_name)"/> -->
+  <!-- </node> -->
+
+  <include file="$(find kxr_cube_solver)/launch/sound_play.launch" >
+  </include>
+
+</launch>

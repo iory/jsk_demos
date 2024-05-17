@@ -1,0 +1,34 @@
+<launch>
+
+  <!-- <arg name="image_topic_name" default="/camera/color/image_raw"/> -->
+  <arg name="image_topic_name" default="/remote/color/image_raw"/>
+
+
+  <node name="republish"
+        pkg="image_transport" type="republish"
+        args="compressed raw">
+    <remap from="in" to="/camera/color/image_raw"/>
+    <remap from="out" to="/remote/color/image_raw"/>
+  </node>
+
+  <!-- <arg name="image_topic_name" default="/usb_cam/image_raw"/> -->
+
+  <!-- <arg name="video_device" default="/dev/video0" /> -->
+
+  <!-- <node name="usb_cam" -->
+  <!--       pkg="usb_cam" type="usb_cam_node" -->
+  <!--       output="screen" > -->
+  <!--   <rosparam subst_value="true" > -->
+  <!--     video_device: $(arg video_device) -->
+  <!--     pixel_format: yuyv -->
+  <!--   </rosparam> -->
+  <!-- </node> -->
+
+  <node name="cube_solver"
+        pkg="kxr_cube_solver" type="cube_solver.py"
+        output="screen">
+    <remap from="~image_in" to="$(arg image_topic_name)"/>
+  </node>
+
+
+</launch>
