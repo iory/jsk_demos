@@ -4,7 +4,7 @@ import math
 from helpers import ciede2000, bgr2lab
 import config
 from config import color2index
-from color_classifier import KNNColorClassifier
+# from color_classifier import KNNColorClassifier
 
 import datetime
 
@@ -49,7 +49,7 @@ class cubeDetector:
         self.thickness = 2
         self.white = (255,255,255)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
-        self.cl = KNNColorClassifier.from_file('/home/iory/color.pkl')
+        # self.cl = KNNColorClassifier.from_file('/home/iory/color.pkl')
 
         self.initFaces()
 
@@ -111,13 +111,14 @@ class cubeDetector:
         face = []
         for i,roi in enumerate(self.rois):
             img = getROI(frame, roi, self.roi_size)
-            # bgr = get_dominant_color(img)
-            # cc = get_closest_color(bgr, config.colors)
-            # for i,c in enumerate(config.colors):
-            #     if cc["color_name"] == c[0]:
-            #         res = i
-            probs, colors, indices = self.cl.predict_proba(img)
-            face.append(color2index[colors[0]])
+            bgr = get_dominant_color(img)
+            cc = get_closest_color(bgr, config.colors)
+            for i,c in enumerate(config.colors):
+                if cc["color_name"] == c[0]:
+                    res = i
+            face.append(res)
+            # probs, colors, indices = self.cl.predict_proba(img)
+            # face.append(color2index[colors[0]])
         return face
 
     def drawInfo(self, frame, face, msgs):
