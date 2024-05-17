@@ -10,7 +10,7 @@ repositories:
   rcb4:
     type: git
     url: https://github.com/iory/rcb4.git
-    version: 9109ae78b1fe3f7f898b2fe2a85cb970d99a4ba9
+    version: 955724b81a8f78ef323b048cf2c642f584a91807
   ros-perception/image_transport_plugins:
     type: git
     url: https://github.com/ros-perception/image_transport_plugins

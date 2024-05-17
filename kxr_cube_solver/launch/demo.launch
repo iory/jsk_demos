@@ -9,4 +9,7 @@
   <include file="$(find kxreus)/launch/eusmodel_server.launch" >
   </include>
 
+  <include file="$(find kxr_cube_solver)/launch/sound_play.launch" >
+  </include>
+
 </launch>
