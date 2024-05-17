@@ -28,5 +28,4 @@
        args="-d $(find kxr_cube_solver)/launch/rviz/viewer.rviz" >
   </node>
 
-
 </launch>
