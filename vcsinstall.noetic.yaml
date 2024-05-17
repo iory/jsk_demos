@@ -1,0 +1,17 @@
+repositories:
+  IntelRealSense/realsense-ros:
+    type: git
+    url: https://github.com/IntelRealSense/realsense-ros
+    version: de76e14920434ae6c79eae2c89b09725672b91e3
+  jsk-ros-pkg/jsk_demos:
+    type: git
+    url: https://github.com/iory/jsk_demos
+    version: cube-solver
+  rcb4:
+    type: git
+    url: https://github.com/iory/rcb4.git
+    version: 9109ae78b1fe3f7f898b2fe2a85cb970d99a4ba9
+  ros-perception/image_transport_plugins:
+    type: git
+    url: https://github.com/ros-perception/image_transport_plugins
+    version: cca6781d47732e7fca078df950780c09dfca9225
