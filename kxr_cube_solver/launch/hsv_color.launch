@@ -11,7 +11,7 @@
   <arg name="queue_size" default="3" doc="Specigy queue_size of input image subscribers" />
   <arg name="gui" default="true"/>
 
-  <arg name="MANAGER" default="/camera/realsense2_camera" />
+  <arg name="MANAGER" default="/camera/realsense2_camera_manager" />
 
   <group ns="red" >
     <node name="hsv_color_filter"
@@ -22,12 +22,12 @@
       <param name="use_camera_info" value="false" />
       <param name="debug_view" value="false" />
       <param name="queue_size" value="$(arg queue_size)" />
-      <param name="h_limit_max" value="$(arg h_limit_max)" />
-      <param name="h_limit_min" value="$(arg h_limit_min)" />
-      <param name="s_limit_max" value="$(arg s_limit_max)" />
-      <param name="s_limit_min" value="$(arg s_limit_min)" />
-      <param name="v_limit_max" value="$(arg v_limit_max)" />
-      <param name="v_limit_min" value="$(arg v_limit_min)" />
+      <param name="h_limit_max" value="16" />
+      <param name="h_limit_min" value="282" />
+      <param name="s_limit_max" value="255" />
+      <param name="s_limit_min" value="0" />
+      <param name="v_limit_max" value="255" />
+      <param name="v_limit_min" value="0" />
     </node>
 
     <node name="apply_mask_image"
@@ -53,12 +53,12 @@
       <param name="use_camera_info" value="false" />
       <param name="debug_view" value="false" />
       <param name="queue_size" value="$(arg queue_size)" />
-      <param name="h_limit_max" value="$(arg h_limit_max)" />
-      <param name="h_limit_min" value="$(arg h_limit_min)" />
-      <param name="s_limit_max" value="$(arg s_limit_max)" />
-      <param name="s_limit_min" value="$(arg s_limit_min)" />
-      <param name="v_limit_max" value="$(arg v_limit_max)" />
-      <param name="v_limit_min" value="$(arg v_limit_min)" />
+      <param name="h_limit_max" value="28" />
+      <param name="h_limit_min" value="360" />
+      <param name="s_limit_max" value="255" />
+      <param name="s_limit_min" value="0" />
+      <param name="v_limit_max" value="255" />
+      <param name="v_limit_min" value="0" />
     </node>
 
     <node name="apply_mask_image"
@@ -84,12 +84,12 @@
       <param name="use_camera_info" value="false" />
       <param name="debug_view" value="false" />
       <param name="queue_size" value="$(arg queue_size)" />
-      <param name="h_limit_max" value="$(arg h_limit_max)" />
-      <param name="h_limit_min" value="$(arg h_limit_min)" />
-      <param name="s_limit_max" value="$(arg s_limit_max)" />
-      <param name="s_limit_min" value="$(arg s_limit_min)" />
-      <param name="v_limit_max" value="$(arg v_limit_max)" />
-      <param name="v_limit_min" value="$(arg v_limit_min)" />
+      <param name="h_limit_max" value="209" />
+      <param name="h_limit_min" value="186" />
+      <param name="s_limit_max" value="255" />
+      <param name="s_limit_min" value="97" />
+      <param name="v_limit_max" value="255" />
+      <param name="v_limit_min" value="0" />
     </node>
 
     <node name="apply_mask_image"
@@ -115,12 +115,12 @@
       <param name="use_camera_info" value="false" />
       <param name="debug_view" value="false" />
       <param name="queue_size" value="$(arg queue_size)" />
-      <param name="h_limit_max" value="$(arg h_limit_max)" />
-      <param name="h_limit_min" value="$(arg h_limit_min)" />
-      <param name="s_limit_max" value="$(arg s_limit_max)" />
-      <param name="s_limit_min" value="$(arg s_limit_min)" />
-      <param name="v_limit_max" value="$(arg v_limit_max)" />
-      <param name="v_limit_min" value="$(arg v_limit_min)" />
+      <param name="h_limit_max" value="108" />
+      <param name="h_limit_min" value="33" />
+      <param name="s_limit_max" value="256" />
+      <param name="s_limit_min" value="98" />
+      <param name="v_limit_max" value="256" />
+      <param name="v_limit_min" value="0" />
     </node>
 
     <node name="apply_mask_image"
@@ -147,12 +147,12 @@
       <param name="use_camera_info" value="false" />
       <param name="debug_view" value="false" />
       <param name="queue_size" value="$(arg queue_size)" />
-      <param name="h_limit_max" value="$(arg h_limit_max)" />
-      <param name="h_limit_min" value="$(arg h_limit_min)" />
-      <param name="s_limit_max" value="$(arg s_limit_max)" />
-      <param name="s_limit_min" value="$(arg s_limit_min)" />
-      <param name="v_limit_max" value="$(arg v_limit_max)" />
-      <param name="v_limit_min" value="$(arg v_limit_min)" />
+      <param name="h_limit_max" value="182" />
+      <param name="h_limit_min" value="122" />
+      <param name="s_limit_max" value="256" />
+      <param name="s_limit_min" value="152" />
+      <param name="v_limit_max" value="256" />
+      <param name="v_limit_min" value="0" />
     </node>
 
     <node name="apply_mask_image"
@@ -178,12 +178,12 @@
       <param name="use_camera_info" value="false" />
       <param name="debug_view" value="false" />
       <param name="queue_size" value="$(arg queue_size)" />
-      <param name="h_limit_max" value="$(arg h_limit_max)" />
-      <param name="h_limit_min" value="$(arg h_limit_min)" />
-      <param name="s_limit_max" value="$(arg s_limit_max)" />
-      <param name="s_limit_min" value="$(arg s_limit_min)" />
-      <param name="v_limit_max" value="$(arg v_limit_max)" />
-      <param name="v_limit_min" value="$(arg v_limit_min)" />
+      <param name="h_limit_max" value="360" />
+      <param name="h_limit_min" value="0" />
+      <param name="s_limit_max" value="79" />
+      <param name="s_limit_min" value="40" />
+      <param name="v_limit_max" value="256" />
+      <param name="v_limit_min" value="0" />
     </node>
 
     <node name="apply_mask_image"
