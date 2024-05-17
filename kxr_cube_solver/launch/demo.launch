@@ -16,10 +16,6 @@
   <include file="$(find kxr_cube_solver)/launch/d405.launch" >
   </include>
 
-  <include file="$(find kxr_controller)/launch/viewer.launch" >
-  </include>
-
-
   <node name="get_urdf_model"
         pkg="kxr_models" type="get_urdf_model.py" >
     <rosparam subst_value="true">
