@@ -78,9 +78,9 @@ class CubeSolverFSM(object):
 
         self.lang = rospy.get_param('~language', 'jp')
         if not self.lang in valid_language:
-            rospy.logerr(
-                'Invalid language {}.'.format(self.lang)
-                ' You can use {}.'.format(valid_language))
+            msg = 'Invalid language {}.'.format(self.lang)
+            msg += ' You can use {}.'.format(valid_language)
+            rospy.logerr(msg)
             sys.exit(1)
 
         self.tipsIndex = 0
