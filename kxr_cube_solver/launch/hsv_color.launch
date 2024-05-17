@@ -115,7 +115,7 @@
   </group>
 
   <node name="tile_image"
-        pkg="jsk_perception" type="tile_image.py"
+        pkg="kxr_cube_solver" type="tile_image.py"
         output="screen">
     <remap from="~output" to="~output" />
     <rosparam subst_value="true">
