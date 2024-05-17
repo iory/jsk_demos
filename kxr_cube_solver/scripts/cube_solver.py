@@ -91,11 +91,11 @@ class CubeSolverFSM(object):
         return self.speakProc.is_alive()
 
     def speak(self, msg_jp, msg_en, wait=True):
-        rospy.loginfo('Speak "{}"'.format(msg))
+        rospy.loginfo('Speak "{}"'.format(msg_jp))
         if self.lang == 'jp':
             self.speakProc = Thread(
                 target=speak_jp,
-                args=(msg, 'robotsound_jp', 1, wait))
+                args=(msg_jp, 'robotsound_jp', 1, wait))
         elif self.lang == 'en':
             self.speakProc = Thread(
                 target=speak_en,
