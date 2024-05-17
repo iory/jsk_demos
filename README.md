@@ -10,6 +10,6 @@ cd ~/ros/kxr_cube_solver
 rosdep install --from-paths -i -y -r .
 catkin build --cmake-args -DCMAKE_BUILD_TYPE=Release
 source ~/ros/kxr_cube_solver/devel/setup.bash
-catkin b realsense2_camera --cmake-args -DCMAKE_BUILD_TYPE=Release
+catkin b --cmake-args -DCMAKE_BUILD_TYPE=Release
 pip3 install pydub gtts kociemba ros-speak
 ```
