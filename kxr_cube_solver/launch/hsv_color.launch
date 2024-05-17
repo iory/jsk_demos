@@ -1,7 +1,6 @@
 <launch>
 
-  <!-- <arg name="image" default="/camera/color/image_raw" doc="The image topic. Should be remapped to the name of the real image topic." /> -->
-  <arg name="image" default="/kinect_head/rgb/image_raw" doc="The image topic. Should be remapped to the name of the real image topic." />
+  <arg name="image" default="/camera/color/image_raw" doc="The image topic. Should be remapped to the name of the real image topic." />
 
   <arg name="h_limit_max" default="250" doc="The maximum allowed field value Hue" />
   <arg name="h_limit_min" default="0" doc="The minimum allowed field value Hue" />
