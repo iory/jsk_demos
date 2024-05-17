@@ -1,6 +1,7 @@
 <launch>
 
   <arg name="joint_group_description" value="$(find kxreus)/config/kxrl2l2a6h2m.yaml" />
+  <arg name="connect_tf" default="true" />
 
   <include file="$(find kxr_controller)/launch/kxr_controller.launch" >
     <arg name="joint_group_description" value="$(arg joint_group_description)" />
@@ -11,5 +12,25 @@
 
   <include file="$(find kxr_cube_solver)/launch/sound_play.launch" >
   </include>
+
+  <include file="$(find kxr_cube_solver)/launch/d405.launch" >
+  </include>
+
+  <include file="$(find kxr_controller)/launch/viewer.launch" >
+  </include>
+
+
+  <node name="get_urdf_model"
+        pkg="kxr_models" type="get_urdf_model.py" >
+    <rosparam subst_value="true">
+      connect_tf: $(arg connect_tf)
+    </rosparam>
+  </node>
+
+  <node name="$(anon rviz)"
+       pkg="rviz" type="rviz"
+       args="-d $(find kxr_cube_solver)/launch/rviz/viewer.rviz" >
+  </node>
+
 
 </launch>
