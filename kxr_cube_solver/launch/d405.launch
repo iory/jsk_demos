@@ -9,4 +9,8 @@
     <arg name="color_height" value="480" />
   </include>
 
+  <param name="/camera/stereo_module/exposure" value="11600" />
+  <param name="/camera/stereo_module/enable_auto_white_balance" value="false" />
+  <param name="/camera/stereo_module/white_balance" value="4218" />
+
 </launch>
