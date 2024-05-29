@@ -43,3 +43,17 @@ This ROS node publishes alternating values of `0` and `1000` to the `/vacuum_pre
 It is implemented using the rospy library in Python and is intended for use in robotics applications that require control of vacuum pressure based on user input.
 
 
+
+### for cube device
+
+In radxa,
+
+```
+roslaunch kxr_controller kxr_controller.launch  publish_sensor:=true
+```
+
+In external PC,
+
+```
+roslaunch manip_teaching cube.launch
+```
