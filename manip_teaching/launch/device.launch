@@ -8,17 +8,7 @@
   <include file="$(find manip_teaching)/launch/launch_t265.launch" >
   </include>
 
-  <group unless="$(arg use_pad)" >
-    <node name="vacuum_pressure"
-          pkg="manip_teaching" type="vacuum_pressure.py" >
-    </node>
-  </group>
-
-  <group if="$(arg use_pad)" >
-    <node name="pseudo_vacuum_pressure"
-          pkg="manip_teaching" type="pseudo_vacuum_by_button.py"
-          output="screen" >
-    </node>
-  </group>
+  <include file="$(find manip_teaching)/launch/controller.launch" >
+  </include>
 
 </launch>

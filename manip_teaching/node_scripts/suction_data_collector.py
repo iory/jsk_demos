@@ -9,6 +9,7 @@ from collections import deque
 from pathlib import Path
 from threading import Lock
 
+from skrobot.interfaces.ros.tf_utils import tf_pose_to_coords
 import cv2
 import cv_bridge
 import numpy as np
@@ -23,7 +24,6 @@ from pybsc.image_utils import imread, imwrite
 from pybsc.timestamp_utils import get_timestamp_indices_wrt_base
 from pybsc.vision.blur_detection import estimate_blur
 from sensor_msgs.msg import CompressedImage, Image
-from skrobot.interfaces.ros.tf_utils import tf_pose_to_coords
 
 np.set_printoptions(precision=2)
 
@@ -57,6 +57,8 @@ class DataCollector(object):
             sensor_msgs.msg.CameraInfo)
         rospy.loginfo('camera info received')
         self.cm = PinholeCameraModel.from_camera_info(camera_info)
+        self.blur_pub = rospy.Publisher('blur', std_msgs.msg.Float32,
+                                        queue_size=1)
 
         self.queue = deque(maxlen=200)
         self.stamp_queue = deque(maxlen=200)
@@ -66,15 +68,11 @@ class DataCollector(object):
             callback=self.img_callback)
 
         self.vacuum_sub = rospy.Subscriber(
-            '/vacuum_pressure',
+            '/fullbody_controller/average_pressure/40',
             std_msgs.msg.Float32,
             queue_size=1,
             callback=self.vacuum_callback
         )
-
-        self.blur_pub = rospy.Publisher('blur', std_msgs.msg.Float32,
-                                        queue_size=1)
-
         self.suctioned = False
         self.tf_buffer = tf2_ros.Buffer(rospy.Duration(30.0))
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
@@ -112,12 +110,14 @@ class DataCollector(object):
             self.stamp_queue.append(msg.header.stamp.to_sec())
 
     def vacuum_callback(self, msg):
-        if self.suctioned is False and msg.data < 320:
+        if self.suctioned is False and msg.data < -1:
             self.suctioned_time_stamp = rospy.Time.now()
             self.suctioned = True
             self.save_image()
             rospy.loginfo('suctioned')
-        elif msg.data >= 320:
+        elif msg.data >= 0:
+            if self.suctioned:
+                rospy.loginfo('suction ended')
             self.suctioned = False
 
     def get_pose(self, from_frame, to_frame, stamp):
@@ -195,6 +195,7 @@ class DataCollector(object):
                 continue
             makedirs(self.root_image_path / 'viz')
             filename = '{}.jpg'.format(current_time_str())
+            rospy.loginfo('Save image {}'.format(filename))
             imwrite(self.root_image_path / 'viz' / filename, viz)
             imwrite(self.root_image_path / filename, img)
             save_json(
