@@ -1,7 +1,7 @@
 <launch>
 
   <param name="camera_module_description"
-         command="xacro $(find manip_teaching)/urdf/camera_module.urdf" />
+         command="xacro $(find manip_teaching)/urdf/camera_with_pump.urdf" />
   <node name="robot_state_publisher_azure"
         pkg="robot_state_publisher" type="robot_state_publisher">
       <remap from="robot_description" to="camera_module_description" />
