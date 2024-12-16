@@ -39,7 +39,6 @@ class Button(object):
     def tick(self, pressed):
         now = time.time() * 1000  # Current time in milliseconds
 
-        print(self._state, pressed)
         if self._state == 'IDLE':
             if pressed:
                 self._state = 'DEBOUNCE_PRESS'
@@ -69,8 +68,6 @@ class Button(object):
                     if self._long_press_stop_callback:
                         self._long_press_stop_callback()
                 else:
-                    print(now - self._press_start_time, self._click_ms)
-                    print(self._click_count)
                     if now - self._press_start_time >= self._click_ms:
                         if self._click_count == 1 and self._click_callback:
                             self._click_callback()
