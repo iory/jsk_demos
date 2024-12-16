@@ -1,0 +1,9 @@
+<launch>
+
+  <include file="$(find kxr_controller)/launch/kxr_controller.launch" >
+    <arg name="urdf_path" value="" />
+    <arg name="servo_config_path" value="$(find manip_teaching)/config/servo_config.yaml" />
+    <arg name="control_pressure" value="true" />
+  </include>
+
+</launch>
