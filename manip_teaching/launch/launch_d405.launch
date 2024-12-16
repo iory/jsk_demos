@@ -3,18 +3,6 @@
   <arg name="camera" default="d405" />
   <arg name="use_high" default="false" />
 
-  <node name="link1_broadcaster"
-        pkg="tf" type="static_transform_publisher"
-        args="0.00034432653431454296 -0.0010792891404017568 -0.038291160926020945
-              -0.0005371544465914706 -0.001783615531099514 0.005907839284016769 0.9999807957434713
-              t265_link d405_link 10" />
-
-  <node name="suction_tf_broadcaster"
-        pkg="tf" type="static_transform_publisher"
-        args="0.02 -0.01 -0.045
-              0 0 0 1
-              d405_link suction_frame 10" />
-
   <group unless="$(arg use_high)" >
     <include file="$(find manip_teaching)/launch/rs_camera.launch" >
       <arg name="respawn" value="true" />

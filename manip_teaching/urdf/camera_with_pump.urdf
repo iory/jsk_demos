@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<robot name="camera_with_pump2">
+  <link name="base_link">
+    <inertial>
+      <origin xyz="-0.0226573995934764 -0.0026056378709466 -0.0129420694840237" rpy="0.0 -0.0 0.0"/>
+      <mass value="0.395757124911999"/>
+      <inertia ixx="7.71021654024725e-05" ixy="-1.31770942600829e-06" ixz="-2.19372674766887e-05" iyy="0.000236619099009709" iyz="2.78505058663576e-08" izz="0.000217681372878933"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://manip_teaching/meshes/base_link.dae"/>
+      </geometry>
+      <material name=""/>
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963267949 -0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://manip_teaching/meshes/base_link.dae"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963267949 -0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="d405_link">
+    <inertial>
+      <origin xyz="-0.0224 -0.0155540040717308 -0.00013557759161586" rpy="0.0 -0.0 0.0"/>
+      <mass value="0.0590215187603002"/>
+      <inertia ixx="9.01928210868736e-06" ixy="-6.81819126471851e-25" ixz="1.5026526238702e-20" iyy="1.64321452792171e-05" iyz="3.39484630401768e-08" izz="9.11296790486746e-06"/>
+    </inertial>
+    <visual>
+      <geometry/>
+      <origin xyz="-0.0134 -0.009 -4.89858719658943e-18" rpy="3.14159265358979 -0.0 1.5707963267949"/>
+    </visual>
+    <collision>
+      <geometry/>
+      <origin xyz="-0.0134 -0.009 -4.89858719658943e-18" rpy="3.14159265358979 -0.0 1.5707963267949"/>
+    </collision>
+  </link>
+  <link name="suction_frame">
+    <inertial>
+      <origin xyz="-0.0461524909970739 -1.65629569393543e-07 0.00911849857669409" rpy="0.0 -0.0 0.0"/>
+      <mass value="0.016422245519603"/>
+      <inertia ixx="3.89200335389267e-06" ixy="-1.19161563059758e-11" ixz="8.82772437047526e-07" iyy="3.43208353470626e-06" iyz="-2.3922921982892e-11" izz="5.53601156619401e-06"/>
+    </inertial>
+    <visual>
+      <geometry/>
+      <material name=""/>
+      <origin xyz="-0.027 1.38777878078145e-18 0.016" rpy="3.14159265358979 -0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry/>
+      <origin xyz="-0.027 1.38777878078145e-18 0.016" rpy="3.14159265358979 -0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="t265_link">
+    <inertial>
+      <origin xyz="-0.00700393876081753 -0.00786130730253645 9.55081874374694e-06" rpy="0.0 -0.0 0.0"/>
+      <mass value="0.0153522629829022"/>
+      <inertia ixx="1.39361946583912e-05" ixy="-1.34672770578314e-08" ixz="-1.90513550222851e-09" iyy="9.41413823478533e-07" iyz="4.36675000374055e-09" izz="1.3239974539793e-05"/>
+    </inertial>
+    <visual>
+      <geometry/>
+      <material name=""/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+    </collision>
+  </link>
+  <joint name="base_to_d405_link" type="fixed">
+    <limit effort="0.0" velocity="0.0"/>
+    <parent link="base_link"/>
+    <child link="d405_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0827524318960711 0.0309999999999999 -0.0070373182140181" rpy="-1.5707963267949 -0.0 0.0"/>
+  </joint>
+  <joint name="base_to_suction_joint" type="fixed">
+    <limit effort="0.0" velocity="0.0"/>
+    <parent link="base_link"/>
+    <child link="suction_frame"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.100252431896071 -0.0160000000000002 0.00196268178598191" rpy="-1.5707963267949 -0.0 0.0"/>
+  </joint>
+  <joint name="base_to_t265_joint" type="fixed">
+    <limit effort="0.0" velocity="0.0"/>
+    <parent link="base_link"/>
+    <child link="t265_link"/>
+    <axis xyz="0. 0. 0."/>
+    <origin xyz="0.0136161902876692 0.0309999999999998 0.0369126817859819" rpy="-1.570796326794893 -1.5707963267948932 3.141592653589793"/>
+  </joint>
+  <material name="">
+    <color rgba="0.79215686 0.81960784 0.93333333 1.        "/>
+  </material>
+</robot>
