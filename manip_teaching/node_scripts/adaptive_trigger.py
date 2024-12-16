@@ -17,21 +17,17 @@ pump_state = True
 
 def main():
     global pump_state
-    parser = argparse.ArgumentParser(
-        description='Run KXRROSRobotInterface')
-    parser.add_argument(
-        '--namespace', type=str, help='Specify the ROS namespace', default='')
-    args = parser.parse_args()
 
     rospy.init_node('kxr_interface', anonymous=True)
 
-    download_urdf_mesh_files(args.namespace)
+    namespace = ''
+    download_urdf_mesh_files(namespace)
 
     robot_model = RobotModel()
     robot_model.load_urdf_from_robot_description(
-        args.namespace + '/robot_description_viz')
+        namespace + '/robot_description_viz')
     ri = KXRROSRobotInterface(  # NOQA
-        robot_model, namespace=args.namespace)
+        robot_model, namespace=namespace, controller_timeout=60.0)
 
     ri.send_stretch(5)
     ri.servo_on()
