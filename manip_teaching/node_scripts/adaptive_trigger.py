@@ -31,7 +31,7 @@ def main():
     robot_model.load_urdf_from_robot_description(
         args.namespace + '/robot_description_viz')
     ri = KXRROSRobotInterface(  # NOQA
-        robot_model, namespace=args.namespace, controller_timeout=60.0)
+        robot_model, namespace=args.namespace)
 
     ri.send_stretch(5)
     ri.servo_on()

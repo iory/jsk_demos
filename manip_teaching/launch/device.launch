@@ -1,7 +1,5 @@
 <launch>
 
-  <arg name="use_pad" default="false" />
-
   <include file="$(find manip_teaching)/launch/launch_d405.launch" >
   </include>
 
@@ -10,5 +8,12 @@
 
   <include file="$(find manip_teaching)/launch/controller.launch" >
   </include>
+
+   <node name="adaptive_trigger"
+        pkg="manip_teaching" type="adaptive_trigger.py"
+        output="screen"
+        clear_params="true"
+        respawn="true" >
+  </node>
 
 </launch>
