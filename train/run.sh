@@ -16,7 +16,7 @@ if [ -z "${DATASET_DIR}" ]; then
 fi
 echo "Target Dir: ${DATASET_DIR}"
 
-batchsize=16
+batchsize=8
 epoch=10
 outpath=$(realpath ./gen_data)
 while getopts "b:e:o:" opt; do
@@ -28,7 +28,7 @@ while getopts "b:e:o:" opt; do
             epoch=$OPTARG
             ;;
         o)
-            outpath=$(realpath $OPTARG)
+            outpath=$OPTARG
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -47,7 +47,8 @@ else
 fi
 
 
-cmd="python generate_data.py --from-images-dir /workspace/target_data -b ${batchsize} --epoch ${epoch} --compress-annotation-data --out /home/user${outpath} --pretrained-model-path /workspace/yolov8x-seg.pt"
+cmd="python generate_data.py --from-images-dir /workspace/target_data -b ${batchsize} --epoch ${epoch} --compress-annotation-data -o ${outpath} --pretrained-model-path /workspace/yolov8x-seg.pt"
+echo $cmd
 docker run --rm \
        -u "$(id -u $USER):$(id -g $USER)" \
        --userns=host \

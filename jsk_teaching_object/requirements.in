@@ -2,7 +2,6 @@ gdown
 scikit-robot
 paramiko
 matplotlib
-moviepy
 numba==0.56.4
 numpy==1.23.5
 openai==0.28.0

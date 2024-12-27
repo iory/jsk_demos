@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 
 from threading import Lock
-import datetime
-import re
 import os.path as osp
-from pathlib import Path
 
-import actionlib
 import cv_bridge
 import numpy as np
 import rospy
@@ -18,23 +14,14 @@ from jsk_recognition_msgs.msg import (ClassificationResult,
 from jsk_topic_tools import ConnectionBasedTransport
 from pcl_msgs.msg import PointIndices
 from ultralytics import YOLO
+import cv2
 
 from jsk_teaching_object.cfg import InstanceSegmentationConfig as Config
-from jsk_teaching_object.msg import UpdateModelAction, UpdateModelResult
 
 
-def get_latest_pt_file(path):
-    path = Path(path)
-    files = list(sorted(path.glob('*.pt')))
-    timestamps = []
-    for file in files:
-        match = re.search(r"(\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2})", str(file))
-        if match:
-            timestamp_str = match.group(1)
-            timestamp = datetime.datetime.strptime(timestamp_str, '%Y-%m-%d-%H-%M-%S')
-            timestamps.append((timestamp, file))
-    timestamps.sort(reverse=True)  # Sort in descending order
-    return timestamps[0][1] if timestamps else None
+def resize_masks(masks, wh):
+    out = [cv2.resize(mask, wh, interpolation=cv2.INTER_NEAREST) for mask in masks]
+    return np.array(out)
 
 
 class ObjectDetectionNode(ConnectionBasedTransport):
@@ -44,16 +31,13 @@ class ObjectDetectionNode(ConnectionBasedTransport):
 
         self.lock = Lock()
 
-        self.classifier_name = rospy.get_param('~classifier_name', 'fg')
+        self.classifier_name = rospy.get_param('~classifier_name', 'grape_segmentation')
         self.ignore_class_names = rospy.get_param(
-            '~ignore_class_names', ['others'])
+            '~ignore_class_names', [''])
 
         weights = rospy.get_param(
             '~model_path', None)
-        if weights is None:
-            weights = get_latest_pt_file(
-                osp.expanduser(rospy.get_param('~root_image_path')))
-        device = rospy.get_param('~device', 0)
+        device = rospy.get_param('~device', -1)
         if device < 0:
             device = 'cpu'
         self.srv = Server(Config, self.config_callback)
@@ -80,24 +64,14 @@ class ObjectDetectionNode(ConnectionBasedTransport):
             "~output/class", ClassificationResult,
             queue_size=1)
 
-        self.update_model_server = actionlib.SimpleActionServer(
-            '~update_model',
-            UpdateModelAction,
-            execute_cb=self.update_model_action,
-            auto_start=True)
-        rospy.loginfo('update model action started.')
-
-    def update_model_action(self, goal):
-        self.load_model(goal.model_path)
-        self.update_model_server.set_succeeded(UpdateModelResult())
-
     def load_model(self, model_path):
         del self.model
         torch.cuda.empty_cache()
         with self.lock:
             rospy.loginfo('Loading model {}'.format(model_path))
-            self.model = YOLO(model_path)
-            self.model = self.model.to(self.device)
+            self.model = YOLO(model_path, task='segment')
+            if 'ncnn' not in osp.basename(model_path):
+                self.model = self.model.to(self.device)
         self.target_names = [name for _, name in self.model.names.items()]
         rospy.loginfo("Loaded {} labels. {}".format(
             len(self.target_names),
@@ -107,6 +81,8 @@ class ObjectDetectionNode(ConnectionBasedTransport):
         self.score_thresh = config.score_thresh
         self.nms_thresh = config.nms_thresh
         self.max_det = config.max_det
+        self.roi = (config.roi_x_min, config.roi_y_min,
+                    config.roi_x_max, config.roi_y_max)
         return config
 
     def subscribe(self):
@@ -120,14 +96,22 @@ class ObjectDetectionNode(ConnectionBasedTransport):
         self.sub.unregister()
 
     def callback(self, msg):
+        if abs(msg.header.stamp - rospy.Time.now()).to_sec() > 1.0:
+            return
         bridge = self.bridge
         encoding = self.encoding
         im = bridge.imgmsg_to_cv2(
             msg, desired_encoding='bgr8')
         org_h, org_w = im.shape[:2]
 
+        if self.roi is not None:
+            x_min, y_min, x_max, y_max = self.roi
+            roi_image = im[y_min:y_max, x_min:x_max]
+        else:
+            roi_image = im
+
         with self.lock:
-            results = self.model(im, verbose=False)
+            results = self.model(roi_image, verbose=False)
         if results:
             result = results[0]
         else:
@@ -153,6 +137,13 @@ class ObjectDetectionNode(ConnectionBasedTransport):
                 continue
             if conf < self.score_thresh:
                 continue
+
+            if self.roi is not None:
+                x1 = x1 + x_min
+                y1 = y1 + y_min
+                x2 = x2 + x_min
+                y2 = y2 + y_min
+
             valid_indices.append(j)
             rects_msg.rects.append(
                 Rect(x=int(x1), y=int(y1),
@@ -164,12 +155,18 @@ class ObjectDetectionNode(ConnectionBasedTransport):
         lbl_ins = np.zeros((im.shape[0], im.shape[1]), dtype=np.int32)
         if result.masks is not None:
             masks = result.masks.data.cpu().numpy()
+            masks = resize_masks(masks, (roi_image.shape[1], roi_image.shape[0]))
             masks = masks[valid_indices]
             R, H, W = masks.shape
             mask_indices = np.array(
                 np.arange(H * W).reshape(H, W), dtype=np.int32)
+
             for mask in masks:
                 indices = mask_indices[mask > 0]
+
+                if self.roi is not None:
+                    indices = [(i // W + y_min) * org_w + (i % W + x_min) for i in indices]
+
                 indices_msg = PointIndices(header=msg.header, indices=indices)
                 msg_indices.cluster_indices.append(indices_msg)
 

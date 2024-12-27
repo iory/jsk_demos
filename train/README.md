@@ -50,7 +50,7 @@ Once the image is successfully built, you can execute the `run.sh` script, provi
 ./run.sh TARGET_DIRECTORY
 ```
 
-After running the command, the script will generate the required data and store the trained models in the `TARGET_DIRECTORY/generated_data` directory.
+After running the command, the script will generate the required data and store the trained models in the `TARGET_DIRECTORY-generated_data` directory.
 
 
 ## Run for ROS
