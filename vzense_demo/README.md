@@ -132,3 +132,13 @@ roslaunch vzense_demo record_vzense.launch
 ```
 roslaunch vzense_demo play.launch bagpath:=<ABSOLUTEPATH OF ROSBAG>
 ```
+
+## sample hsi color filter
+
+[こちらのリンク](https://drive.google.com/uc?id=1LhuGYlPNXEJW-G3dOwxD60z3k9KvYRxg)のbagファイルをdownloadして、`vzense_demo/sample/data/`以下に置く。
+
+```
+roslaunch vzense_demo sample_hsi_color_filter.launch
+```
+
+rvizが立ち上がり色認識のサンプルプログラムが立ち上がる。
