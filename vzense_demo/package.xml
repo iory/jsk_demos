@@ -18,6 +18,7 @@
   <!-- ALPHABETICAL ORDER -->
 
   <!-- ALPHABETICAL ORDER -->
+  <exec_depend>openni2_launch</exec_depend>
   <exec_depend>dynamic_reconfigure</exec_depend>
   <exec_depend>jsk_pcl_ros</exec_depend>
   <exec_depend>jsk_rviz_plugins</exec_depend>
