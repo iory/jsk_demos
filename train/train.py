@@ -152,7 +152,7 @@ if __name__ == '__main__':
 
     source_image_dir = args.image_directory.rstrip('/')
     rsync_image_command = 'rsync -e "{}" --verbose -r {} {}:{}'.format(
-        proxy_command if proxy_command else "ssh -i {}".format(args.identity_file),
+        proxy_command if proxy_command else "ssh -o ServerAliveInterval=60 -i {}".format(args.identity_file),
         source_image_dir, ssh_command.split(' ')[-1], tmp_dir)
     run_command(rsync_image_command, shell=True)
 
@@ -191,7 +191,7 @@ if __name__ == '__main__':
         saved_weight_name = './{}-generated_data/{}.pt'.format(osp.basename(source_image_dir),
                                                                osp.basename(source_image_dir))
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} {}'.format(
-        proxy_command if proxy_command else "ssh -i {}".format(args.identity_file),
+        proxy_command if proxy_command else "ssh -o ServerAliveInterval=60 -i {}".format(args.identity_file),
         ssh_command.split(' ')[-1], '{}/gen_data/train/weights/best.pt'.format(source_image_dir_in_remote),
         saved_weight_name)
     print(rsync_image_command)
@@ -209,7 +209,7 @@ if __name__ == '__main__':
             osp.basename(source_image_dir),
             osp.basename(source_image_dir))
     rsync_image_command = 'rsync -e "{}" --verbose {}:{} {}'.format(
-        proxy_command if proxy_command else "ssh -i {}".format(args.identity_file),
+        proxy_command if proxy_command else "ssh -o ServerAliveInterval=60 -i {}".format(args.identity_file),
         ssh_command.split(' ')[-1], '{}/gen_data/config.yaml'.format(source_image_dir_in_remote),
         saved_yaml_name)
     run_command(rsync_image_command, shell=True)
@@ -223,7 +223,7 @@ if __name__ == '__main__':
         saved_rembg_dir_name = './{}-generated_data/{}-preprocessing'.format(osp.basename(source_image_dir),
                                                                              osp.basename(source_image_dir))
     rsync_image_command = 'rsync -r -e "{}" --verbose {}:{} {}'.format(
-        proxy_command if proxy_command else "ssh -i {}".format(args.identity_file),
+        proxy_command if proxy_command else "ssh -o ServerAliveInterval=60 -i {}".format(args.identity_file),
         ssh_command.split(' ')[-1], '{}/gen_data/preprocessing'.format(source_image_dir_in_remote),
         saved_rembg_dir_name)
     run_command(rsync_image_command, shell=True)
