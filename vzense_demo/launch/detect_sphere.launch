@@ -1,0 +1,191 @@
+<launch>
+
+  <arg name="launch_camera" default="false" />
+  <arg name="gui" default="true" />
+  <arg name="manager" default="hsi_filter_manager" />
+
+  <arg name="h_max" default="85" />
+  <arg name="h_min" default="33" />
+  <arg name="s_max" default="256" />
+  <arg name="s_min" default="57" />
+  <arg name="v_max" default="256" />
+  <arg name="v_min" default="242" />
+
+  <arg name="INPUT_IMAGE" value="color/image_raw" />
+  <arg name="INPUT_CLOUD" value="transformedDepth/points" />
+
+  <group if="$(arg launch_camera)" >
+    <include file="$(find vzense_demo)/launch/vzense.launch" >
+      <arg name="gui" value="false" />
+    </include>
+  </group>
+
+  <node name="$(arg manager)"
+        pkg="nodelet" type="nodelet"
+        args="manager"/>
+
+  <group ns="camera" >
+    <group ns="left_vzense_camera" >
+      <node name="hsv_color_filter"
+            pkg="nodelet" type="nodelet"
+            args="load opencv_apps/hsv_color_filter /$(arg manager)"
+            output="screen" >
+        <remap from="image" to="$(arg INPUT_IMAGE)" />
+        <param name="size" value="5" />
+        <param name="h_limit_max" value="$(arg h_max)" />
+        <param name="h_limit_min" value="$(arg h_min)" />
+        <param name="s_limit_max" value="$(arg s_max)" />
+        <param name="s_limit_min" value="$(arg s_min)" />
+        <param name="v_limit_max" value="$(arg v_max)" />
+        <param name="v_limit_min" value="$(arg v_min)" />
+      </node>
+
+      <node name="morphology_open"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_perception/Opening /$(arg manager)"
+            output="screen" >
+        <remap from="~input" to="hsv_color_filter/image" />
+        <param name="size" value="5" />
+      </node>
+
+      <node name="apply_mask_image"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_perception/ApplyMaskImage /$(arg manager)"
+            respawn="true" >
+        <remap from="~input" to="$(arg INPUT_IMAGE)" />
+        <remap from="~input/mask" to="morphology_open/output" />
+        <rosparam>
+          approximate_sync: false
+          clip: false
+          queue_size: 100
+        </rosparam>
+      </node>
+
+      <node name="mask_image_to_indices"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_pcl_utils/MaskImageToPointIndices /$(arg manager)">
+        <remap from="~input" to="morphology_open/output" />
+      </node>
+      <node name="extract_indices_target"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_pcl/ExtractIndices /$(arg manager)">
+        <remap from="~input" to="$(arg INPUT_CLOUD)" />
+        <remap from="~indices" to="mask_image_to_indices/output" />
+        <rosparam subst_value="true">
+          keep_organized: true
+          approximate_sync: true
+          queue_size: 100
+        </rosparam>
+      </node>
+
+      <node name="euclidean_clustering"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_pcl/EuclideanClustering /$(arg manager)"
+            output="screen">
+        <remap from="~input" to="extract_indices_target/output" />
+        <rosparam>
+          tolerance: 0.02
+          min_size: 100
+        </rosparam>
+      </node>
+
+      <node name="cluster_decomposer"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_pcl/ClusterPointIndicesDecomposerZAxis /$(arg manager)"
+            output="screen" clear_params="true">
+        <remap from="~input" to="extract_indices_target/output" />
+        <remap from="~target" to="euclidean_clustering/output" />
+        <remap from="~debug_output" to="debug_output" />
+        <remap from="~boxes" to="boxes" />
+        <rosparam>
+        </rosparam>
+      </node>
+    </group>
+
+    <group ns="right_vzense_camera" >
+      <node name="hsv_color_filter"
+            pkg="nodelet" type="nodelet"
+            args="load opencv_apps/hsv_color_filter /$(arg manager)"
+            output="screen" >
+        <remap from="image" to="$(arg INPUT_IMAGE)" />
+        <param name="size" value="5" />
+        <param name="h_limit_max" value="$(arg h_max)" />
+        <param name="h_limit_min" value="$(arg h_min)" />
+        <param name="s_limit_max" value="$(arg s_max)" />
+        <param name="s_limit_min" value="$(arg s_min)" />
+        <param name="v_limit_max" value="$(arg v_max)" />
+        <param name="v_limit_min" value="$(arg v_min)" />
+      </node>
+
+      <node name="morphology_open"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_perception/Opening /$(arg manager)"
+            output="screen" >
+        <remap from="~input" to="hsv_color_filter/image" />
+        <param name="size" value="5" />
+      </node>
+
+      <node name="apply_mask_image"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_perception/ApplyMaskImage /$(arg manager)"
+            respawn="true" >
+        <remap from="~input" to="$(arg INPUT_IMAGE)" />
+        <remap from="~input/mask" to="morphology_open/output" />
+        <rosparam>
+          approximate_sync: false
+          clip: false
+          queue_size: 100
+        </rosparam>
+      </node>
+
+      <node name="mask_image_to_indices"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_pcl_utils/MaskImageToPointIndices /$(arg manager)">
+        <remap from="~input" to="morphology_open/output" />
+      </node>
+      <node name="extract_indices_target"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_pcl/ExtractIndices /$(arg manager)">
+        <remap from="~input" to="$(arg INPUT_CLOUD)" />
+        <remap from="~indices" to="mask_image_to_indices/output" />
+        <rosparam subst_value="true">
+          keep_organized: true
+          approximate_sync: true
+          queue_size: 100
+        </rosparam>
+      </node>
+
+      <node name="euclidean_clustering"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_pcl/EuclideanClustering /$(arg manager)"
+            output="screen">
+        <remap from="~input" to="extract_indices_target/output" />
+        <rosparam>
+          tolerance: 0.02
+          min_size: 100
+        </rosparam>
+      </node>
+
+      <node name="cluster_decomposer"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_pcl/ClusterPointIndicesDecomposerZAxis /$(arg manager)"
+            output="screen" clear_params="true">
+        <remap from="~input" to="extract_indices_target/output" />
+        <remap from="~target" to="euclidean_clustering/output" />
+        <remap from="~debug_output" to="debug_output" />
+        <remap from="~boxes" to="boxes" />
+        <rosparam>
+        </rosparam>
+      </node>
+    </group>
+
+  </group>
+
+  <group if="$(arg gui)" >
+    <node name="$(anon rviz)"
+          pkg="rviz" type="rviz"
+          args="-d $(find vzense_demo)/launch/config/detect_sphere.rviz" >
+    </node>
+  </group>
+
+</launch>
