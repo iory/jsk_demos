@@ -72,6 +72,14 @@ def main():
         md5='e6b9386e7e2937b183bb87a74e590857',
     )
 
+    download_data(
+        pkg_name=PKG,
+        path='trained_data/yolo8/apple/original_augmented_best.pt',
+        url='https://github.com/joy0010/Apple-Detection-in-MinneApple-Dataset-with-YOLOv8/raw/refs/heads/master/Models/Original_augmented_best.pt',  # NOQA
+        md5='f7ec241999bff9ca2d1da8f77ff3e903',
+    )
+
+
 
 if __name__ == '__main__':
     main()
