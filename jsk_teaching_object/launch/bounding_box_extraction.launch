@@ -1,0 +1,74 @@
+<launch>
+
+  <arg name="input_image" default="/camera/color/image_raw" />
+  <arg name="input_cloud" default="/camera/depth/color/points" />
+  <arg name="input_indices" default="/object_detection/output/cluster_indices" />
+  <arg name="manager" value="/camera/realsense2_camera_manager" />
+  <arg name="downsample" default="true" />
+  <arg name="gui" default="true" />
+
+  <arg name="color_width" default="480" />
+  <arg name="color_height" default="270" />
+  <arg name="color_fps" default="5" />
+  <arg name="depth_width" default="480" />
+  <arg name="depth_height" default="270" />
+  <arg name="depth_fps" default="5" />
+
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch" >
+    <arg name="align_depth" value="true" />
+    <arg name="enable_pointcloud" value="true" />
+    <arg name="color_width" value="$(arg color_width)" />
+    <arg name="color_height" value="$(arg color_height)" />
+    <arg name="color_fps" value="$(arg color_fps)" />
+    <arg name="depth_width" value="$(arg depth_width)" />
+    <arg name="depth_height" value="$(arg depth_height)" />
+    <arg name="depth_fps" value="$(arg depth_fps)" />
+  </include>
+
+  <include file="$(find jsk_teaching_object)/launch/object_detection.launch" >
+    <arg name="launch_usb_cam" value="false" />
+    <arg name="gui" value="false" />
+    <arg name="input_image" value="$(arg input_image)" />
+  </include>
+
+  <node name="multi_euclidean_clustering"
+        pkg="nodelet" type="nodelet"
+        args="standalone jsk_pcl/EuclideanClustering $(arg manager)"
+        respawn="true"
+        output="screen">
+    <remap from="~input/cluster_indices" to="$(arg input_indices)" />
+    <remap from="~input" to="$(arg input_cloud)" />
+    <rosparam subst_value="true">
+      tolerance: 0.02
+      min_size: 0
+      max_size: 307200
+      approximate_sync: true
+      downsample_enable: $(arg downsample)
+      multi: true
+      queue_size: 100
+      cluster_filter: 1  <!-- take max size of clustering in each cluster -->
+    </rosparam>
+  </node>
+
+  <node name="multi_euclidean_cluster_point_indices_decomposer"
+        pkg="nodelet" type="nodelet"
+        args="load jsk_pcl/ClusterPointIndicesDecomposer $(arg manager)"
+        respawn="true">
+    <remap from="~input" to="$(arg input_cloud)" />
+    <remap from="~target" to="/multi_euclidean_clustering/output" />
+    <rosparam>
+      align_boxes: false
+      use_pca: true
+      approximate_sync: false
+      queue_size: 100
+    </rosparam>
+  </node>
+
+  <group if="$(arg gui)" >
+    <node name="$(anon rviz)"
+          pkg="rviz" type="rviz"
+          args="-d $(find jsk_teaching_object)/launch/config/bounding-box.rviz" >
+    </node>
+  </group>
+
+</launch>
