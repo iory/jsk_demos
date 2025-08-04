@@ -119,21 +119,21 @@ def pick_grape(ri, robot_model, send_time=10.0, move=False, step_by_step=True,
 
     robot_model.angle_vector(pre_pick_pose)
     if move is True:
-        hand.move_hand([np.deg2rad(-50), 0, 0, 0])
+        hand.move_hand([np.deg2rad(-50), 0, 0, 0], wait=False)
     calibrated_angle_vector(robot_model.angle_vector().copy(), time=5.0, move=move)
     robot_model.angle_vector(pick_pose)
     calibrated_angle_vector(robot_model.angle_vector().copy(), time=5.0, move=move)
 
     # octomapのために止める処理
     if move is True:
-        hand.move_hand([np.deg2rad(-50), np.deg2rad(60), 0, np.deg2rad(60)])
+        hand.move_hand([np.deg2rad(-50), np.deg2rad(60), 0, np.deg2rad(60)], wait=False)
         rospy.sleep(5.0)
         hand.init_octomap()
         rospy.sleep(5.0)
         hand.stop_octomap()
-        # hand.start_grasp(angle=130, wait_time=5.0)
-        # hand.move_hand([np.deg2rad(-50), np.deg2rad(130), 0, np.deg2rad(130)])
-        hand.move_hand([np.deg2rad(-50), np.deg2rad(160), 0, np.deg2rad(160)])
+        # hand.start_grasp(angle=130, wait=True)
+        # hand.move_hand([np.deg2rad(-50), np.deg2rad(130), 0, np.deg2rad(130)], wait=False)
+        hand.move_hand([np.deg2rad(-50), np.deg2rad(160), 0, np.deg2rad(160)], wait=False)
         rospy.sleep(5.0)
     robot_model.angle_vector(pre_pick_pose)
     send_robot(send_time=5.0, move=move)

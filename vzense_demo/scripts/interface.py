@@ -144,10 +144,10 @@ def move_box(send_time=10.0, move=False, step_by_step=True):
     if move and step_by_step:
         input('Send Angle vector? [Enter]')
     if move is True:
-        ri.rhand.move_hand([0, 0, -np.deg2rad(30), 0], wait_time=0)
-        ri.lhand.move_hand([0, 0, -np.deg2rad(30), 0], wait_time=5)
-        ri.rhand.move_hand([0, np.deg2rad(140), np.deg2rad(-60), np.deg2rad(120)], wait_time=0)
-        ri.lhand.move_hand([0, np.deg2rad(140), np.deg2rad(-60), np.deg2rad(120)], wait_time=0)
+        ri.rhand.move_hand([0, 0, -np.deg2rad(30), 0], wait=False)
+        ri.lhand.move_hand([0, 0, -np.deg2rad(30), 0], wait=True)
+        ri.rhand.move_hand([0, np.deg2rad(140), np.deg2rad(-60), np.deg2rad(120)], wait=False)
+        ri.lhand.move_hand([0, np.deg2rad(140), np.deg2rad(-60), np.deg2rad(120)], wait=False)
     # send_robot(send_time=send_time, move=move)
 
     robot_model.RARM_JOINT0.joint_angle(np.deg2rad(30))
@@ -245,7 +245,7 @@ def left_place(send_time=10.0, move=False, step_by_step=True):
         input('Send Angle vector? [Enter]')
     send_robot(send_time=send_time, move=move, arm='left')
     if move is True:
-        ri.lhand.stop_grasp()
+        ri.lhand.stop_grasp(wait=False)
 
 
 def right_place(send_time=10.0, move=False, step_by_step=True):
@@ -277,7 +277,7 @@ def right_place(send_time=10.0, move=False, step_by_step=True):
         input('Send Angle vector? [Enter]')
         send_robot(send_time=send_time, move=move, arm='rarm')
     if move is True:
-        ri.lhand.stop_grasp()
+        ri.lhand.stop_grasp(wait=False)
 
 
 
@@ -335,23 +335,23 @@ def left_pick_grape(send_time=10.0, move=False, step_by_step=True):
     pre_pick_pose = robot_model.angle_vector()
 
     robot_model.angle_vector(pre_pick_pose)
-    # ri.lhand.stop_grasp()
+    # ri.lhand.stop_grasp(wait=False)
     if move is True:
-        ri.lhand.move_hand([np.deg2rad(-50), 0, 0, 0])
+        ri.lhand.move_hand([np.deg2rad(-50), 0, 0, 0], wait=False)
     calibrated_angle_vector(robot_model.angle_vector().copy(), time=5.0, move=move)
     robot_model.angle_vector(pick_pose)
     calibrated_angle_vector(robot_model.angle_vector().copy(), time=5.0, move=move)
 
     # octomapのために止める処理
     if move is True:
-        ri.lhand.move_hand([np.deg2rad(-50), np.deg2rad(60), 0, np.deg2rad(60)])
+        ri.lhand.move_hand([np.deg2rad(-50), np.deg2rad(60), 0, np.deg2rad(60)], wait=False)
         rospy.sleep(5.0)
         ri.lhand.init_octomap()
         rospy.sleep(5.0)
         ri.lhand.stop_octomap()
-        # ri.lhand.start_grasp(angle=130, wait_time=5.0)
-        # ri.lhand.move_hand([np.deg2rad(-50), np.deg2rad(130), 0, np.deg2rad(130)])
-        ri.lhand.move_hand([np.deg2rad(-50), np.deg2rad(160), 0, np.deg2rad(160)])
+        # ri.lhand.start_grasp(angle=130, wait=True)
+        # ri.lhand.move_hand([np.deg2rad(-50), np.deg2rad(130), 0, np.deg2rad(130)], wait=False)
+        ri.lhand.move_hand([np.deg2rad(-50), np.deg2rad(160), 0, np.deg2rad(160)], wait=False)
         rospy.sleep(5.0)
     robot_model.angle_vector(pre_pick_pose)
     send_robot(send_time=5.0, move=move)

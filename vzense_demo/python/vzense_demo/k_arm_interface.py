@@ -1,6 +1,5 @@
 import actionlib
 import control_msgs.msg
-from std_msgs.msg import Bool
 from std_srvs.srv import Trigger
 from std_srvs.srv import SetBool
 from std_srvs.srv import SetBoolRequest
@@ -35,32 +34,27 @@ class HandInterface(object):
             self.jnt_names.append(
                 '{}_{}_joint'.format(self.hand, finger))
         self.jnt_pos = None
-        self.rarm_traj_pub = rospy.Publisher(
-            '{}/joint_trajectory'.format(self.hand),
-            JointTrajectory,
-            queue_size=1,
+        self.rarm_jnt_traj_act = actionlib.SimpleActionClient(
+            ('{}/position_joint_trajectory_controller/'
+                'follow_joint_trajectory').format(self.hand),
+            control_msgs.msg.FollowJointTrajectoryAction,
         )
-        self.enable_int_pubs = []
-        self.enable_tof_pubs = []
+        self.rarm_jnt_traj_act.wait_for_server()
+        self.enable_int_srvs = []
+        self.enable_tof_srvs = []
         for finger in ['thumb', 'index']:
             for pos in ['tip', 'root']:
-                self.enable_int_pubs.append(
-                    rospy.Publisher(
-                        '{}/{}/distal/{}/enable_intensity'.format(
-                            self.hand, finger, pos),
-                        Bool,
-                        queue_size=1,
-                        latch=True,
-                    )
+                int_name = '{}/{}/distal/{}/enable_intensity'.format(
+                    self.hand, finger, pos)
+                rospy.wait_for_service(int_name)
+                self.enable_int_srvs.append(
+                    rospy.ServiceProxy(int_name, SetBool)
                 )
-                self.enable_tof_pubs.append(
-                    rospy.Publisher(
-                        '{}/{}/distal/{}/enable_tof'.format(
-                            self.hand, finger, pos),
-                        Bool,
-                        queue_size=1,
-                        latch=True,
-                    )
+                tof_name = '{}/{}/distal/{}/enable_tof'.format(
+                    self.hand, finger, pos)
+                rospy.wait_for_service(tof_name)
+                self.enable_tof_srvs.append(
+                    rospy.ServiceProxy(tof_name, SetBool)
                 )
         set_init_i_srv_names = []
         for finger in ['thumb', 'index']:
@@ -84,7 +78,7 @@ class HandInterface(object):
         rospy.wait_for_service(cloud_stop_srv_name)
         self.cloud_stop_srv = rospy.ServiceProxy(cloud_stop_srv_name, Empty)
 
-    def move_hand(self, target_pos, time=1, wait_time=0):
+    def move_hand(self, target_pos, time=1, wait=True):
         if self.use_hand is False:
             rospy.logwarn('{} interface is disabled.'.format(self.hand))
             return
@@ -99,16 +93,18 @@ class HandInterface(object):
                 time_from_start=rospy.Duration(time),
             )
         )
-        self.rarm_traj_pub.publish(traj_msg)
-        if wait_time > 0:
-            rospy.sleep(wait_time)
+        goal = control_msgs.msg.FollowJointTrajectoryGoal()
+        goal.trajectory = traj_msg
+        self.rarm_jnt_traj_act.send_goal(goal)
+        if wait:
+            self.rarm_jnt_traj_act.wait_for_result()
 
     def init_octomap(self):
         # handの間にのがない状態を確認して実行
-        self.enable_int_pubs[1].publish(Bool(data=False))
-        self.enable_int_pubs[3].publish(Bool(data=False))
-        self.enable_tof_pubs[1].publish(Bool(data=False))
-        self.enable_tof_pubs[3].publish(Bool(data=False))
+        self.enable_int_srvs[1](False)
+        self.enable_int_srvs[3](False)
+        self.enable_tof_srvs[1](False)
+        self.enable_tof_srvs[3](False)
         rospy.sleep(0.1)
 
         # Initialize intensity_model_acquisition
@@ -121,25 +117,25 @@ class HandInterface(object):
         self.cloud_stop_srv()
 
         # Re-enable all sensors
-        self.enable_int_pubs[1].publish(Bool(data=True))
-        self.enable_int_pubs[3].publish(Bool(data=True))
-        self.enable_tof_pubs[1].publish(Bool(data=True))
-        self.enable_tof_pubs[3].publish(Bool(data=True))
+        self.enable_int_srvs[1](True)
+        self.enable_int_srvs[3](True)
+        self.enable_tof_srvs[1](True)
+        self.enable_tof_srvs[3](True)
 
-    def start_grasp(self, time=1, wait_time=0,
+    def start_grasp(self, time=1, wait=True,
                     angle=90):
         angle = max(min(angle, 130), 0)
         self.move_hand([-np.pi/2, np.deg2rad(angle), 0, np.deg2rad(angle)],
-                       time=time, wait_time=wait_time)
+                       time=time, wait=wait)
 
-    def stop_grasp(self, time=1, wait_time=0):
+    def stop_grasp(self, time=1, wait=True):
         self.move_hand([-np.pi/2, 0, 0, 0],
-                       time=time, wait_time=wait_time)
+                       time=time, wait=wait)
 
     def grasp_box_pose(self):
-        self.move_hand([0, 0, -np.deg2rad(30), 0], wait_time=5)
-        # self.move_hand([0, np.deg2rad(150), -np.deg2rad(30), np.deg2rad(0)], wait_time=4)
-        self.move_hand([0, np.deg2rad(150), -np.deg2rad(30), np.deg2rad(130)], wait_time=0)
+        self.move_hand([0, 0, -np.deg2rad(30), 0], wait=True)
+        # self.move_hand([0, np.deg2rad(150), -np.deg2rad(30), np.deg2rad(0)], wait=True)
+        self.move_hand([0, np.deg2rad(150), -np.deg2rad(30), np.deg2rad(130)], waite=False)
 
     def reset_octomap(self):
         if self.use_hand is False:
@@ -228,10 +224,10 @@ class KARMROSRobotInterface(ROSRobotInterfaceBase):
                 self.larm_controller]
 
     def start_grasp(self):
-        self.move_hand([-np.pi/2, np.pi/2, 0, np.pi/2], 1, 5)
+        self.move_hand([-np.pi/2, np.pi/2, 0, np.pi/2], 1, wait=True)
 
     def stop_grasp(self):
-        self.move_hand([-np.pi/2, 0, 0, 0], 1, 5)
+        self.move_hand([-np.pi/2, 0, 0, 0], 1, wait=True)
 
 
 if __name__ == '__main__':

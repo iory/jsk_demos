@@ -132,10 +132,10 @@ def move_box(send_time=10.0, move=False, step_by_step=True):
     if move and step_by_step:
         input('Send Angle vector? [Enter]')
     if move is True:
-        ri.rhand.move_hand([0, 0, -np.deg2rad(30), 0], wait_time=0)
-        ri.lhand.move_hand([0, 0, -np.deg2rad(30), 0], wait_time=5)
-        ri.rhand.move_hand([0, np.deg2rad(140), np.deg2rad(-60), np.deg2rad(120)], wait_time=0)
-        ri.lhand.move_hand([0, np.deg2rad(140), np.deg2rad(-60), np.deg2rad(120)], wait_time=0)
+        ri.rhand.move_hand([0, 0, -np.deg2rad(30), 0], wait=False)
+        ri.lhand.move_hand([0, 0, -np.deg2rad(30), 0], wait=True)
+        ri.rhand.move_hand([0, np.deg2rad(140), np.deg2rad(-60), np.deg2rad(120)], wait=False)
+        ri.lhand.move_hand([0, np.deg2rad(140), np.deg2rad(-60), np.deg2rad(120)], wait=False)
     # send_robot(send_time=send_time, move=move)
 
     robot_model.RARM_JOINT0.joint_angle(np.deg2rad(30))
