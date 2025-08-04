@@ -1,14 +1,28 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(jsk_teaching_object)
 
-find_package(catkin REQUIRED COMPONENTS
-  actionlib
-  actionlib_msgs
-  catkin_virtualenv
-  dynamic_reconfigure
-  jsk_data
-  std_msgs
-)
+# Add a CMake option for enabling/disabling virtualenv
+option(USE_VIRTUALENV "Use Python virtual environment" ON)
+
+if(USE_VIRTUALENV)
+  find_package(catkin REQUIRED COMPONENTS
+    actionlib
+    actionlib_msgs
+    catkin_virtualenv
+    dynamic_reconfigure
+    jsk_data
+    std_msgs
+  )
+else()
+  find_package(catkin REQUIRED COMPONENTS
+    actionlib
+    actionlib_msgs
+    dynamic_reconfigure
+    jsk_data
+    std_msgs
+  )
+  message(STATUS "Not using catkin_virtualenv as USE_VIRTUALENV is OFF.")
+endif()
 
 # ------------------------------------------------------------------------------------
 # Download
@@ -44,13 +58,15 @@ catkin_package(
   LIBRARIES ${PROJECT_NAME}
 )
 
-catkin_generate_virtualenv(
-  INPUT_REQUIREMENTS requirements.in
-  PYTHON_INTERPRETER python3
-  USE_SYSTEM_PACKAGES FALSE
-  ISOLATE_REQUIREMENTS FALSE
-  CHECK_VENV FALSE
-)
+if(USE_VIRTUALENV)
+  catkin_generate_virtualenv(
+    INPUT_REQUIREMENTS requirements.in
+    PYTHON_INTERPRETER python3
+    USE_SYSTEM_PACKAGES FALSE
+    ISOLATE_REQUIREMENTS FALSE
+    CHECK_VENV FALSE
+  )
+endif()
 
 file(GLOB SCRIPT_PROGRAMS scripts/*.py)
 catkin_install_python(
