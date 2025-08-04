@@ -1,6 +1,5 @@
 import actionlib
 import control_msgs.msg
-from std_msgs.msg import Bool
 from std_srvs.srv import Trigger
 from std_srvs.srv import SetBool
 from std_srvs.srv import SetBoolRequest
@@ -41,27 +40,21 @@ class HandInterface(object):
             control_msgs.msg.FollowJointTrajectoryAction,
         )
         self.rarm_jnt_traj_act.wait_for_server()
-        self.enable_int_pubs = []
-        self.enable_tof_pubs = []
+        self.enable_int_srvs = []
+        self.enable_tof_srvs = []
         for finger in ['thumb', 'index']:
             for pos in ['tip', 'root']:
-                self.enable_int_pubs.append(
-                    rospy.Publisher(
-                        '{}/{}/distal/{}/enable_intensity'.format(
-                            self.hand, finger, pos),
-                        Bool,
-                        queue_size=1,
-                        latch=True,
-                    )
+                int_name = '{}/{}/distal/{}/enable_intensity'.format(
+                    self.hand, finger, pos)
+                rospy.wait_for_service(int_name)
+                self.enable_int_srvs.append(
+                    rospy.ServiceProxy(int_name, SetBool)
                 )
-                self.enable_tof_pubs.append(
-                    rospy.Publisher(
-                        '{}/{}/distal/{}/enable_tof'.format(
-                            self.hand, finger, pos),
-                        Bool,
-                        queue_size=1,
-                        latch=True,
-                    )
+                tof_name = '{}/{}/distal/{}/enable_tof'.format(
+                    self.hand, finger, pos)
+                rospy.wait_for_service(tof_name)
+                self.enable_tof_srvs.append(
+                    rospy.ServiceProxy(tof_name, SetBool)
                 )
         set_init_i_srv_names = []
         for finger in ['thumb', 'index']:
@@ -108,10 +101,10 @@ class HandInterface(object):
 
     def init_octomap(self):
         # handの間にのがない状態を確認して実行
-        self.enable_int_pubs[1].publish(Bool(data=False))
-        self.enable_int_pubs[3].publish(Bool(data=False))
-        self.enable_tof_pubs[1].publish(Bool(data=False))
-        self.enable_tof_pubs[3].publish(Bool(data=False))
+        self.enable_int_srvs[1](False)
+        self.enable_int_srvs[3](False)
+        self.enable_tof_srvs[1](False)
+        self.enable_tof_srvs[3](False)
         rospy.sleep(0.1)
 
         # Initialize intensity_model_acquisition
@@ -124,10 +117,10 @@ class HandInterface(object):
         self.cloud_stop_srv()
 
         # Re-enable all sensors
-        self.enable_int_pubs[1].publish(Bool(data=True))
-        self.enable_int_pubs[3].publish(Bool(data=True))
-        self.enable_tof_pubs[1].publish(Bool(data=True))
-        self.enable_tof_pubs[3].publish(Bool(data=True))
+        self.enable_int_srvs[1](True)
+        self.enable_int_srvs[3](True)
+        self.enable_tof_srvs[1](True)
+        self.enable_tof_srvs[3](True)
 
     def start_grasp(self, time=1, wait=True,
                     angle=90):
