@@ -7,12 +7,12 @@
   <arg name="downsample" default="true" />
   <arg name="gui" default="true" />
 
-  <arg name="color_width" default="480" />
-  <arg name="color_height" default="270" />
-  <arg name="color_fps" default="5" />
-  <arg name="depth_width" default="480" />
-  <arg name="depth_height" default="270" />
-  <arg name="depth_fps" default="5" />
+  <arg name="color_width" default="424" />
+  <arg name="color_height" default="240" />
+  <arg name="color_fps" default="6" />
+  <arg name="depth_width" default="424" />
+  <arg name="depth_height" default="240" />
+  <arg name="depth_fps" default="6" />
 
   <include file="$(find realsense2_camera)/launch/rs_camera.launch" >
     <arg name="align_depth" value="true" />
@@ -23,6 +23,7 @@
     <arg name="depth_width" value="$(arg depth_width)" />
     <arg name="depth_height" value="$(arg depth_height)" />
     <arg name="depth_fps" value="$(arg depth_fps)" />
+    <arg name="ordered_pc" value="true" />
   </include>
 
   <include file="$(find jsk_teaching_object)/launch/object_detection.launch" >
@@ -40,8 +41,8 @@
     <remap from="~input" to="$(arg input_cloud)" />
     <rosparam subst_value="true">
       tolerance: 0.02
-      min_size: 0
-      max_size: 307200
+      min_size: 10
+      max_size: 100000
       approximate_sync: true
       downsample_enable: $(arg downsample)
       multi: true
