@@ -6,6 +6,7 @@
   <arg name="manager" value="/camera/realsense2_camera_manager" />
   <arg name="downsample" default="true" />
   <arg name="gui" default="true" />
+  <arg name="device" default="-1" />
 
   <arg name="color_width" default="424" />
   <arg name="color_height" default="240" />
@@ -30,6 +31,7 @@
     <arg name="launch_usb_cam" value="false" />
     <arg name="gui" value="false" />
     <arg name="input_image" value="$(arg input_image)" />
+    <arg name="device" value="$(arg device)" />
   </include>
 
   <node name="multi_euclidean_clustering"
