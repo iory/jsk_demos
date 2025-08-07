@@ -95,6 +95,102 @@ class ObjectDetectionNode(ConnectionBasedTransport):
     def unsubscribe(self):
         self.sub.unregister()
 
+    def _process_segmentation(self, result, valid_indices, labels, rects,
+                              roi_image, org_dims):
+        """Processes masks or bounding boxes to generate segmentation data.
+
+        This method generates segmentation data (cluster indices and label maps)
+        by processing masks from the model output. If masks are not available,
+        it falls back to using bounding boxes.
+
+        Args:
+            result: The inference result from the YOLO model.
+            valid_indices (list): A list of indices for valid detections that
+                                  passed the score threshold.
+            labels (list): A list of integer class labels for valid detections.
+            rects (list): A list of jsk_recognition_msgs.msg.Rect for valid
+                          detections.
+            roi_image (np.ndarray): The cropped region of interest image.
+            org_dims (tuple): A tuple of (height, width) for the original
+                              input image.
+
+        Returns:
+            tuple: A tuple containing:
+                - list: A list of NumPy arrays, where each array contains the
+                        pixel indices for a detected instance.
+                - np.ndarray: The semantic segmentation map (label_cls).
+                - np.ndarray: The instance segmentation map (label_ins).
+        """
+        org_h, org_w = org_dims
+        cluster_indices_list = []
+
+        # Initialize full-size label maps with -1 to denote the background.
+        lbl_cls = np.full(org_dims, -1, dtype=np.int32)
+        lbl_ins = np.full(org_dims, -1, dtype=np.int32)
+
+        # --- Path 1: Process from masks if available ---
+        if result.masks is not None and len(result.masks.data) > 0:
+            roi_h, roi_w = roi_image.shape[:2]
+            masks = result.masks.data.cpu().numpy()
+            masks = resize_masks(masks, (roi_w, roi_h))
+            masks = masks[valid_indices]
+
+            if len(masks) > 0:
+                # Generate cluster indices for each mask
+                mask_indices_roi = np.arange(
+                    roi_h * roi_w, dtype=np.int32).reshape(roi_h, roi_w)
+                for mask in masks:
+                    indices_in_roi = mask_indices_roi[mask > 0]
+                    if self.roi is not None:
+                        x_min, y_min = self.roi[0], self.roi[1]
+                        indices = ((indices_in_roi // roi_w + y_min) * org_w +
+                                   (indices_in_roi % roi_w + x_min))
+                    else:
+                        indices = indices_in_roi
+                    cluster_indices_list.append(indices)
+
+                # Generate label maps for the ROI using the stack of masks
+                labels_np = np.array(labels)
+                R = len(masks)
+                roi_lbl_cls = np.max(
+                    (masks > 0) * (labels_np.reshape(-1, 1, 1) + 1),
+                    axis=0) - 1
+                roi_lbl_ins = np.max(
+                    (masks > 0) * (np.arange(R).reshape(-1, 1, 1) + 1),
+                    axis=0) - 1
+
+                # Place the ROI label maps into the full-size maps
+                if self.roi is not None:
+                    x_min, y_min, x_max, y_max = self.roi
+                    lbl_cls[y_min:y_max, x_min:x_max] = roi_lbl_cls
+                    lbl_ins[y_min:y_max, x_min:x_max] = roi_lbl_ins
+                else:
+                    lbl_cls, lbl_ins = roi_lbl_cls, roi_lbl_ins
+
+        # --- Path 2: Fallback to using bounding boxes ---
+        else:
+            if len(rects) > 0:
+                rospy.logwarn_once(
+                    "result.masks not found. "
+                    "Falling back to bounding boxes for segmentation."
+                )
+            for i, rect in enumerate(rects):
+                x, y, w, h = rect.x, rect.y, rect.width, rect.height
+                # Draw the instance and class IDs onto the label maps
+                y_slice = slice(max(0, y), min(org_h, y + h))
+                x_slice = slice(max(0, x), min(org_w, x + w))
+                lbl_ins[y_slice, x_slice] = i
+                lbl_cls[y_slice, x_slice] = labels[i]
+
+                # Generate indices from bounding box coordinates
+                if w > 0 and h > 0:
+                    x_coords, y_coords = np.meshgrid(
+                        np.arange(x, x + w), np.arange(y, y + h))
+                    indices = y_coords.flatten() * org_w + x_coords.flatten()
+                    cluster_indices_list.append(indices.astype(np.int32))
+
+        return cluster_indices_list, lbl_cls, lbl_ins
+
     def callback(self, msg):
         if abs(msg.header.stamp - rospy.Time.now()).to_sec() > 1.0:
             return
@@ -139,6 +235,7 @@ class ObjectDetectionNode(ConnectionBasedTransport):
                 continue
 
             if self.roi is not None:
+                x_min, y_min, _, _ = self.roi
                 x1 = x1 + x_min
                 y1 = y1 + y_min
                 x2 = x2 + x_min
@@ -151,37 +248,18 @@ class ObjectDetectionNode(ConnectionBasedTransport):
             labels.append(int(cls))
             scores.append(float(conf))
 
-        lbl_cls = np.zeros((im.shape[0], im.shape[1]), dtype=np.int32)
-        lbl_ins = np.zeros((im.shape[0], im.shape[1]), dtype=np.int32)
-        if result.masks is not None:
-            masks = result.masks.data.cpu().numpy()
-            masks = resize_masks(masks, (roi_image.shape[1], roi_image.shape[0]))
-            masks = masks[valid_indices]
-            R, H, W = masks.shape
-            mask_indices = np.array(
-                np.arange(H * W).reshape(H, W), dtype=np.int32)
+        cluster_indices_list, lbl_cls, lbl_ins = self._process_segmentation(
+            result=result,
+            valid_indices=valid_indices,
+            labels=labels,
+            rects=rects_msg.rects,
+            roi_image=roi_image,
+            org_dims=(org_h, org_w)
+        )
 
-            for mask in masks:
-                indices = mask_indices[mask > 0]
-
-                if self.roi is not None:
-                    indices = [(i // W + y_min) * org_w + (i % W + x_min) for i in indices]
-
-                indices_msg = PointIndices(header=msg.header, indices=indices)
-                msg_indices.cluster_indices.append(indices_msg)
-
-            labels = np.array(labels)
-            # -1: label for background
-            if len(masks) > 0:
-                lbl_cls = np.max(
-                    (masks > 0)
-                    * (labels.reshape(-1, 1, 1) + 1) - 1, axis=0)
-                lbl_cls = np.array(lbl_cls, dtype=np.int32)
-                lbl_ins = np.max(
-                    (masks > 0) * (np.arange(R).reshape(-1, 1, 1) + 1) - 1,
-                    axis=0)
-                lbl_ins = np.array(lbl_ins, dtype=np.int32)
-            labels = labels.tolist()
+        for indices in cluster_indices_list:
+            indices_msg = PointIndices(header=msg.header, indices=indices.tolist())
+            msg_indices.cluster_indices.append(indices_msg)
 
         self.pub_indices.publish(msg_indices)
         self.rects_pub.publish(rects_msg)
