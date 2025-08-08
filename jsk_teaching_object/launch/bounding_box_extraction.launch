@@ -9,12 +9,12 @@
   <arg name="device" default="-1" />
   <arg name="model_file" default="apple/original_augmented_best.pt" />
 
-  <arg name="color_width" default="424" />
-  <arg name="color_height" default="240" />
-  <arg name="color_fps" default="6" />
-  <arg name="depth_width" default="424" />
-  <arg name="depth_height" default="240" />
-  <arg name="depth_fps" default="6" />
+  <arg name="color_width" default="848" />
+  <arg name="color_height" default="480" />
+  <arg name="color_fps" default="5" />
+  <arg name="depth_width" default="848" />
+  <arg name="depth_height" default="480" />
+  <arg name="depth_fps" default="5" />
 
   <include file="$(find realsense2_camera)/launch/rs_camera.launch" >
     <arg name="align_depth" value="true" />
