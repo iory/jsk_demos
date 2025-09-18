@@ -55,7 +55,7 @@
     </node>
     <node name="mask_image_to_indices"
           pkg="nodelet" type="nodelet"
-          args="load jsk_pcl_utils/MaskImageToPointIndices $(arg MANAGER)">
+          args="load jsk_pcl_utils/MaskImageToPointIndices $(arg manager)">
       <remap from="~input" to="/hsv_color_filter/image" />
       <remap from="~output" to="$(arg input_indices)" />
     </node>
