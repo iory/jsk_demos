@@ -37,7 +37,7 @@
     <node name="hsv_color_filter"
           pkg="opencv_apps" type="hsv_color_filter"
           output="screen" >
-      <remap from="~input" to="$(arg input_image)" />
+      <remap from="image" to="$(arg input_image)" />
       <param name="size" value="5" />
     </node>
     <node name="apply_mask_image"
