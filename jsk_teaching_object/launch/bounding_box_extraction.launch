@@ -1,10 +1,17 @@
 <launch>
 
-  <arg name="input_image" default="/camera/color/image_raw" />
-  <arg name="input_cloud" default="/camera/depth/color/points" />
   <arg name="input_indices" default="/object_detection/output/cluster_indices" />
   <arg name="manager" value="/camera/realsense2_camera_manager" />
   <arg name="launch_camera" default="true" />
+  <group if="$(arg launch_camera)" >
+    <arg name="input_image" default="/camera/color/image_raw" />
+    <arg name="input_cloud" default="/camera/depth/color/points" />
+  </group>
+  <group unless="$(arg launch_camera)" >
+    <arg name="input_image" default="/camera/rgb/image_raw" />
+    <arg name="input_cloud" default="/camera/depth/points" />
+  </group>
+  <arg name="use_color_filter" default="false" />
   <arg name="downsample" default="true" />
   <arg name="gui" default="true" />
   <arg name="device" default="-1" />
@@ -30,13 +37,42 @@
     <arg name="ordered_pc" value="true" />
   </include>
 
-  <include file="$(find jsk_teaching_object)/launch/object_detection.launch" >
-    <arg name="launch_usb_cam" value="false" />
-    <arg name="gui" value="false" />
-    <arg name="input_image" value="$(arg input_image)" />
-    <arg name="device" value="$(arg device)" />
-    <arg name="model_file" value="$(arg model_file)" />
-  </include>
+  <group if="$(arg use_color_filter)" >
+    <node name="hsv_color_filter"
+          pkg="nodelet" type="nodelet"
+          args="load opencv_apps::HSVColorFilterNodelet $(arg MANAGER)"
+          output="screen" >
+      <remap from="~input" to="$(arg input_image)" />
+      <param name="size" value="5" />
+    </node>
+    <node name="apply_mask_image"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_perception/ApplyMaskImage $(arg MANAGER)"
+          respawn="true" >
+      <remap from="~input" to="$(arg input_image)" />
+      <remap from="~input/mask" to="/hsv_color_filter/image" />
+      <rosparam>
+        approximate_sync: false
+        clip: false
+        queue_size: 5
+      </rosparam>
+    </node>
+    <node name="mask_image_to_indices"
+          pkg="nodelet" type="nodelet"
+          args="load jsk_pcl_utils/MaskImageToPointIndices $(arg MANAGER)">
+      <remap from="~input" to="/hsv_color_filter/image" />
+      <remap from="~output" to="$(arg input_indices)" />
+    </node>
+  </group>
+  <group unless="$(arg use_color_filter)" >
+    <include file="$(find jsk_teaching_object)/launch/object_detection.launch" >
+      <arg name="launch_usb_cam" value="false" />
+      <arg name="gui" value="false" />
+      <arg name="input_image" value="$(arg input_image)" />
+      <arg name="device" value="$(arg device)" />
+      <arg name="model_file" value="$(arg model_file)" />
+    </include>
+  </group>
 
   <node name="multi_euclidean_clustering"
         pkg="nodelet" type="nodelet"
