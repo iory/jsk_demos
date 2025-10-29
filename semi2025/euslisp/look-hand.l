@@ -1,7 +1,7 @@
 #!/usr/bin/env roseus
 
 (load "package://kxreus/euslisp/kxr-interface.l")
-(load "package://semi2024/euslisp/semi-kxr.l")
+(load "package://semi2025/euslisp/semi-kxr.l")
 (load "models/arrow-object.l")
 
 (ros::load-ros-manifest "roseus")

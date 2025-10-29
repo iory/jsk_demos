@@ -1,10 +1,10 @@
 ;;;
 ;;;	roslaunch realsense2_camera rs_rgbd.launch gui:=false
-;;;	roslaunch semi2024 hand_pose_estimation_d405.launch gui:=false
+;;;	roslaunch semi2025 hand_pose_estimation_d405.launch gui:=false
 ;;;
 
 (load "package://kxreus/euslisp/kxr-interface.l")
-(load "package://semi2024/euslisp/semi-kxr.l")
+(load "package://semi2025/euslisp/semi-kxr.l")
 (load "models/arrow-object.l")
 
 (ros::load-ros-manifest "roseus")

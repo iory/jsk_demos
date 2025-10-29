@@ -1,8 +1,8 @@
 <package format="3">
-  <name>semi2024</name>
+  <name>semi2025</name>
   <version>0.0.1</version>
 
-  <description>Workspace for Semi2024 in JSK.</description>
+  <description>Workspace for Semi2025 in JSK.</description>
   <author>Iori Yanokura</author>
   <author email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</author>
   <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
@@ -47,6 +47,6 @@
   <!-- ALPHABETICAL ORDER -->
 
   <export>
-    <nodelet plugin="${prefix}/plugins/nodelet/libsemi2024.xml"/>
+    <nodelet plugin="${prefix}/plugins/nodelet/libsemi2025.xml"/>
   </export>
 </package>

@@ -8,7 +8,7 @@
   <group ns="$(arg camera_name)">
     <group ns="$(arg rgb)" >
       <node name="face_pose_estimation"
-            pkg="semi2024" type="face_recognition.py"
+            pkg="semi2025" type="face_recognition.py"
             respawn="true"
             clear_params="true"
             output="screen" >
@@ -21,7 +21,7 @@
     </group>
 
     <node name="face_skeleton_with_depth"
-          pkg="semi2024" type="skeleton_with_depth.py"
+          pkg="semi2025" type="skeleton_with_depth.py"
           respawn="true"
           clear_params="true"
           output="screen" >
