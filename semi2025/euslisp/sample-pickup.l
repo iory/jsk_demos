@@ -1,7 +1,7 @@
 #!/usr/bin/env roseus
 
 (load "package://kxreus/euslisp/kxr-interface.l")
-(load "package://semi2025/euslisp/semi-kxr.l")
+(load "package://jedy_bringup/euslisp/jedy-interface.l")
 (load "models/arrow-object.l")
 
 (ros::load-ros-manifest "roseus")
@@ -9,7 +9,7 @@
 (ros::load-ros-manifest "apriltag_ros")
 (ros::roseus "visualize_hand_pose")
 
-(kxr-init)
+(jedy-init)
 
 (setq *camera-color-optical-frame* (arrow))
 (setq *target-end-coords-axis* (arrow))
