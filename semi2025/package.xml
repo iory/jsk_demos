@@ -10,6 +10,7 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_virtualenv</buildtool_depend>
 
   <!-- ALPHABETICAL ORDER -->
   <build_depend>camera_info_manager</build_depend>
@@ -48,5 +49,6 @@
 
   <export>
     <nodelet plugin="${prefix}/plugins/nodelet/libsemi2025.xml"/>
+    <pip_requirements>requirements.in</pip_requirements>
   </export>
 </package>
