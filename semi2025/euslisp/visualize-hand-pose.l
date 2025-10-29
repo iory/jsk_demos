@@ -12,7 +12,7 @@
 (ros::roseus "visualize_hand_pose")
 
 (jedy-init)
-
+(setq *robot* *jedy*)
 
 (setq *camera-color-optical-frame* (arrow))
 (send *camera-color-optical-frame* :newcoords
