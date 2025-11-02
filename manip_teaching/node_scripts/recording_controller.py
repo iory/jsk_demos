@@ -76,6 +76,16 @@ class RecordingController:
         with self.topics_lock:
             return all(self.topics_ready.values())
 
+    def is_camera_ready(self, camera_name):
+        """Check if a specific camera's topics are ready"""
+        with self.topics_lock:
+            if camera_name == 'D405':
+                return (self.topics_ready['/d405/depth/image_rect_raw/compressedDepth'] and
+                        self.topics_ready['/d405/color/image_raw/compressed'])
+            elif camera_name == 'T265':
+                return self.topics_ready['/t265/odom/sample']
+        return False
+
     def get_disk_space(self):
         """Get available disk space in GB"""
         try:
@@ -105,8 +115,17 @@ class RecordingController:
             msg.data = f"{GREEN}Ready to rec{RESET}\nFree: {disk_space}"
             self.info_pub.publish(msg)
         else:
+            # Show individual camera status
+            d405_ready = self.is_camera_ready('D405')
+            t265_ready = self.is_camera_ready('T265')
+
+            d405_color = GREEN if d405_ready else RED
+            t265_color = GREEN if t265_ready else RED
+
             msg = String()
-            msg.data = f"{YELLOW}Not ready{RESET}\nFree: {disk_space}"
+            msg.data = (f"{YELLOW}Not ready{RESET}\n"
+                       f"{d405_color}D405{RESET} {t265_color}T265{RESET}\n"
+                       f"Free: {disk_space}")
             self.info_pub.publish(msg)
 
     def button_callback(self, msg):
