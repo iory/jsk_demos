@@ -2,6 +2,7 @@
 
   <node name="$(anon rosbag_record)"
         pkg="rosbag" type="record"
+	output="screen"
         args="
               /t265/accel/imu_info
               /t265/accel/metadata
@@ -20,9 +21,6 @@
               /d405/extrinsics/depth_to_color
               /tf
               /tf_static
-              /vacuum_pressure
-              /visualization/battery/value
-              /get_image
               ">
   </node>
 
