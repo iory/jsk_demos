@@ -1,0 +1,3 @@
+ultralytics>=8.4.45
+lap>=0.5.13
+clip @ git+https://github.com/openai/CLIP.git

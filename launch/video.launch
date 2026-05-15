@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+  Video-file demo launch.
+
+  Plays an mp4 (default: $(find balloon_detection)/pooh/$(arg video)) through
+  video_stream_opencv and pipes its output into detect_events.launch.
+-->
+<launch>
+  <arg name="video" default="IMG_8615.mp4"
+       doc="File name under $(find balloon_detection)/pooh/."/>
+  <arg name="video_path" default="$(find balloon_detection)/pooh/$(arg video)"
+       doc="Override with an absolute path (file or /dev/videoN)."/>
+  <arg name="publish_fps" default="30"
+       doc="Rate at which video_stream_opencv publishes frames."/>
+  <arg name="loop" default="false"/>
+  <arg name="visualize" default="true"/>
+  <arg name="device" default="cpu"/>
+  <arg name="model" default="yolov8x-worldv2.pt"/>
+  <arg name="balloon_classes" default="balloon,red balloon"/>
+  <arg name="teddy_classes" default="teddy bear,stuffed animal,Winnie the Pooh plush"/>
+
+  <include file="$(find video_stream_opencv)/launch/camera.launch">
+    <arg name="camera_name" value="videofile"/>
+    <arg name="video_stream_provider" value="$(arg video_path)"/>
+    <arg name="buffer_queue_size" value="1000"/>
+    <arg name="fps" value="$(arg publish_fps)"/>
+    <arg name="frame_id" value="videofile_frame"/>
+    <arg name="camera_info_url" value=""/>
+    <arg name="flip_horizontal" value="false"/>
+    <arg name="flip_vertical" value="false"/>
+    <arg name="loop_videofile" value="$(arg loop)"/>
+    <arg name="visualize" value="false"/>
+  </include>
+
+  <include file="$(find balloon_detection)/launch/detect_events.launch">
+    <arg name="image_topic" value="/videofile/image_raw"/>
+    <arg name="model" value="$(arg model)"/>
+    <arg name="device" value="$(arg device)"/>
+    <arg name="balloon_classes" value="$(arg balloon_classes)"/>
+    <arg name="teddy_classes" value="$(arg teddy_classes)"/>
+    <arg name="visualize" value="$(arg visualize)"/>
+  </include>
+</launch>

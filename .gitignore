@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+runs/
+build/
+devel/
+install/
+logs/
+.catkin_tools/
+
+# Sample videos are not tracked.
+pooh/*.mp4
