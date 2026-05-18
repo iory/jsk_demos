@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Wrapper that launches detect_events_node.py via a uv-managed virtualenv.
+#
+# The package source directory is baked in at CMake configure time so that
+# `roslaunch` / `rosrun` can invoke this wrapper from devel/install space
+# without losing track of where the pyproject.toml lives.
+#
+# Override at runtime by exporting BALLOON_DETECTION_SRC.
+
+set -e
+
+# ANSI colors (disabled when stderr is not a TTY).
+if [ -t 2 ]; then
+    RED='\033[1;31m'
+    YELLOW='\033[1;33m'
+    RESET='\033[0m'
+else
+    RED=''
+    YELLOW=''
+    RESET=''
+fi
+
+err() { printf "${RED}[detect_events_node_uv] %s${RESET}\n" "$*" >&2; }
+hint() { printf "${YELLOW}[detect_events_node_uv] %s${RESET}\n" "$*" >&2; }
+
+PKG_DIR="${BALLOON_DETECTION_SRC:-@balloon_detection_SOURCE_DIR@}"
+
+if [ ! -f "$PKG_DIR/pyproject.toml" ]; then
+    err "ERROR: pyproject.toml not found in: $PKG_DIR"
+    hint "Set BALLOON_DETECTION_SRC to the balloon_detection package source dir."
+    exit 1
+fi
+
+if ! command -v uv >/dev/null 2>&1; then
+    err "ERROR: 'uv' command not found in PATH."
+    hint "Install uv from https://docs.astral.sh/uv/  (e.g. curl -LsSf https://astral.sh/uv/install.sh | sh)"
+    hint "Or rebuild without USE_UV: catkin build balloon_detection --cmake-args -DUSE_UV=OFF"
+    exit 1
+fi
+
+exec uv run --project "$PKG_DIR" python "$PKG_DIR/scripts/detect_events_node.py" "$@"

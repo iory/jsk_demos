@@ -18,6 +18,8 @@
   <arg name="model" default="yolov8x-worldv2.pt"/>
   <arg name="balloon_classes" default="balloon,red balloon"/>
   <arg name="teddy_classes" default="teddy bear,stuffed animal,Winnie the Pooh plush"/>
+  <arg name="use_uv" default="false"
+       doc="Launch the detector via the uv-managed virtualenv wrapper."/>
 
   <include file="$(find video_stream_opencv)/launch/camera.launch">
     <arg name="camera_name" value="videofile"/>
@@ -39,5 +41,6 @@
     <arg name="balloon_classes" value="$(arg balloon_classes)"/>
     <arg name="teddy_classes" value="$(arg teddy_classes)"/>
     <arg name="visualize" value="$(arg visualize)"/>
+    <arg name="use_uv" value="$(arg use_uv)"/>
   </include>
 </launch>

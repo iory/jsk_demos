@@ -1,0 +1,17 @@
+[project]
+name = "balloon-detection"
+version = "0.1.0"
+description = "Balloon hand-off / fly-away event detection using YOLO-WorldV2 + ByteTrack."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "ultralytics>=8.4.45",
+    "lap>=0.5.13",
+    "clip @ git+https://github.com/openai/CLIP.git",
+]
+
+[tool.uv]
+# This project is a ROS package, not a Python package to be built/installed.
+# We only use uv to manage a Python interpreter and its dependencies.
+package = false

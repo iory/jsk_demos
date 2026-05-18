@@ -10,5 +10,9 @@ install/
 logs/
 .catkin_tools/
 
+# uv: keep pyproject.toml + .python-version under VCS, but the resolved
+# lockfile is environment-specific (cuda vs cpu wheels, etc.) — skip it for now.
+uv.lock
+
 # Sample videos are not tracked.
 pooh/*.mp4

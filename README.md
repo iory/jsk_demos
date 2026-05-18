@@ -32,6 +32,51 @@ The first build creates a per-package virtualenv and installs `ultralytics`,
 `lap`, and the OpenAI `clip` module into it. This pulls torch and takes a few
 minutes.
 
+### Alternative: build with [uv](https://docs.astral.sh/uv/)
+
+Ubuntu 20.04 ships Python 3.8, which is too old for some of the runtime
+dependencies (notably newer `ultralytics`). To pin a specific Python
+version, build the package with `uv` instead of `catkin_virtualenv`.
+
+Install `uv` once:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+The required Python version is set in `.python-version` (currently `3.10`)
+and dependencies are declared in `pyproject.toml`. Edit `.python-version` or
+add `[tool.uv]` `python = "..."` to change it.
+
+Build the package with the `USE_UV` CMake flag turned on:
+
+```bash
+cd ~/ros/balloon-detection
+source /opt/ros/one/setup.bash
+catkin clean balloon_detection -y  # if previously built with catkin_virtualenv
+catkin build balloon_detection --cmake-args -DUSE_UV=ON
+```
+
+`catkin build` will invoke `uv sync` against `src/balloon_detection`,
+downloading the pinned Python interpreter and installing all deps into
+`src/balloon_detection/.venv`. The wrapper installed to
+`devel/lib/balloon_detection/detect_events_node_uv` shells into that venv via
+`uv run`, so launch files just need `use_uv:=true`.
+
+```bash
+roslaunch balloon_detection video.launch use_uv:=true
+```
+
+Re-run `uv sync` manually (from `src/balloon_detection`) whenever you change
+`pyproject.toml`; CMake re-runs it on every `catkin build` as well.
+
+Note: the node decodes `sensor_msgs/Image` (and optionally `CompressedImage`
+via `compressed:=true`) with a small in-package numpy helper
+(`scripts/img_utils.py`) rather than `cv_bridge`, so the uv-managed Python
+does not need to match the ROS-distro's Python ABI. This is what makes the
+uv path usable on Ubuntu 20.04 / ROS noetic, where the stock
+`cv_bridge_boost.so` is locked to Python 3.8.
+
 ## Run
 
 ```bash
@@ -62,6 +107,8 @@ or specify an arbitrary path (or `/dev/video0`) via `video_path:=`.
 | `device` | `cpu` | e.g. `cuda:0`. |
 | `balloon_classes` | `balloon,red balloon` | CSV YOLO-World prompts for the balloon. |
 | `teddy_classes` | `teddy bear,stuffed animal,Winnie the Pooh plush` | CSV prompts for the receiver. |
+| `use_uv` | `false` | Launch the detector via the uv-managed venv (needs `catkin build --cmake-args -DUSE_UV=ON`). |
+| `compressed` | `false` | Subscribe to `sensor_msgs/CompressedImage` instead of raw `Image` (remap `image` to the compressed topic). |
 
 ### `detect_events.launch` — detection only
 

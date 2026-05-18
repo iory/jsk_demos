@@ -44,10 +44,15 @@ _clip.tokenize = _clip_tokenize_compat
 import cv2  # noqa: E402
 import numpy as np  # noqa: E402
 import rospy  # noqa: E402
-from cv_bridge import CvBridge  # noqa: E402
-from sensor_msgs.msg import Image  # noqa: E402
+from sensor_msgs.msg import CompressedImage, Image  # noqa: E402
 from std_msgs.msg import String  # noqa: E402
 from ultralytics import YOLO  # noqa: E402
+
+from img_utils import (  # noqa: E402
+    compressed_imgmsg_to_cv2,
+    cv2_to_imgmsg,
+    imgmsg_to_cv2,
+)
 
 HELD_IOU_THRESH = 0.005
 VEL_WINDOW_SECS = 0.27
@@ -423,7 +428,7 @@ class DetectEventsNode:
             "Model ready. balloon=%s teddy=%s", balloon_prompts, teddy_prompts
         )
 
-        self.bridge = CvBridge()
+        self.compressed = bool(rospy.get_param("~compressed", False))
         self.detector = None
         self.frame_idx = 0
         self.last_event_count = 0
@@ -434,16 +439,27 @@ class DetectEventsNode:
         self.state_pub = rospy.Publisher("~state", String, queue_size=1, latch=True)
         self.last_state_published = None
 
-        self.sub = rospy.Subscriber(
-            "image", Image, self.image_cb, queue_size=1, buff_size=2 ** 26,
-        )
-        rospy.loginfo("Subscribed (remap 'image' from launch).")
+        if self.compressed:
+            self.sub = rospy.Subscriber(
+                "image", CompressedImage, self.image_cb,
+                queue_size=1, buff_size=2 ** 26,
+            )
+            rospy.loginfo("Subscribed to CompressedImage (remap 'image' from launch).")
+        else:
+            self.sub = rospy.Subscriber(
+                "image", Image, self.image_cb,
+                queue_size=1, buff_size=2 ** 26,
+            )
+            rospy.loginfo("Subscribed to Image (remap 'image' from launch).")
 
     def image_cb(self, msg):
         try:
-            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+            if self.compressed:
+                frame = compressed_imgmsg_to_cv2(msg, desired_encoding="bgr8")
+            else:
+                frame = imgmsg_to_cv2(msg, desired_encoding="bgr8")
         except Exception as e:
-            rospy.logwarn("cv_bridge error: %s", e)
+            rospy.logwarn("image decode error: %s", e)
             return
         h, w = frame.shape[:2]
 
@@ -495,7 +511,7 @@ class DetectEventsNode:
         self.last_event_count = len(self.detector.events)
 
         try:
-            out_msg = self.bridge.cv2_to_imgmsg(annotated, encoding="bgr8")
+            out_msg = cv2_to_imgmsg(annotated, encoding="bgr8")
             out_msg.header = msg.header
             self.image_pub.publish(out_msg)
         except Exception as e:
