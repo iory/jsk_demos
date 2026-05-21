@@ -11,7 +11,7 @@
   <arg name="image_topic" default="image"
        doc="Input sensor_msgs/Image topic (remapped onto the node's 'image')."/>
   <arg name="model" default="yolov8x-worldv2.pt"/>
-  <arg name="device" default="cpu"/>
+  <arg name="device" default="cuda"/>
   <arg name="balloon_classes" default="balloon,red balloon"
        doc="Comma-separated YOLO-World prompts treated as the balloon class."/>
   <arg name="teddy_classes" default="teddy bear,stuffed animal,Winnie the Pooh plush"

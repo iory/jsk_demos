@@ -77,6 +77,23 @@ does not need to match the ROS-distro's Python ABI. This is what makes the
 uv path usable on Ubuntu 20.04 / ROS noetic, where the stock
 `cv_bridge_boost.so` is locked to Python 3.8.
 
+### Jetson / reComputer note: rebuild torchvision with CUDA
+
+On Jetson / reComputer, the `torchvision` installed by the package
+virtualenv may not match the Jetson CUDA-enabled PyTorch environment.
+If importing or running the detector fails around `torchvision`, rebuild
+`torchvision` inside the package virtualenv with CUDA enabled.
+
+```bash
+source ~/ros/balloon-detection/devel/.private/balloon_detection/share/balloon_detection/venv/bin/activate
+
+pip uninstall -y torchvision
+
+FORCE_CUDA=1 TORCH_CUDA_ARCH_LIST="8.7" BUILD_VERSION=0.13.0 MAX_JOBS=4 \
+pip install --no-cache-dir --no-build-isolation \
+"git+https://github.com/pytorch/vision.git@v0.13.0#egg=torchvision"
+```
+
 ## Run
 
 ```bash
