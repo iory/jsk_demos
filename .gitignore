@@ -16,3 +16,4 @@ uv.lock
 
 # Sample videos are not tracked.
 pooh/*.mp4
+yolov8x-worldv2.pt

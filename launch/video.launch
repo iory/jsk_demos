@@ -14,7 +14,7 @@
        doc="Rate at which video_stream_opencv publishes frames."/>
   <arg name="loop" default="false"/>
   <arg name="visualize" default="true"/>
-  <arg name="device" default="cpu"/>
+  <arg name="device" default="cuda"/>
   <arg name="model" default="yolov8x-worldv2.pt"/>
   <arg name="balloon_classes" default="balloon,red balloon"/>
   <arg name="teddy_classes" default="teddy bear,stuffed animal,Winnie the Pooh plush"/>

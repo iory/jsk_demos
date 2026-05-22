@@ -1,3 +1,5 @@
-ultralytics>=8.4.45
+torch @ https://developer.nvidia.com/w/compute/redist/jp/v50/pytorch/torch-1.12.0a0+8a1a93a9.nv22.5-cp38-cp38-linux_aarch64.whl
+ultralytics==8.2.0
 lap>=0.5.13
+torchvision==0.13.0
 clip @ git+https://github.com/openai/CLIP.git

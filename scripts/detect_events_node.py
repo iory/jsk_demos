@@ -64,6 +64,8 @@ FLEW_AWAY_DWELL_SECS = 2.0
 EDGE_MARGIN_RATIO = 0.10
 STABILITY_WINDOW_SECS = 3.0
 STABILITY_RADIUS_RATIO = 0.10
+INITIAL_RELATION_SECS = 1.0
+HELD_DIST_MARGIN_RATIO = 0.08
 STATE_COLORS = {
     "NO_BALLOON": (128, 128, 128),
     "APPROACHING": (0, 165, 255),
@@ -139,6 +141,10 @@ class BalloonEventDetector:
         self.last_balloon_xy = None
         self.last_t = None
         self.events = []
+        self.initial_dist_samples = []
+        self.initial_dist = None
+        self.initial_relation_done = False
+        self.held_dist_margin = HELD_DIST_MARGIN_RATIO * diag
 
     def update(self, frame_idx, t, balloon_box, teddy_box):
         dt = 0.0 if self.last_t is None else max(0.0, t - self.last_t)
@@ -170,7 +176,29 @@ class BalloonEventDetector:
             iou = iou_xyxy(balloon_box, teddy_box)
 
         balloon_visible = balloon_box is not None
-        balloon_close = (iou > HELD_IOU_THRESH) or (dist < self.held_dist_thresh)
+
+        # record distance between teddy and balloon first
+        if balloon_box is not None and teddy_box is not None and not self.initial_relation_done:
+            self.initial_dist_samples.append(dist)
+            if t >= INITIAL_RELATION_SECS and self.initial_dist_samples:
+                self.initial_dist = float(np.median(self.initial_dist_samples))
+                self.initial_relation_done = True
+                self.events.append(
+                    {
+                        "frame": frame_idx,
+                        "time_sec": round(t, 2),
+                        "event": "INITIAL_RELATION_SET",
+                        "note": f"initial_dist={self.initial_dist:.1f}, margin={self.held_dist_margin:.1f}",
+                    }
+                )
+
+        # judge if teddy is holding a balloon by comparing with initial distance
+        if self.initial_dist is not None:
+            balloon_close = dist <= self.initial_dist + self.held_dist_margin
+        else:
+            # if there is no initial distance, use threshold
+            balloon_close = (iou > HELD_IOU_THRESH) or (dist < self.held_dist_thresh)
+
         prev_state = self.state
 
         if balloon_visible:
@@ -259,12 +287,12 @@ class BalloonEventDetector:
                 self.state = "FLEW_AWAY"
                 self.held_total_secs = 0.0
         elif self.state == "FLEW_AWAY":
-            if balloon_visible and balloon_close:
-                self.state = "HELD"
-                self.held_secs = HOLD_SECS_FOR_HELD
-                self.held_total_secs = HOLD_SECS_FOR_HELD
-                self.received_emitted = False
-            elif balloon_visible:
+            # if balloon_visible and balloon_close:
+            #     self.state = "HELD"
+            #     self.held_secs = HOLD_SECS_FOR_HELD
+            #     self.held_total_secs = HOLD_SECS_FOR_HELD
+            #     self.received_emitted = False
+            if balloon_visible:
                 self.state = "APPROACHING"
                 self.held_secs = 0.0
 
