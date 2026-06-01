@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>hydrus_traj_verify</name>
+  <version>0.1.0</version>
+  <description>
+    Headless, ROS-only verification harness for the hydrus leg5
+    circle-tracking controller (trajectry_real.py).  A dummy plant node
+    models an ideal flight-controller + servos, so the control logic can
+    be validated over real ROS topics/tf without rviz, Gazebo, or the
+    real machine.
+  </description>
+
+  <maintainer email="ab.ioryz@gmail.com">Iori Yanokura</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>aerial_robot_msgs</exec_depend>
+
+  <!-- scikit-robot (with FloatingJoint) is a pip dependency, not a ROS
+       package; see README for install / PYTHONPATH notes. -->
+</package>

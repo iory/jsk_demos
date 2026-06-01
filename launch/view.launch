@@ -1,0 +1,29 @@
+<launch>
+  <!-- dummy plant + leg5 tracker + rviz. robot_description is generated
+       from the hydrus xacro; both nodes read it (no hard-coded paths). -->
+  <arg name="model"
+       default="$(find hydrus)/robots/quad/tilt_0deg_ce_15inch_202604/robot.urdf.xacro"/>
+  <arg name="run_tracker" default="true"/>
+  <arg name="use_viewer"  default="false"/>
+  <arg name="radius"      default="0.10"/>
+  <arg name="steps"       default="400"/>
+  <arg name="fix_joint"   default="joint2"/>
+  <arg name="fix_angle"   default="0.6"/>
+
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
+
+  <node pkg="hydrus_traj_verify" type="dummy_plant.py" name="dummy_plant"
+        output="screen"/>
+
+  <node pkg="rviz" type="rviz" name="rviz"
+        args="-d $(find hydrus_traj_verify)/rviz/hydrus.rviz"/>
+
+  <group if="$(arg run_tracker)">
+    <node pkg="hydrus_traj_verify" type="trajectry_real.py"
+          name="trajectory_tracker" output="screen"
+          args="--radius $(arg radius) --steps $(arg steps)
+                --fix-joint $(arg fix_joint) --fix-angle $(arg fix_angle)">
+      <param name="use_viewer" value="$(arg use_viewer)"/>
+    </node>
+  </group>
+</launch>

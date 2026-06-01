@@ -21,8 +21,6 @@ from sensor_msgs.msg import JointState
 
 from geometry_msgs.msg import Vector3Stamped
 
-URDF_PATH = "/home/tokunaga/ros/jsk_aerial_robot_ws/src/jsk_aerial_robot/robots/hydrus/robots/quad/tilt_0deg_ce_15inch_202604/robot.urdf"
-
 # xyz,royをROSのtfから取得
 def get_xyz_rpy(listener, parent_frame, child_frame):
     trans, quat = listener.lookupTransform(parent_frame, child_frame, rospy.Time(0))
@@ -200,7 +198,7 @@ def main():
     parser.add_argument('--radius', type=float, default=0.10)
     parser.add_argument('--dt', type=float, default=0.02)
     parser.add_argument('--resolution', type=int, nargs=2, default=(960, 720))
-    parser.add_argument('--update-interval', type=float, default=0.002)
+    parser.add_argument('--update-interval', type=float, default=0.03)
     parser.add_argument('--trail-points', type=int, default=80)
     parser.add_argument('--ik-stop', type=int, default=20)
     parser.add_argument('--control-hz',type=float, default=50.0)
@@ -213,11 +211,12 @@ def main():
                         help='joint1 の初期値 (中心値) [rad]')
     parser.add_argument('--q3_center', type=float, default=1.0,
                         help='joint3 の初期値 (中心値) [rad]')
-    parser.add_argument('--max-cog-step', type=float, default=0.0001,
-                        help='COG コマンドの最大変化量 [m]')
-    parser.add_argument('--max-q-step', type=float, default=0.001,
-                        help='joint コマンドの最大変化量 [rad]')
-    args = parser.parse_args()
+    parser.add_argument('--max-cog-step', type=float, default=0.02,
+                        help='COG コマンドの最大変化量 [m] (旧 0.0001 は遅すぎた)')
+    parser.add_argument('--max-q-step', type=float, default=0.05,
+                        help='joint コマンドの最大変化量 [rad] (旧 0.001 は遅すぎた)')
+    # rospy.myargv() で roslaunch が付ける __name:= 等を除いてから parse
+    args = parser.parse_args(rospy.myargv()[1:])
     
     # ----------------------------------------------------------------
     # ros登録
@@ -240,10 +239,16 @@ def main():
     }
 
     # ------------------------------------------------------------------
-    # URDF 読み込み
+    # URDF 読み込み (~urdf にパス, 無ければ /robot_description を一時ファイルへ)
     # ------------------------------------------------------------------
-    print('Loading URDF:', URDF_PATH)
-    robot = RobotModelFromURDF(urdf_file=URDF_PATH)
+    urdf_path = rospy.get_param('~urdf', '')
+    if not urdf_path:
+        import tempfile
+        fd, urdf_path = tempfile.mkstemp(suffix='.urdf')
+        with os.fdopen(fd, 'w') as f:
+            f.write(rospy.get_param('robot_description'))
+    print('Loading URDF:', urdf_path)
+    robot = RobotModelFromURDF(urdf_file=urdf_path)
     print('  root_link =', robot.root_link.name)
     print('  joints    =', [j.name for j in robot.joint_list])  
     
@@ -312,46 +317,35 @@ def main():
     # ------------------------------------------------------------------
     # Viewer セットアップ (PyrenderViewer)
     # ------------------------------------------------------------------
+    # rviz で見る運用では PyrenderViewer を開かない (~use_viewer:=false).
+    # 可視化は rviz の RobotModel に任せ, このノードは制御に専念する.
+    use_viewer = rospy.get_param('~use_viewer', False)
     viewer = None
     target_axis = None
-    # update_interval が大きいと viewer の描画が遅くてカクついて見える.
-    # デフォルト 1.0s (= 1Hz) は明らかに遅いので 0.02s (50Hz) 程度に.
-    viewer = skrobot.viewers.PyrenderViewer(
-        resolution=tuple(args.resolution),
-        update_interval=args.update_interval)
-    viewer.add(robot)
-
-    # ★ 参照円軌道をあらかじめ小さい球の列で描いておく.
-    # IK ループが追従すべき経路が一目で分かる.
-    from skrobot.model.primitives import Sphere
+    root_axis = None
     trail_spheres = []
-    for j in range(args.trail_points):
-        phi = 2.0 * np.pi * j / args.trail_points
-        wp = p0 + np.array([args.radius * np.cos(phi),
-                            args.radius * np.sin(phi),
-                            0.0])
-        mark = Sphere(radius=0.008, pos=wp)
-        mark.set_color([60, 120, 220, 255])   # 青系
-        viewer.add(mark)
-        trail_spheres.append(mark)
-
-    # 現在ターゲットを示す大きめの軸 (毎フレーム動く)
-    target_axis = skrobot.model.Axis(
-        axis_radius=0.015, axis_length=0.18, pos=p0.copy())
-    viewer.add(target_axis)
-    # root 軸 (毎フレーム動く)
-    root_axis = skrobot.model.Axis(
-        axis_radius=0.008, axis_length=0.20, pos=fixed_root_xyz)
-    viewer.add(root_axis)
-
-    viewer.show()
-    print()
-    print('==> PyrenderViewer is running '
-            '(update_interval={:.3f}s).'.format(args.update_interval))
-    print('    Blue spheres = 参照円軌道, '
-            '大きい軸 = 現在ターゲット, ロボット leg5 が追従.')
-    print('    Close the window (or press [q]) to stop the IK loop.')
-    print()
+    if use_viewer:
+        viewer = skrobot.viewers.PyrenderViewer(
+            resolution=tuple(args.resolution),
+            update_interval=args.update_interval)
+        viewer.add(robot)
+        from skrobot.model.primitives import Sphere
+        for j in range(args.trail_points):
+            phi = 2.0 * np.pi * j / args.trail_points
+            wp = p0 + np.array([args.radius * np.cos(phi),
+                                args.radius * np.sin(phi),
+                                0.0])
+            mark = Sphere(radius=0.008, pos=wp)
+            mark.set_color([60, 120, 220, 255])   # 青系
+            viewer.add(mark)
+            trail_spheres.append(mark)
+        target_axis = skrobot.model.Axis(
+            axis_radius=0.015, axis_length=0.18, pos=p0.copy())
+        viewer.add(target_axis)
+        root_axis = skrobot.model.Axis(
+            axis_radius=0.008, axis_length=0.20, pos=fixed_root_xyz)
+        viewer.add(root_axis)
+        viewer.show()
 
     # ------------------------------------------------------------------
     # メインループ: while viewer.is_active:
@@ -411,15 +405,10 @@ def main():
             report_step(k, target_xyz, leg5_pos, robot, ok)
         return target_xyz, err, root_rpy, ok
 
-    if viewer is None:
-        # ヘッドレス: 1 周だけ回して数値出力
-        for k in range(args.steps):
-            _, err, _, _ = step_once(k, center_xyz=p0)
-            errors.append(err)
-    else:
-        # インタラクティブ: 閉じられるまでずっと回す
-        # IKを解くとrootのjointが勝手に更新
-        while viewer.is_active:
+    # headless (rviz) でも GUI でも, 下の SET_MODE -> TEST_MODE を回す.
+    if True:
+        # viewer があれば閉じるまで, 無ければ shutdown まで
+        while not rospy.is_shutdown() and (viewer is None or viewer.is_active):
             if mode == 'SET_MODE':
                 # rosから現在のroot姿勢取得
                 root_xyz, root_rpy = get_xyz_rpy(listener, parent_frame='world', child_frame='hydrus/root')
@@ -437,7 +426,7 @@ def main():
                 _, leg5_pos = solve_one_step(robot, leg5, target_coords, link_list, stop=args.ik_stop)
                 q_target = np.array([robot.joint1.joint_angle(), robot.joint2.joint_angle(), robot.joint3.joint_angle()])
                 cog_target = robot.centroid().copy()
-                _, cog_rpy = get_xyz_rpy(listener, parent_frame='world', child_frame='hydrus/fc')
+                _, cog_rpy = get_xyz_rpy(listener, parent_frame='world', child_frame='hydrus/cog')  # fc は ~1.6rad 傾き搭載のため cog から取得
                 cog_yaw = cog_rpy[2]
                 q_cmd = np.array(q_cmd)  
                 cog_cmd = np.array(cog_cmd)  
@@ -490,20 +479,22 @@ def main():
                 # 得られた値をpub
                 q_cmd = pub_limit_joint(q_cmd, np.array([robot.joint1.joint_angle(), robot.joint2.joint_angle(), robot.joint3.joint_angle()]), args.max_q_step)
                 cog_cmd = pub_limit_nav(cog_cmd, robot.centroid().copy(), args.max_cog_step)
-                _, cog_rpy = get_xyz_rpy(listener, parent_frame='world', child_frame='hydrus/fc')
+                _, cog_rpy = get_xyz_rpy(listener, parent_frame='world', child_frame='hydrus/cog')  # fc は ~1.6rad 傾き搭載のため cog から取得
                 cog_yaw = cog_rpy[2]
                 pub_command_values(nav_pub, joint_pub, cog_cmd, q_cmd, cog_yaw)
                 # debug情報をpublish
                 publish_debug(listener, debug_pubs, fixed_root_xyz, target_xyz)
-                # target を可視化マーカーに反映 (これも破壊更新)
-                target_axis.newcoords(Coordinates(pos=target_xyz))
-                # root の姿勢も可視化マーカーに反映(rotについてはyaw,pitch,rollの順で入れる)
-                root_axis.newcoords(Coordinates(pos=fixed_root_xyz, rot=[root_rpy[2], root_rpy[1], root_rpy[0]]))
+                # 可視化マーカー反映 (viewer 使用時のみ; rviz では不要)
+                if viewer is not None:
+                    target_axis.newcoords(Coordinates(pos=target_xyz))
+                    # rot は yaw,pitch,roll の順
+                    root_axis.newcoords(Coordinates(pos=fixed_root_xyz, rot=[root_rpy[2], root_rpy[1], root_rpy[0]]))
+                    viewer.redraw()
                 report_step(k, target_xyz, leg5.worldpos(), robot, True)
-                viewer.redraw()
                 rate.sleep()
-                k += 1                
-        viewer.redraw()
+                k += 1
+        if viewer is not None:
+            viewer.redraw()
         rate.sleep()  # time.sleep(args.dt) の代わりに ROSのRateを使用
     # ------------------------------------------------------------------
     # まとめ
