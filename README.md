@@ -166,6 +166,100 @@ roslaunch balloon_detection video.launch \
 
 `model` / `device` / `conf` / `iou` は `detect_objects.launch` と同じ。
 
+## 犬のポーズ推定（`dog_pose_node.py`）
+
+YOLO-World とは独立したもう一組のノード + launch。Ultralytics の
+[dog-pose](https://docs.ultralytics.com/ja/datasets/pose/dog-pose) データセット
+（24 キーポイント）で学習した YOLO pose モデルを回して、犬の bbox と骨格を
+`jsk_recognition_msgs/HumanSkeletonArray` などで publish する。
+
+### まず学習する
+
+Ultralytics が配っているのは **データセット (`dog-pose.yaml`) であって学習済み
+重みではない**ので、先に自分で学習する必要がある。同梱の
+`train_dog_pose.py` がそのラッパー（初回にデータセット 337 MB を落とす）。
+
+```bash
+rosrun balloon_detection train_dog_pose.py --epochs 100 --device 0
+# -> runs/dog-pose/weights/best.pt
+```
+
+### 動かす
+
+```bash
+roslaunch balloon_detection dog_pose.launch \
+    image_topic:=/camera/color/image_raw \
+    model:=$HOME/runs/dog-pose/weights/best.pt \
+    device:=cuda:0 visualize:=true
+```
+
+```bash
+rostopic echo /dog_pose/skeleton   # 骨格（HumanSkeletonArray）
+rostopic echo /dog_pose/pose       # キーポイント（PeoplePoseArray）
+rostopic echo /dog_pose/rects      # bbox
+```
+
+rviz では `jsk_rviz_plugin/HumanSkeletonArray` ディスプレイをそのまま
+`/dog_pose/skeleton` に向ければ骨が出る。
+
+### 座標系（重要）
+
+デフォルトはモノラル画像だけなので、キーポイントは **ピクセル座標**
+（`x` = u, `y` = v, `z` = 0）で出る。実寸の 3D が欲しい場合は depth と
+`camera_info` を渡す。
+
+```bash
+roslaunch balloon_detection dog_pose.launch \
+    image_topic:=/camera/color/image_raw \
+    depth_topic:=/camera/aligned_depth_to_color/image_raw \
+    camera_info_topic:=/camera/color/camera_info \
+    with_depth:=true model:=$HOME/runs/dog-pose/weights/best.pt
+```
+
+このとき座標はカメラ光学座標系のメートル。**depth が取れなかったキーポイントは
+メッセージから落とす**（適当な値で埋めない）ので、`limb_names` を見て
+どの関節が入っているかを確認すること。
+
+### 出力トピック
+
+| トピック | 型 | 中身 |
+|---|---|---|
+| `/dog_pose/skeleton` | `jsk_recognition_msgs/HumanSkeletonArray` | 犬 1 匹 = 1 `HumanSkeleton`。`bone_names` は `"withers->tail_start"` 形式、`bones` が線分。`human_ids` は ByteTrack の追跡 ID |
+| `/dog_pose/pose` | `jsk_recognition_msgs/PeoplePoseArray` | 各犬の可視キーポイント。`limb_names` にキーポイント名、`scores` にスコア |
+| `/dog_pose/rects` | `jsk_recognition_msgs/RectArray` | 各犬の bbox |
+| `/dog_pose/class` | `jsk_recognition_msgs/ClassificationResult` | `rects` と同順のラベルと確信度 |
+| `/dog_pose/image_annotated` | `sensor_msgs/Image` | 骨格を描画した画像（購読者がいるときだけ生成） |
+
+4 本とも検出 0 件でも毎フレーム空で publish される。配列の i 番目どうしが対応する。
+
+キーポイント名は `dog-pose.yaml` の `kpt_names` そのまま（`nose`, `withers`,
+`tail_start`, `front_left_paw`, ... の 24 個）。骨の繋ぎ方は yaml に定義が無いので
+`dog_pose_node.py` の `DOG_BONES` で定義している（頭・背骨・尻尾・四肢の
+elbow -> knee -> paw）。
+
+### `dog_pose.launch` の引数
+
+| Arg | Default | Notes |
+|---|---|---|
+| `model` | `$HOME/runs/dog-pose/weights/best.pt` | dog-pose で学習した重み。**動く既定値は無い** |
+| `image_topic` | `image` | 入力 `sensor_msgs/Image`。 |
+| `device` | `cpu` | 例: `cuda:0`。 |
+| `conf` | `0.25` | 検出の確信度しきい値。 |
+| `iou` | `0.5` | NMS の IoU しきい値。 |
+| `kpt_conf` | `0.3` | これ未満のキーポイントは出力しない。 |
+| `track` | `true` | ByteTrack で `human_ids` を安定させる。 |
+| `with_depth` | `false` | depth + `camera_info` を同期して 3D 化。 |
+| `depth_topic` | `depth_image` | color に位置合わせ済みの depth。 |
+| `camera_info_topic` | `camera_info` | color の内部パラメータ。 |
+| `visualize` | `false` | `image_view` を開く。 |
+
+動画ファイルで試すなら `dog_pose_video.launch`（`video_path:=` は絶対パス必須）。
+
+```bash
+roslaunch balloon_detection dog_pose_video.launch \
+    video_path:=$HOME/dog.mp4 model:=$HOME/runs/dog-pose/weights/best.pt
+```
+
 ## トラブルシュート
 
 ### numpy 2 系がらみの import エラー

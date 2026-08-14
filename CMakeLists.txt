@@ -10,7 +10,10 @@ catkin_generate_virtualenv(
 )
 
 catkin_install_python(
-  PROGRAMS scripts/detect_objects_node.py
+  PROGRAMS
+  scripts/detect_objects_node.py
+  scripts/dog_pose_node.py
+  scripts/train_dog_pose.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   RENAME_PROCESS FALSE
 )

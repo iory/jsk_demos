@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+  Video-file demo of dog_pose.launch.
+
+  Plays a video through video_stream_opencv and pipes its output into
+  dog_pose.launch. Depth is not available from a plain video, so the keypoints
+  are image coordinates with z=0.
+-->
+<launch>
+  <arg name="video_path" doc="Absolute path to an mp4 (or /dev/videoN)."/>
+  <arg name="publish_fps" default="30"
+       doc="Rate at which video_stream_opencv publishes frames."/>
+  <arg name="loop" default="false"/>
+  <arg name="visualize" default="true"/>
+  <arg name="device" default="cpu"/>
+  <arg name="model" default="$(env HOME)/runs/dog-pose/weights/best.pt"/>
+  <arg name="conf" default="0.25"/>
+  <arg name="kpt_conf" default="0.3"/>
+  <arg name="track" default="true"/>
+
+  <include file="$(find video_stream_opencv)/launch/camera.launch">
+    <arg name="camera_name" value="videofile"/>
+    <arg name="video_stream_provider" value="$(arg video_path)"/>
+    <arg name="buffer_queue_size" value="1000"/>
+    <arg name="fps" value="$(arg publish_fps)"/>
+    <arg name="frame_id" value="videofile_frame"/>
+    <arg name="camera_info_url" value=""/>
+    <arg name="flip_horizontal" value="false"/>
+    <arg name="flip_vertical" value="false"/>
+    <arg name="loop_videofile" value="$(arg loop)"/>
+    <arg name="visualize" value="false"/>
+  </include>
+
+  <include file="$(find balloon_detection)/launch/dog_pose.launch">
+    <arg name="image_topic" value="/videofile/image_raw"/>
+    <arg name="model" value="$(arg model)"/>
+    <arg name="device" value="$(arg device)"/>
+    <arg name="conf" value="$(arg conf)"/>
+    <arg name="kpt_conf" value="$(arg kpt_conf)"/>
+    <arg name="track" value="$(arg track)"/>
+    <arg name="visualize" value="$(arg visualize)"/>
+  </include>
+</launch>

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!--
+  Dog detection + 24-keypoint pose estimation.
+
+  Subscribes to an arbitrary sensor_msgs/Image source (remap or override via
+  `image_topic`) and publishes ~rects / ~class / ~pose / ~skeleton, the last
+  one as jsk_recognition_msgs/HumanSkeletonArray for the
+  jsk_rviz_plugin/HumanSkeletonArray display.
+
+  `model` must be weights trained on dog-pose.yaml; see
+  scripts/train_dog_pose.py. Ultralytics publishes the dataset, not a
+  pretrained dog-pose checkpoint, so there is no working default.
+
+  Without depth the keypoints are pixels with z=0. Set with_depth:=true and
+  give depth_topic / camera_info_topic to get metres in the camera frame.
+-->
+<launch>
+  <arg name="image_topic" default="image"
+       doc="Input sensor_msgs/Image topic (remapped onto the node's 'image')."/>
+  <arg name="model" default="$(env HOME)/runs/dog-pose/weights/best.pt"
+       doc="Path to the dog-pose YOLO weights produced by train_dog_pose.py."/>
+  <arg name="device" default="cpu"/>
+  <arg name="conf" default="0.25" doc="Detection confidence threshold."/>
+  <arg name="iou" default="0.5" doc="NMS IoU threshold."/>
+  <arg name="kpt_conf" default="0.3"
+       doc="Keypoints scoring below this are left out of ~pose / ~skeleton."/>
+  <arg name="track" default="true"
+       doc="Run ByteTrack so human_ids stay stable across frames."/>
+
+  <arg name="with_depth" default="false"
+       doc="Sync a depth image + camera_info and emit metric 3D keypoints."/>
+  <arg name="depth_topic" default="depth_image"
+       doc="Registered depth image aligned with image_topic."/>
+  <arg name="camera_info_topic" default="camera_info"/>
+  <arg name="approximate_sync" default="true"/>
+  <arg name="slop" default="0.1"/>
+
+  <arg name="visualize" default="false"
+       doc="Open image_view on the annotated output topic."/>
+
+  <node name="dog_pose" pkg="balloon_detection" type="dog_pose_node.py"
+        output="screen" required="true">
+    <remap from="image" to="$(arg image_topic)"/>
+    <remap from="depth_image" to="$(arg depth_topic)"/>
+    <remap from="camera_info" to="$(arg camera_info_topic)"/>
+    <param name="model" value="$(arg model)"/>
+    <param name="device" value="$(arg device)"/>
+    <param name="conf" value="$(arg conf)"/>
+    <param name="iou" value="$(arg iou)"/>
+    <param name="kpt_conf" value="$(arg kpt_conf)"/>
+    <param name="track" value="$(arg track)"/>
+    <param name="with_depth" value="$(arg with_depth)"/>
+    <param name="approximate_sync" value="$(arg approximate_sync)"/>
+    <param name="slop" value="$(arg slop)"/>
+  </node>
+
+  <node name="dog_pose_view" pkg="image_view" type="image_view" output="screen"
+        if="$(arg visualize)">
+    <remap from="image" to="/dog_pose/image_annotated"/>
+  </node>
+</launch>
