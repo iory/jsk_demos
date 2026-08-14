@@ -102,8 +102,8 @@ def draw_detections(frame, detections, class_names):
         BGR image to draw on.
     detections : list of tuple
         ``(xyxy, class_index, confidence)`` tuples from ``extract_all_boxes``.
-    class_names : list of str
-        Prompt of each class index.
+    class_names : dict
+        ``{class index: name}`` the model used for this frame.
 
     Returns
     -------
@@ -163,7 +163,7 @@ class DetectObjectsNode:
         )
         rospy.loginfo("Subscribed (remap 'image' from launch).")
 
-    def publish_detections(self, header, detections, width, height):
+    def publish_detections(self, header, names, detections, width, height):
         """Publish every detection of one frame as rects plus class labels.
 
         ``~rects`` and ``~class`` are published on every frame, empty included,
@@ -171,10 +171,17 @@ class DetectObjectsNode:
         The two arrays share their ordering: the i-th rect is described by the
         i-th entry of ``label_names`` / ``label_proba``.
 
+        Nothing is published for a frame whose class list no longer matches
+        ``~classes``: ultralytics rebuilds the model on its own after a CUDA
+        OOM, which silently undoes ``set_classes`` and leaves the detections
+        speaking the checkpoint's original vocabulary.
+
         Parameters
         ----------
         header : std_msgs.msg.Header
             Header of the input image, copied onto both messages.
+        names : dict
+            ``{class index: name}`` the model used for this frame.
         detections : list of tuple
             ``(xyxy, class_index, confidence)`` tuples from
             ``extract_all_boxes``.
@@ -183,6 +190,21 @@ class DetectObjectsNode:
         height : int
             Input image height in pixels, used to clamp the boxes.
         """
+        model_classes = [names[i] for i in sorted(names)]
+        if model_classes != self.classes:
+            rospy.logerr_throttle(
+                10.0,
+                "The model is predicting %d classes (%s) instead of the %d "
+                "prompts in ~classes (%s). set_classes has been undone, which "
+                "ultralytics does when it rebuilds the model -- after a CUDA "
+                "out-of-memory, for instance. Dropping the frame rather than "
+                "publishing labels from the wrong vocabulary.",
+                len(model_classes),
+                model_classes[:4],
+                len(self.classes),
+                self.classes,
+            )
+            return
         rects_msg = RectArray(header=header)
         class_msg = ClassificationResult(
             header=header,
@@ -198,7 +220,7 @@ class DetectObjectsNode:
                 Rect(x=x1, y=y1, width=max(0, x2 - x1), height=max(0, y2 - y1))
             )
             class_msg.labels.append(cls_idx)
-            class_msg.label_names.append(self.classes[cls_idx])
+            class_msg.label_names.append(names[cls_idx])
             class_msg.label_proba.append(conf)
         self.rects_pub.publish(rects_msg)
         self.class_pub.publish(class_msg)
@@ -218,12 +240,13 @@ class DetectObjectsNode:
             iou=self.iou_thresh,
             verbose=False,
         )
-        detections = extract_all_boxes(results[0])
-        self.publish_detections(msg.header, detections, w, h)
+        result = results[0]
+        detections = extract_all_boxes(result)
+        self.publish_detections(msg.header, result.names, detections, w, h)
 
         if self.image_pub.get_num_connections() == 0:
             return
-        annotated = draw_detections(frame, detections, self.classes)
+        annotated = draw_detections(frame, detections, result.names)
         try:
             out_msg = self.bridge.cv2_to_imgmsg(annotated, encoding="bgr8")
             out_msg.header = msg.header
