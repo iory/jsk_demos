@@ -8,9 +8,9 @@
   video.launch, which wraps this launch with video_stream_opencv.
 -->
 <launch>
-  <arg name="classes"
+  <arg name="classes" default="pen,tablet,pc"
        doc="Comma-separated YOLO-World prompts to detect, e.g. 'red scarf,person'."/>
-  <arg name="image_topic" default="image"
+  <arg name="image_topic" default="/camera/color/image_raw"
        doc="Input sensor_msgs/Image topic (remapped onto the node's 'image')."/>
   <arg name="model" default="yolov8x-worldv2.pt"/>
   <arg name="device" default="cpu"/>
