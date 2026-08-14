@@ -2,7 +2,8 @@
 
 Subscribes to a ``sensor_msgs/Image`` topic (the ``image`` name is meant to be
 remapped from launch), runs YOLO-WorldV2 + ByteTrack + a wall-clock state
-machine per frame, and publishes annotated images and event messages.
+machine per frame, and publishes annotated images, per-frame detections,
+and event messages.
 """
 
 import json
@@ -45,6 +46,9 @@ import cv2  # noqa: E402
 import numpy as np  # noqa: E402
 import rospy  # noqa: E402
 from cv_bridge import CvBridge  # noqa: E402
+from jsk_recognition_msgs.msg import ClassificationResult  # noqa: E402
+from jsk_recognition_msgs.msg import Rect  # noqa: E402
+from jsk_recognition_msgs.msg import RectArray  # noqa: E402
 from sensor_msgs.msg import Image  # noqa: E402
 from std_msgs.msg import String  # noqa: E402
 from ultralytics import YOLO  # noqa: E402
@@ -81,26 +85,46 @@ def iou_xyxy(a, b):
     return inter / (area_a + area_b - inter)
 
 
-def pick_top(boxes_cls, boxes_conf, boxes_xyxy, allowed_idx):
+def pick_top(detections, allowed_idx):
     best_conf = 0.0
     best_box = None
-    for cls_i, conf_i, xyxy_i in zip(boxes_cls, boxes_conf, boxes_xyxy):
-        if int(cls_i) in allowed_idx and conf_i > best_conf:
-            best_conf = float(conf_i)
-            best_box = list(map(float, xyxy_i))
+    for xyxy, cls_i, conf_i in detections:
+        if cls_i in allowed_idx and conf_i > best_conf:
+            best_conf = conf_i
+            best_box = xyxy
     return best_box, best_conf
 
 
-def extract_boxes(result, balloon_idx, teddy_idx):
+def extract_all_boxes(result):
+    """Collect every detection of a YOLO result.
+
+    Parameters
+    ----------
+    result : ultralytics.engine.results.Results
+        Single-image result returned by ``YOLO.track``.
+
+    Returns
+    -------
+    list of tuple
+        One ``(xyxy, class_index, confidence)`` tuple per detection, where
+        ``xyxy`` is a list of four floats in pixels. Empty when the frame
+        contains no detection.
+    """
     boxes = result.boxes
-    balloon_box = balloon_conf = None
-    teddy_box = teddy_conf = None
-    if boxes is not None and len(boxes) > 0:
-        cls = boxes.cls.cpu().numpy().astype(int)
-        confs = boxes.conf.cpu().numpy()
-        xyxy = boxes.xyxy.cpu().numpy()
-        balloon_box, balloon_conf = pick_top(cls, confs, xyxy, balloon_idx)
-        teddy_box, teddy_conf = pick_top(cls, confs, xyxy, teddy_idx)
+    if boxes is None or len(boxes) == 0:
+        return []
+    cls = boxes.cls.cpu().numpy().astype(int)
+    confs = boxes.conf.cpu().numpy()
+    xyxy = boxes.xyxy.cpu().numpy()
+    return [
+        (list(map(float, box)), int(cls_i), float(conf_i))
+        for box, cls_i, conf_i in zip(xyxy, cls, confs)
+    ]
+
+
+def extract_boxes(detections, balloon_idx, teddy_idx):
+    balloon_box, balloon_conf = pick_top(detections, balloon_idx)
+    teddy_box, teddy_conf = pick_top(detections, teddy_idx)
     return balloon_box, balloon_conf, teddy_box, teddy_conf
 
 
@@ -411,6 +435,7 @@ class DetectEventsNode:
                 "~balloon_classes and ~teddy_classes must be non-empty CSV lists."
             )
         classes = balloon_prompts + teddy_prompts
+        self.classes = classes
         self.balloon_idx = set(range(len(balloon_prompts)))
         self.teddy_idx = set(
             range(len(balloon_prompts), len(balloon_prompts) + len(teddy_prompts))
@@ -430,6 +455,10 @@ class DetectEventsNode:
         self.t_start = None
 
         self.image_pub = rospy.Publisher("~image_annotated", Image, queue_size=1)
+        self.rects_pub = rospy.Publisher("~rects", RectArray, queue_size=1)
+        self.class_pub = rospy.Publisher(
+            "~class", ClassificationResult, queue_size=1
+        )
         self.event_pub = rospy.Publisher("~events", String, queue_size=10)
         self.state_pub = rospy.Publisher("~state", String, queue_size=1, latch=True)
         self.last_state_published = None
@@ -438,6 +467,46 @@ class DetectEventsNode:
             "image", Image, self.image_cb, queue_size=1, buff_size=2 ** 26,
         )
         rospy.loginfo("Subscribed (remap 'image' from launch).")
+
+    def publish_detections(self, header, detections, width, height):
+        """Publish every detection of one frame as rects plus class labels.
+
+        ``~rects`` and ``~class`` are published on every frame, empty included,
+        so a subscriber can tell "nothing detected" apart from "no new message".
+        The two arrays share their ordering: the i-th rect is described by the
+        i-th entry of ``label_names`` / ``label_proba``.
+
+        Parameters
+        ----------
+        header : std_msgs.msg.Header
+            Header of the input image, copied onto both messages.
+        detections : list of tuple
+            ``(xyxy, class_index, confidence)`` tuples from
+            ``extract_all_boxes``.
+        width : int
+            Input image width in pixels, used to clamp the boxes.
+        height : int
+            Input image height in pixels, used to clamp the boxes.
+        """
+        rects_msg = RectArray(header=header)
+        class_msg = ClassificationResult(
+            header=header,
+            classifier=self.model_path,
+            target_names=self.classes,
+        )
+        for xyxy, cls_idx, conf in detections:
+            x1 = int(round(min(max(xyxy[0], 0.0), width)))
+            y1 = int(round(min(max(xyxy[1], 0.0), height)))
+            x2 = int(round(min(max(xyxy[2], 0.0), width)))
+            y2 = int(round(min(max(xyxy[3], 0.0), height)))
+            rects_msg.rects.append(
+                Rect(x=x1, y=y1, width=max(0, x2 - x1), height=max(0, y2 - y1))
+            )
+            class_msg.labels.append(cls_idx)
+            class_msg.label_names.append(self.classes[cls_idx])
+            class_msg.label_proba.append(conf)
+        self.rects_pub.publish(rects_msg)
+        self.class_pub.publish(class_msg)
 
     def image_cb(self, msg):
         try:
@@ -467,9 +536,10 @@ class DetectEventsNode:
             iou=self.iou_thresh,
             verbose=False,
         )
-        r = results[0]
+        detections = extract_all_boxes(results[0])
+        self.publish_detections(msg.header, detections, w, h)
         balloon_box, balloon_conf, teddy_box, teddy_conf = extract_boxes(
-            r, self.balloon_idx, self.teddy_idx
+            detections, self.balloon_idx, self.teddy_idx
         )
         info = self.detector.update(self.frame_idx, t, balloon_box, teddy_box)
         annotated = self.detector.annotate(
