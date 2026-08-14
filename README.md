@@ -173,24 +173,31 @@ YOLO-World とは独立したもう一組のノード + launch。Ultralytics の
 （24 キーポイント）で学習した YOLO pose モデルを回して、犬の bbox と骨格を
 `jsk_recognition_msgs/HumanSkeletonArray` などで publish する。
 
-### まず学習する
-
-Ultralytics が配っているのは **データセット (`dog-pose.yaml`) であって学習済み
-重みではない**ので、先に自分で学習する必要がある。同梱の
-`train_dog_pose.py` がそのラッパー（初回にデータセット 337 MB を落とす）。
-
-```bash
-rosrun balloon_detection train_dog_pose.py --epochs 100 --device 0
-# -> runs/dog-pose/weights/best.pt
-```
-
 ### 動かす
+
+学習は不要。`model` を省略すると、初回起動時に公開の学習済み重みを
+`$ROS_HOME/dog_pose/` に落としてきて以後それを使う。
 
 ```bash
 roslaunch balloon_detection dog_pose.launch \
     image_topic:=/camera/color/image_raw \
-    model:=$HOME/runs/dog-pose/weights/best.pt \
     device:=cuda:0 visualize:=true
+```
+
+使っている重みは HuggingFace の
+[`20-team-daeng-ddang-ai/dog-pose-estimation`](https://huggingface.co/20-team-daeng-ddang-ai/dog-pose-estimation)
+（`yolo26m-pose` を `dog-pose.yaml` で 100 epochs, imgsz 640、AGPL-3.0）。
+チェックポイントに記録されている val メトリクスは box mAP50-95 **0.901** /
+pose mAP50-95 **0.607**。Ultralytics 公式は dog-pose の**データセットしか
+配布していない**ので、公開されている 24 点の重みは事実上これだけ。
+
+自分で学習し直す場合は同梱の `train_dog_pose.py`（初回にデータセット 337 MB
+を落とす）。`model:=` にはローカルパスでも URL でも渡せる。
+
+```bash
+rosrun balloon_detection train_dog_pose.py --epochs 100 --device 0
+roslaunch balloon_detection dog_pose.launch \
+    model:=$HOME/runs/dog-pose/weights/best.pt
 ```
 
 ```bash
@@ -234,20 +241,38 @@ roslaunch balloon_detection dog_pose.launch \
 
 キーポイント名は `dog-pose.yaml` の `kpt_names` そのまま（`nose`, `withers`,
 `tail_start`, `front_left_paw`, ... の 24 個）。骨の繋ぎ方は yaml に定義が無いので
-`dog_pose_node.py` の `DOG_BONES` で定義している（頭・背骨・尻尾・四肢の
-elbow -> knee -> paw）。
+`dog_pose_node.py` の `DOG_BONES`（23 本）で定義している。
+
+#### 24 点のうち 4 点は絶対に出ない
+
+dog-pose データセットの全 8476 インスタンスのラベルを集計したところ、
+**`left_eye` / `right_eye` / `withers` / `throat` の 4 点はアノテーション率
+0.0%** だった。`kpt_names` には名前があるが実際には一度もラベルされていない
+ので、このデータセットで学習した**どのモデルでもこの 4 点は出ない**（実測でも
+conf ≈ 0.00〜0.03）。
+
+そのため `DOG_BONES` は、背骨を `withers` ではなく**四肢の elbow と
+`tail_start` の間に張る**構成にしてある。`withers` を経由させると胴体が丸ごと
+切れてしまうため。実写で試すと 23 本中 14〜18 本が残り、頭 → 耳 → 肩 → 脇腹 →
+尻尾 → 四肢が 1 本に繋がる。
+
+参考までに実測のアノテーション率（高い順の一部）: `nose` 99.3%, `chin` 89.9%,
+`front_left_paw` 89.0%, `left_ear_base` 88.3%, `left_ear_tip` 68.4%,
+`rear_left_paw` 55.1%, `tail_end` 47.0%, `tail_start` 45.3%,
+`rear_right_elbow` 40.5%。後ろ足と尻尾は半分程度なので、欠けるのは正常。
 
 ### `dog_pose.launch` の引数
 
 | Arg | Default | Notes |
 |---|---|---|
-| `model` | `$HOME/runs/dog-pose/weights/best.pt` | dog-pose で学習した重み。**動く既定値は無い** |
+| `model` | （空） | 空なら公開の学習済み重みを自動 DL。ローカルパスでも URL でも可 |
 | `image_topic` | `image` | 入力 `sensor_msgs/Image`。 |
 | `device` | `cpu` | 例: `cuda:0`。 |
 | `conf` | `0.25` | 検出の確信度しきい値。 |
 | `iou` | `0.5` | NMS の IoU しきい値。 |
 | `kpt_conf` | `0.3` | これ未満のキーポイントは出力しない。 |
 | `track` | `true` | ByteTrack で `human_ids` を安定させる。 |
+| `min_valid_keypoints` | `0` | キーポイントがこの数未満の検出を捨てる。0 で無効。 |
 | `with_depth` | `false` | depth + `camera_info` を同期して 3D 化。 |
 | `depth_topic` | `depth_image` | color に位置合わせ済みの depth。 |
 | `camera_info_topic` | `camera_info` | color の内部パラメータ。 |
@@ -256,9 +281,15 @@ elbow -> knee -> paw）。
 動画ファイルで試すなら `dog_pose_video.launch`（`video_path:=` は絶対パス必須）。
 
 ```bash
-roslaunch balloon_detection dog_pose_video.launch \
-    video_path:=$HOME/dog.mp4 model:=$HOME/runs/dog-pose/weights/best.pt
+roslaunch balloon_detection dog_pose_video.launch video_path:=$HOME/dog.mp4
 ```
+
+### 誤検出について
+
+犬・自転車・トラックが写った写真で試したところ、犬を conf 0.896 で正しく
+検出する一方、トラックの領域を conf 0.567 で犬と誤検出した。ただし誤検出側は
+キーポイントが 7/24 しか乗らなかったので、`min_valid_keypoints:=10` のような
+足切りか `conf:=0.5` 以上で落とせる。犬が写っていないバスや絵画では 0 件だった。
 
 ## トラブルシュート
 

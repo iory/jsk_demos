@@ -25,10 +25,24 @@ Without depth the keypoints are image coordinates: ``x``/``y`` in pixels and
 ``camera_info`` to get metric 3D points in the camera optical frame instead;
 keypoints whose depth is missing are then dropped from the message.
 
-The model is not shipped with Ultralytics -- ``dog-pose.yaml`` is a dataset,
-not pretrained weights. Train one first (``scripts/train_dog_pose.py``) and
-point ``~model`` at the resulting ``best.pt``.
+Model
+-----
+``~model`` takes a local path or an ``http(s)`` URL; a URL is downloaded once
+into ``$ROS_HOME/dog_pose/`` and reused. The default points at the only public
+dog-pose checkpoint we could find (see ``DEFAULT_MODEL_URL``). Ultralytics
+ships ``dog-pose.yaml`` as a dataset, not as weights, so ``train_dog_pose.py``
+is there to produce your own.
+
+Four of the 24 keypoints are never annotated in the dog-pose dataset, so no
+model trained on it can predict them -- see ``UNLABELLED_KEYPOINTS``.
 """
+
+import hashlib
+import os
+import shutil
+import tempfile
+from urllib.parse import urlparse
+from urllib.request import urlopen
 
 import cv2
 import numpy as np
@@ -79,36 +93,55 @@ DOG_KEYPOINT_NAMES = [
     "throat",
 ]
 
-# dog-pose.yaml carries no edge list, so the bones below are our own anatomical
-# reading of the 24 keypoints: head, spine, tail and the four limbs
-# (elbow -> knee -> paw, shoulder-to-withers and hip-to-tail_start).
+# Measured over all 8476 annotated instances of the dog-pose dataset: these
+# four keypoints are labelled 0.0% of the time. They exist in ``kpt_names`` but
+# no model trained on dog-pose.yaml can ever predict them, so no bone below
+# depends on them. They still travel through ~pose if some other model fills
+# them in.
+UNLABELLED_KEYPOINTS = ["left_eye", "right_eye", "withers", "throat"]
+
+# dog-pose.yaml carries no edge list, so the bones below are our own. The torso
+# is strung between the four elbows and tail_start rather than through the
+# withers, because the withers is one of the never-annotated keypoints above;
+# routing the spine through it would leave the body disconnected in practice.
 DOG_BONES = [
+    # head
     ("nose", "chin"),
-    ("nose", "left_eye"),
-    ("nose", "right_eye"),
-    ("left_eye", "left_ear_base"),
-    ("right_eye", "right_ear_base"),
+    ("nose", "left_ear_base"),
+    ("nose", "right_ear_base"),
+    ("left_ear_base", "right_ear_base"),
     ("left_ear_base", "left_ear_tip"),
     ("right_ear_base", "right_ear_tip"),
-    ("chin", "throat"),
-    ("throat", "withers"),
-    ("left_ear_base", "withers"),
-    ("right_ear_base", "withers"),
-    ("withers", "tail_start"),
+    # neck and shoulder girdle
+    ("left_ear_base", "front_left_elbow"),
+    ("right_ear_base", "front_right_elbow"),
+    ("front_left_elbow", "front_right_elbow"),
+    # flanks, hip girdle and tail
+    ("front_left_elbow", "rear_left_elbow"),
+    ("front_right_elbow", "rear_right_elbow"),
+    ("rear_left_elbow", "rear_right_elbow"),
+    ("rear_left_elbow", "tail_start"),
+    ("rear_right_elbow", "tail_start"),
     ("tail_start", "tail_end"),
-    ("withers", "front_left_elbow"),
+    # limbs, elbow -> knee -> paw
     ("front_left_elbow", "front_left_knee"),
     ("front_left_knee", "front_left_paw"),
-    ("withers", "front_right_elbow"),
     ("front_right_elbow", "front_right_knee"),
     ("front_right_knee", "front_right_paw"),
-    ("tail_start", "rear_left_elbow"),
     ("rear_left_elbow", "rear_left_knee"),
     ("rear_left_knee", "rear_left_paw"),
-    ("tail_start", "rear_right_elbow"),
     ("rear_right_elbow", "rear_right_knee"),
     ("rear_right_knee", "rear_right_paw"),
 ]
+
+# yolo26m-pose fine-tuned on dog-pose.yaml for 100 epochs at imgsz 640.
+# Reported by its own checkpoint: box mAP50-95 0.901, pose mAP50-95 0.607.
+# AGPL-3.0, like everything else derived from Ultralytics weights.
+DEFAULT_MODEL_URL = (
+    "https://huggingface.co/20-team-daeng-ddang-ai/dog-pose-estimation"
+    "/resolve/main/best.pt"
+)
+
 
 PALETTE = [
     (255, 0, 255),
@@ -120,6 +153,56 @@ PALETTE = [
     (128, 0, 255),
     (0, 0, 255),
 ]
+
+
+def resolve_model_path(model, cache_dir):
+    """Return a local path for ``model``, fetching it once when it is a URL.
+
+    The cache file name carries a hash of the URL, so two checkpoints that are
+    both called ``best.pt`` upstream cannot shadow each other.
+
+    Parameters
+    ----------
+    model : str
+        Local path, or an ``http://`` / ``https://`` URL.
+    cache_dir : str
+        Directory the downloaded weights are kept in. Created if missing.
+
+    Returns
+    -------
+    str
+        Path to the weights on disk.
+    """
+    if not model.startswith(("http://", "https://")):
+        return model
+    digest = hashlib.sha1(model.encode("utf-8")).hexdigest()[:12]
+    basename = os.path.basename(urlparse(model).path) or "model.pt"
+    path = os.path.join(cache_dir, "{}_{}".format(digest, basename))
+    if os.path.exists(path):
+        rospy.loginfo("Using cached weights: %s", path)
+        return path
+
+    if not os.path.isdir(cache_dir):
+        os.makedirs(cache_dir)
+    rospy.loginfo("Downloading weights from %s", model)
+    # Download beside the target and rename, so an interrupted run cannot
+    # leave a truncated file that later looks like a valid cache hit.
+    handle, tmp_path = tempfile.mkstemp(dir=cache_dir, suffix=".part")
+    os.close(handle)
+    try:
+        response = urlopen(model)
+        try:
+            with open(tmp_path, "wb") as f:
+                shutil.copyfileobj(response, f)
+        finally:
+            response.close()
+        os.rename(tmp_path, path)
+    except Exception:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        raise
+    rospy.loginfo("Saved weights to %s", path)
+    return path
 
 
 def _split_csv(s):
@@ -249,11 +332,23 @@ class DogPoseNode(object):
     def __init__(self):
         rospy.init_node("dog_pose")
 
-        self.model_path = rospy.get_param("~model", "dog-pose.pt")
+        # Empty means "whatever the node ships with", so the launch
+        # files do not have to repeat the URL.
+        self.model_param = rospy.get_param("~model", "") or DEFAULT_MODEL_URL
+        self.model_path = resolve_model_path(
+            self.model_param,
+            os.path.join(
+                os.environ.get("ROS_HOME", os.path.expanduser("~/.ros")),
+                "dog_pose",
+            ),
+        )
         self.device = rospy.get_param("~device", "cpu")
         self.conf_thresh = float(rospy.get_param("~conf", 0.25))
         self.iou_thresh = float(rospy.get_param("~iou", 0.5))
         self.kpt_conf_thresh = float(rospy.get_param("~kpt_conf", 0.3))
+        self.min_valid_keypoints = int(
+            rospy.get_param("~min_valid_keypoints", 0)
+        )
         self.track = bool(rospy.get_param("~track", True))
         self.tracker = rospy.get_param("~tracker", "bytetrack.yaml")
         self.with_depth = bool(rospy.get_param("~with_depth", False))
@@ -280,6 +375,13 @@ class DogPoseNode(object):
             len(self.keypoint_names),
             len(self.bones),
         )
+        dead = [n for n in UNLABELLED_KEYPOINTS if n in self.keypoint_names]
+        if dead:
+            rospy.loginfo(
+                "dog-pose never annotates %s, so a model trained on it leaves "
+                "them at score 0 and they stay out of ~pose / ~skeleton.",
+                ", ".join(dead),
+            )
 
         self.bridge = CvBridge()
         self.rects_pub = rospy.Publisher("~rects", RectArray, queue_size=1)
@@ -303,7 +405,7 @@ class DogPoseNode(object):
             raise RuntimeError(
                 "{} has no kpt_shape: it is not a pose model. Train one on "
                 "dog-pose.yaml and pass its best.pt as ~model.".format(
-                    self.model_path
+                    self.model_param
                 )
             )
         if int(kpt_shape[0]) != len(self.keypoint_names):
@@ -311,7 +413,7 @@ class DogPoseNode(object):
                 "{} predicts {} keypoints but ~keypoint_names lists {}. Pass "
                 "matching names, or use weights trained on dog-pose.yaml "
                 "(24 keypoints).".format(
-                    self.model_path, kpt_shape[0], len(self.keypoint_names)
+                    self.model_param, kpt_shape[0], len(self.keypoint_names)
                 )
             )
 
@@ -397,7 +499,16 @@ class DogPoseNode(object):
                 iou=self.iou_thresh,
                 verbose=False,
             )
-        return extract_detections(results[0], self.kpt_conf_thresh)
+        detections = extract_detections(results[0], self.kpt_conf_thresh)
+        if self.min_valid_keypoints > 0:
+            # A box with almost no keypoints on it is usually a false positive
+            # rather than a badly-posed dog.
+            detections = [
+                d
+                for d in detections
+                if int(d["kpt_valid"].sum()) >= self.min_valid_keypoints
+            ]
+        return detections
 
     def publish_rects(self, header, detections, width, height):
         """Publish one rect and one label per detection.
@@ -420,7 +531,7 @@ class DogPoseNode(object):
         rects_msg = RectArray(header=header)
         class_msg = ClassificationResult(
             header=header,
-            classifier=self.model_path,
+            classifier=self.model_param,
             target_names=self.class_names,
         )
         for det in detections:

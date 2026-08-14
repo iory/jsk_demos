@@ -7,9 +7,9 @@
   one as jsk_recognition_msgs/HumanSkeletonArray for the
   jsk_rviz_plugin/HumanSkeletonArray display.
 
-  `model` must be weights trained on dog-pose.yaml; see
-  scripts/train_dog_pose.py. Ultralytics publishes the dataset, not a
-  pretrained dog-pose checkpoint, so there is no working default.
+  `model` defaults to a public dog-pose checkpoint that the node downloads
+  once into $ROS_HOME/dog_pose. Point it at your own weights (a path or a URL)
+  to override; scripts/train_dog_pose.py trains them.
 
   Without depth the keypoints are pixels with z=0. Set with_depth:=true and
   give depth_topic / camera_info_topic to get metres in the camera frame.
@@ -17,8 +17,10 @@
 <launch>
   <arg name="image_topic" default="image"
        doc="Input sensor_msgs/Image topic (remapped onto the node's 'image')."/>
-  <arg name="model" default="$(env HOME)/runs/dog-pose/weights/best.pt"
-       doc="Path to the dog-pose YOLO weights produced by train_dog_pose.py."/>
+  <arg name="model" default=""
+       doc="Weights: local path, or http(s) URL cached under $ROS_HOME/dog_pose.
+            Empty uses the node's DEFAULT_MODEL_URL, a public dog-pose
+            checkpoint downloaded on first run."/>
   <arg name="device" default="cpu"/>
   <arg name="conf" default="0.25" doc="Detection confidence threshold."/>
   <arg name="iou" default="0.5" doc="NMS IoU threshold."/>
@@ -26,6 +28,9 @@
        doc="Keypoints scoring below this are left out of ~pose / ~skeleton."/>
   <arg name="track" default="true"
        doc="Run ByteTrack so human_ids stay stable across frames."/>
+  <arg name="min_valid_keypoints" default="0"
+       doc="Drop detections carrying fewer keypoints than this. 0 disables it;
+            raise it to reject boxes that scored well but hold no pose."/>
 
   <arg name="with_depth" default="false"
        doc="Sync a depth image + camera_info and emit metric 3D keypoints."/>
@@ -49,6 +54,7 @@
     <param name="iou" value="$(arg iou)"/>
     <param name="kpt_conf" value="$(arg kpt_conf)"/>
     <param name="track" value="$(arg track)"/>
+    <param name="min_valid_keypoints" value="$(arg min_valid_keypoints)"/>
     <param name="with_depth" value="$(arg with_depth)"/>
     <param name="approximate_sync" value="$(arg approximate_sync)"/>
     <param name="slop" value="$(arg slop)"/>

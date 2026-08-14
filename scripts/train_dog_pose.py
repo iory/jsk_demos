@@ -2,9 +2,14 @@
 """Train a YOLO pose model on the Ultralytics dog-pose dataset.
 
 Ultralytics ships ``dog-pose.yaml`` as a *dataset* recipe, not as pretrained
-weights, so the ROS node needs a checkpoint produced here first. The dataset
-(337 MB, 6773 train / 1703 val images, 24 keypoints) is downloaded on the first
-run into the Ultralytics datasets directory.
+weights. ``dog_pose_node.py`` defaults to a public checkpoint so you do not
+have to run this, but training your own is the way to do better than it. The
+dataset (337 MB, 6773 train / 1703 val images, 24 keypoints) is downloaded on
+the first run into the Ultralytics datasets directory.
+
+Note that 4 of the 24 keypoints -- ``left_eye``, ``right_eye``, ``withers``
+and ``throat`` -- are annotated in 0.0% of the 8476 instances, so no amount of
+training will make them appear.
 
 Examples
 --------

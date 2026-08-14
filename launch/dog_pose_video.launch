@@ -13,10 +13,11 @@
   <arg name="loop" default="false"/>
   <arg name="visualize" default="true"/>
   <arg name="device" default="cpu"/>
-  <arg name="model" default="$(env HOME)/runs/dog-pose/weights/best.pt"/>
+  <arg name="model" default="" doc="Empty uses the bundled default weights."/>
   <arg name="conf" default="0.25"/>
   <arg name="kpt_conf" default="0.3"/>
   <arg name="track" default="true"/>
+  <arg name="min_valid_keypoints" default="0"/>
 
   <include file="$(find video_stream_opencv)/launch/camera.launch">
     <arg name="camera_name" value="videofile"/>
@@ -38,6 +39,7 @@
     <arg name="conf" value="$(arg conf)"/>
     <arg name="kpt_conf" value="$(arg kpt_conf)"/>
     <arg name="track" value="$(arg track)"/>
+    <arg name="min_valid_keypoints" value="$(arg min_valid_keypoints)"/>
     <arg name="visualize" value="$(arg visualize)"/>
   </include>
 </launch>
