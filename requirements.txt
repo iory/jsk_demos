@@ -1,2 +1,5 @@
 ultralytics>=8.4.45
+# ROS 1's cv_bridge is built against numpy 1.x. Letting pip pull numpy 2 into
+# this virtualenv breaks its C ABI at import time (seen on Ubuntu 24.04).
+numpy<2
 clip @ git+https://github.com/openai/CLIP.git

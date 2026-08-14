@@ -22,7 +22,7 @@ rostopic echo /detect_objects/class/label_names   # 何が映ったか
 
 ## Setup
 
-Tested on ROS One (`/opt/ros/one`).
+Tested on Ubuntu 24.04 + ROS One (`/opt/ros/one`).
 
 ```bash
 sudo apt install \
@@ -165,6 +165,28 @@ roslaunch balloon_detection video.launch \
 | `visualize` | `true` | `image_view` を開く。 |
 
 `model` / `device` / `conf` / `iou` は `detect_objects.launch` と同じ。
+
+## トラブルシュート
+
+### numpy 2 系がらみの import エラー
+
+ROS 1 の `cv_bridge` は numpy 1.x に対してビルドされているので、パッケージの
+virtualenv に numpy 2 が入ると C 拡張の ABI が合わずに import で落ちる。
+`requirements.txt` で `numpy<2` に固定してある。既に numpy 2 でビルドしてしまった
+環境では virtualenv を作り直す。
+
+```bash
+catkin clean balloon_detection
+catkin build balloon_detection
+```
+
+### `load() got an unexpected keyword argument 'download_root'`
+
+ultralytics は CLIP を `clip.load(size, device=..., download_root=...)` と呼ぶ
+（`ultralytics/nn/text_model.py`）。`detect_objects_node.py` 冒頭の shim は
+JIT を無効にするためだけに `clip.load` を差し替えているので、`download_root` を
+含む他の引数はそのまま素通しする必要がある。現在の shim は `**kwargs` で
+渡しているのでこのエラーは出ない。
 
 ## License
 

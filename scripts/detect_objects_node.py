@@ -11,8 +11,14 @@ import clip as _clip
 _orig_clip_load = _clip.load
 
 
-def _clip_load_no_jit(name, device="cpu", jit=False):
-    return _orig_clip_load(name, device=device, jit=False)
+def _clip_load_no_jit(name, device="cpu", jit=False, **kwargs):
+    """Load CLIP with the JIT path disabled.
+
+    Only ``jit`` is overridden; every other keyword is passed through, because
+    ultralytics calls ``clip.load(size, device=..., download_root=...)`` and
+    swallowing ``download_root`` here would raise a ``TypeError``.
+    """
+    return _orig_clip_load(name, device=device, jit=False, **kwargs)
 
 
 def _clip_tokenize_compat(texts, context_length=77, truncate=False):
