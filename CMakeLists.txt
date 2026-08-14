@@ -10,7 +10,7 @@ catkin_generate_virtualenv(
 )
 
 catkin_install_python(
-  PROGRAMS scripts/detect_events_node.py
+  PROGRAMS scripts/detect_objects_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   RENAME_PROCESS FALSE
 )

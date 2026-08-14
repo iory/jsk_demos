@@ -3,9 +3,10 @@
   <name>balloon_detection</name>
   <version>0.1.0</version>
   <description>
-    Balloon hand-off / fly-away event detection using YOLO-WorldV2 + ByteTrack.
-    Subscribes to sensor_msgs/Image (e.g. from video_stream_opencv) and runs a
-    per-frame state machine that emits RECEIVED / FLEW_AWAY events.
+    Open-vocabulary object detection with YOLO-WorldV2. Subscribes to
+    sensor_msgs/Image (e.g. from video_stream_opencv), detects the text
+    prompts given in ~classes, and publishes the boxes and class names of
+    every frame.
   </description>
 
   <maintainer email="ab.ioryz@gmail.com">iory</maintainer>

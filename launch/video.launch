@@ -3,9 +3,11 @@
   Video-file demo launch.
 
   Plays an mp4 (default: $(find balloon_detection)/pooh/$(arg video)) through
-  video_stream_opencv and pipes its output into detect_events.launch.
+  video_stream_opencv and pipes its output into detect_objects.launch.
 -->
 <launch>
+  <arg name="classes"
+       doc="Comma-separated YOLO-World prompts to detect, e.g. 'red scarf,person'."/>
   <arg name="video" default="IMG_8615.mp4"
        doc="File name under $(find balloon_detection)/pooh/."/>
   <arg name="video_path" default="$(find balloon_detection)/pooh/$(arg video)"
@@ -16,8 +18,8 @@
   <arg name="visualize" default="true"/>
   <arg name="device" default="cpu"/>
   <arg name="model" default="yolov8x-worldv2.pt"/>
-  <arg name="balloon_classes" default="balloon,red balloon"/>
-  <arg name="teddy_classes" default="teddy bear,stuffed animal,Winnie the Pooh plush"/>
+  <arg name="conf" default="0.25"/>
+  <arg name="iou" default="0.5"/>
 
   <include file="$(find video_stream_opencv)/launch/camera.launch">
     <arg name="camera_name" value="videofile"/>
@@ -32,12 +34,13 @@
     <arg name="visualize" value="false"/>
   </include>
 
-  <include file="$(find balloon_detection)/launch/detect_events.launch">
+  <include file="$(find balloon_detection)/launch/detect_objects.launch">
     <arg name="image_topic" value="/videofile/image_raw"/>
     <arg name="model" value="$(arg model)"/>
     <arg name="device" value="$(arg device)"/>
-    <arg name="balloon_classes" value="$(arg balloon_classes)"/>
-    <arg name="teddy_classes" value="$(arg teddy_classes)"/>
+    <arg name="conf" value="$(arg conf)"/>
+    <arg name="iou" value="$(arg iou)"/>
+    <arg name="classes" value="$(arg classes)"/>
     <arg name="visualize" value="$(arg visualize)"/>
   </include>
 </launch>

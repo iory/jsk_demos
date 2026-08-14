@@ -4,33 +4,35 @@
 
   Subscribes to an arbitrary sensor_msgs/Image source (remap or override
   via `image_topic`). Use this when an image source already exists (a real
-  camera, a rosbag, etc.). For the pooh sample videos, use video.launch
-  which wraps this launch with video_stream_opencv.
+  camera, a rosbag, etc.). To run against a video file instead, use
+  video.launch, which wraps this launch with video_stream_opencv.
 -->
 <launch>
+  <arg name="classes"
+       doc="Comma-separated YOLO-World prompts to detect, e.g. 'red scarf,person'."/>
   <arg name="image_topic" default="image"
        doc="Input sensor_msgs/Image topic (remapped onto the node's 'image')."/>
   <arg name="model" default="yolov8x-worldv2.pt"/>
   <arg name="device" default="cpu"/>
-  <arg name="balloon_classes" default="balloon,red balloon"
-       doc="Comma-separated YOLO-World prompts treated as the balloon class."/>
-  <arg name="teddy_classes" default="teddy bear,stuffed animal,Winnie the Pooh plush"
-       doc="Comma-separated YOLO-World prompts treated as the receiver class."/>
+  <arg name="conf" default="0.25"
+       doc="Confidence threshold. Lower it to see weaker detections."/>
+  <arg name="iou" default="0.5"
+       doc="NMS IoU threshold."/>
   <arg name="visualize" default="false"
        doc="Open image_view on the annotated output topic."/>
 
-  <node name="detect_events" pkg="balloon_detection" type="detect_events_node.py"
+  <node name="detect_objects" pkg="balloon_detection" type="detect_objects_node.py"
         output="screen" required="true">
     <remap from="image" to="$(arg image_topic)"/>
     <param name="model" value="$(arg model)"/>
     <param name="device" value="$(arg device)"/>
-    <param name="use_header_stamp" value="true"/>
-    <param name="balloon_classes" value="$(arg balloon_classes)"/>
-    <param name="teddy_classes" value="$(arg teddy_classes)"/>
+    <param name="conf" value="$(arg conf)"/>
+    <param name="iou" value="$(arg iou)"/>
+    <param name="classes" value="$(arg classes)"/>
   </node>
 
   <node name="annotated_view" pkg="image_view" type="image_view" output="screen"
         if="$(arg visualize)">
-    <remap from="image" to="/detect_events/image_annotated"/>
+    <remap from="image" to="/detect_objects/image_annotated"/>
   </node>
 </launch>
