@@ -15,7 +15,7 @@
   give depth_topic / camera_info_topic to get metres in the camera frame.
 -->
 <launch>
-  <arg name="image_topic" default="image"
+  <arg name="image_topic" default="/camera/color/image_raw"
        doc="Input sensor_msgs/Image topic (remapped onto the node's 'image')."/>
   <arg name="model" default=""
        doc="Weights: local path, or http(s) URL cached under $ROS_HOME/dog_pose.
