@@ -1,0 +1,32 @@
+# YOLO-World and YOLOE are open vocabulary: these prompts are the classes, nothing is trained.
+# A model for the NPU (backend: adla) has them fixed when it is converted; convert it again after
+# changing them (scripts/export_adla_model.py).
+classes:
+  - "apple"
+  - "red apple"
+  - "green apple"
+# the model of each backend when ~model is empty; ~backend auto picks adla on a machine with
+# the NPU of a Khadas VIM4, ultralytics otherwise
+ultralytics_model: yoloe-11s-seg.pt  # downloaded by ultralytics; yolov8x-worldv2 runs at ~1 Hz on a laptop cpu
+adla_model: yoloe-v8l_640_int8.adla    # in models/ (VIM4); the released one has the GRAPE prompts baked in: export one for these prompts
+
+imgsz: 320       # [px] inference size: ~45 ms on the cpu of trickstar, against ~80 ms at 640
+conf: 0.02        # score of a detection to keep it; grape bunches in gazebo scored 0.02-0.4; not measured for apples
+iou: 0.5          # non maximum suppression
+max_detections: 20
+agnostic_nms: true  # the prompts are synonyms: one box for a bunch whichever prompt it matches
+
+# the points of a detection: inside the box, at the depth of its front (the bunch hangs in front
+# of the canopy, which would otherwise end up in the same 3d box)
+depth_quantile: 0.2   # "front" of the box, as a quantile of the depth in it
+depth_margin: 0.15    # [m] kept behind and in front of it
+min_depth: 0.2        # [m] the d435 sees from here
+max_depth: 10.0       # [m]
+min_points: 30        # a detection with fewer points gives no 3d box
+
+# seconds between two detections; the flight does not need every image, and the inference
+# competes with gazebo for the gpu
+min_interval: 0.0
+
+queue_size: 5
+slop: 0.2             # [s] between the color image and the depth image

@@ -1,0 +1,34 @@
+# YOLO-World and YOLOE are open vocabulary: these prompts are the classes, nothing is trained.
+# A model for the NPU (backend: adla) has them fixed when it is converted; convert it again after
+# changing them (scripts/export_adla_model.py).
+classes:
+  - "a bunch of grapes"
+  - "grape cluster"
+  - "grapes"
+  - "green grapes"
+  - "white grapes"
+# the model of each backend when ~model is empty; ~backend auto picks adla on a machine with
+# the NPU of a Khadas VIM4, ultralytics otherwise
+ultralytics_model: yolov8x-worldv2.pt  # downloaded by ultralytics
+adla_model: yoloe-v8l_640_int8.adla    # in models/, downloaded when the package is built on a VIM4
+
+imgsz: 640       # [px] inference size
+conf: 0.02        # score of a detection to keep it; the bunches in gazebo score 0.02-0.4
+iou: 0.5          # non maximum suppression
+max_detections: 20
+agnostic_nms: true  # the prompts are synonyms: one box for a bunch whichever prompt it matches
+
+# the points of a detection: inside the box, at the depth of its front (the bunch hangs in front
+# of the canopy, which would otherwise end up in the same 3d box)
+depth_quantile: 0.2   # "front" of the box, as a quantile of the depth in it
+depth_margin: 0.15    # [m] kept behind and in front of it
+min_depth: 0.2        # [m] the d435 sees from here
+max_depth: 10.0       # [m]
+min_points: 30        # a detection with fewer points gives no 3d box
+
+# seconds between two detections; the flight does not need every image, and the inference
+# competes with gazebo for the gpu
+min_interval: 0.2
+
+queue_size: 5
+slop: 0.2             # [s] between the color image and the depth image

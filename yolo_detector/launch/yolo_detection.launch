@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!-- Detect objects (the prompts of the config) in the camera of the robot and publish them as 3d bounding boxes.
+
+     color image + aligned depth ─┬─ depth_image_proc/point_cloud_xyzrgb ─ organized cloud ─┐
+                                  └─ yolo_detector_node ─ cluster indices ────────────────┴─ jsk_pcl_ros/ClusterPointIndicesDecomposer ─ boxes
+
+     The same launch runs on the real machine and in gazebo: the topics of realsense2_camera and of
+     the gazebo camera are the same. -->
+<launch>
+  <!-- realsense2_camera namespace: <camera_ns>/color/image_raw, <camera_ns>/aligned_depth_to_color/image_raw -->
+  <arg name="camera_ns" default="left_wrist_camera" />
+  <arg name="manager" default="yolo_detection_manager" />
+  <!-- auto: the gpu when torch sees one (the venv is built with a cuda torch only on a machine with a gpu), else the cpu -->
+  <arg name="device" default="auto" />
+  <!-- ultralytics: YOLO-World or YOLOE weights (.pt), run with torch on the device.
+       adla: an .adla made by scripts/export_adla_model.py, run on the NPU of a Khadas VIM4.
+       auto: adla on a machine with that NPU (the robot), ultralytics otherwise (gazebo). -->
+  <arg name="backend" default="auto" />
+  <!-- empty: the model of the backend in the config (ultralytics_model, adla_model) -->
+  <arg name="model" default="" />
+  <!-- seconds between two detections; 0 runs on every image it can keep up with -->
+  <arg name="min_interval" default="0.0" />
+  <!-- inference size [px]; the config's imgsz when empty -->
+  <arg name="imgsz" default="" />
+  <!-- false: only the 2d detections, without the point cloud and the 3d boxes (saves cpu) -->
+  <arg name="boxes" default="true" />
+  <arg name="config" default="$(find yolo_detector)/config/apple.yaml" />
+
+  <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen" if="$(arg boxes)" />
+
+  <!-- the organized cloud the indices of the detector point into -->
+  <node pkg="nodelet" type="nodelet" name="yolo_points" if="$(arg boxes)"
+        args="load depth_image_proc/point_cloud_xyzrgb $(arg manager)" output="screen">
+    <remap from="rgb/image_rect_color" to="/$(arg camera_ns)/color/image_raw" />
+    <remap from="rgb/camera_info" to="/$(arg camera_ns)/color/camera_info" />
+    <remap from="depth_registered/image_rect" to="/$(arg camera_ns)/aligned_depth_to_color/image_raw" />
+    <remap from="depth_registered/points" to="yolo_detection/points" />
+    <param name="queue_size" value="10" />
+  </node>
+
+  <node pkg="yolo_detector" type="yolo_detector_node.py" name="yolo_detector" output="screen">
+    <rosparam file="$(arg config)" command="load" />
+    <param name="backend" value="$(arg backend)" />
+    <param name="device" value="$(arg device)" />
+    <param name="model" value="$(arg model)" />
+    <param name="min_interval" value="$(arg min_interval)" />
+    <param name="imgsz" value="$(arg imgsz)" if="$(eval arg('imgsz') != '')" />
+    <remap from="~input/image" to="/$(arg camera_ns)/color/image_raw" />
+    <remap from="~input/depth" to="/$(arg camera_ns)/aligned_depth_to_color/image_raw" />
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="yolo_boxes" if="$(arg boxes)"
+        args="load jsk_pcl/ClusterPointIndicesDecomposer $(arg manager)" output="screen">
+    <remap from="~input" to="yolo_detection/points" />
+    <remap from="~target" to="yolo_detector/output/cluster_indices" />
+    <!-- the indices carry the stamp of the depth image they were made from, which is the stamp of its
+         cloud: pair them exactly. With approximate_sync, about half of the indices were put on the cloud
+         one frame (33 ms) away, since they come some 0.1 s after it, and on a moving camera the pixels of
+         an object then fell on the canopy behind it, stretching the box over metres. queue_size covers the
+         latency of the detector (0.25 s on the NPU of a VIM4) at 30 Hz. -->
+    <param name="approximate_sync" value="false" />
+    <param name="queue_size" value="30" />
+    <param name="align_boxes" value="false" />
+    <param name="use_pca" value="false" />
+    <param name="publish_tf" value="false" />
+  </node>
+</launch>
