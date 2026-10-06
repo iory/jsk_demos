@@ -7,8 +7,8 @@ FEETECH サーボのリーダーアーム（`teleop_leader_pair_description`）�
 
 ```bash
 mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src
-git clone -b k-imitation-demo https://github.com/iory/jsk_demos.git
-git clone -b uv https://github.com/iory/catkin_virtualenv.git
+git clone --single-branch -b k-imitation-demo https://github.com/iory/jsk_demos.git
+git clone --single-branch -b uv https://github.com/iory/catkin_virtualenv.git
 source /opt/ros/one/setup.bash
 cd ~/catkin_ws && catkin config --extend /opt/ros/one && catkin build k_arm_teleop
 source ~/catkin_ws/devel/setup.bash
@@ -33,8 +33,8 @@ feetech_leader_driver.py ──/teleop_leader/servo_joint_states──> teleop_m
 
 ```bash
 mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src
-git clone -b k-imitation-demo https://github.com/iory/jsk_demos.git
-git clone -b uv https://github.com/iory/catkin_virtualenv.git   # uv 対応版（標準版ではない）
+git clone --single-branch -b k-imitation-demo https://github.com/iory/jsk_demos.git
+git clone --single-branch -b uv https://github.com/iory/catkin_virtualenv.git   # uv 対応版（標準版ではない）
 source /opt/ros/one/setup.bash
 cd ~/catkin_ws && catkin config --extend /opt/ros/one && catkin build k_arm_teleop
 source devel/setup.bash
