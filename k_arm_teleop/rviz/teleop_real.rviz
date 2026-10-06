@@ -44,9 +44,29 @@ Visualization Manager:
       Name: Calibration guide label
       Enabled: true
       Marker Topic: /teleop_leader_guide/label
+    - Class: rviz/Image
+      Name: Wrist camera
+      Enabled: true
+      Image Topic: /wrist_right_camera/color/image_raw
+      Transport Hint: compressed
+      Queue Size: 2
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Normalize Range: true
+    - Class: rviz/Image
+      Name: Head camera
+      Enabled: true
+      Image Topic: /head_camera/color/image_raw
+      Transport Hint: compressed
+      Queue Size: 2
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Normalize Range: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: world
+    Fixed Frame: ARM_BODY
     Frame Rate: 30
   Name: root
   Tools:
@@ -63,6 +83,10 @@ Visualization Manager:
       Name: Current View
       Target Frame: <Fixed Frame>
 Window Geometry:
+  Wrist camera:
+    collapsed: false
+  Head camera:
+    collapsed: false
   Displays:
     collapsed: false
   K_ARM Teleop:

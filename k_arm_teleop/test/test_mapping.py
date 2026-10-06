@@ -133,3 +133,17 @@ def test_follower_to_leader_round_trip():
             for j in follower_joints:
                 assert abs(back['arm'][j] - target[j]) < 1e-4, (name, j, back['arm'][j], target[j])
             assert abs(back['gripper'][arm['gripper']['follower']] - 0.006) < 1e-9
+
+
+def test_drop_links_keeps_one_tree():
+    import pytest
+
+    from k_arm_teleop.urdf_utils import drop_links
+
+    kept = drop_links(URDF, '^l2$')
+    assert 'link name="l2"' not in kept and 'joint name="j2"' not in kept
+    assert parse_joints(kept) == {'j1': (-1.0, 2.0)}
+    # dropping the middle link splits the tree into two roots
+    with pytest.raises(ValueError):
+        drop_links(URDF, '^l1$')
+    assert drop_links(URDF, '') == URDF

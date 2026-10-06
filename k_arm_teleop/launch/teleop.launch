@@ -23,12 +23,29 @@
   <arg name="robot_model" default="$(find k_arm_descriptions)/urdf/K_ARM_DUALARM_primitive.urdf" />
   <arg name="leader_model" default="$(find teleop_leader_pair_description)/urdf/teleop_leader_pair_description.urdf" />
   <arg name="world_frame" default="world" />
+  <!-- frame the ghost robot is attached to: the real ARM_BODY when real -->
+  <arg name="virtual_parent" default="$(eval 'ARM_BODY' if arg('real') else arg('world_frame'))" />
+  <!-- frame the leader and its guide are drawn from: the arm base when real
+       (teleop_real.rviz shows the robot from ARM_BODY, without the linear stage) -->
+  <arg name="leader_parent" default="$(eval 'ARM_BODY' if arg('real') else arg('world_frame'))" />
+  <!-- links left out of the rviz models: the arm the leader does not drive (and, with
+       real:=true, the linear stage); the robots themselves keep every joint -->
+  <arg name="hidden_links" default="$(eval '^(LARM_|left_)' if arg('arm') == 'right' else '^(RARM_|right_)')" />
 
   <!-- K_ARM (real, or its simulated stand-in) -->
   <!-- With real:=true the robot's own bringup owns /robot_description; do not overwrite it. -->
   <param name="robot_description" textfile="$(arg robot_model)" if="$(arg load_robot_description)" />
-  <node name="world_to_robot" pkg="tf2_ros" type="static_transform_publisher"
+  <!-- real:=true: the robot's own TF already places ARM_BODY (LINEAR_LINK3 -> ARM_BODY) -->
+  <node name="world_to_robot" pkg="tf2_ros" type="static_transform_publisher" unless="$(arg real)"
         args="0 0 0 0 0 0 $(arg world_frame) ARM_BODY" />
+  <!-- K_ARM model for rviz under its own name: the robot's /robot_description points at
+       meshes that are not on this PC; the links are placed by TF either way -->
+  <param name="k_arm_teleop/robot_description" unless="$(arg real)"
+         command="python3 $(find k_arm_teleop)/scripts/prefix_urdf.py $(arg robot_model) '' '$(arg hidden_links)'" />
+  <node name="display_description" pkg="k_arm_teleop" type="display_description.py" if="$(arg real)">
+    <param name="target" value="/k_arm_teleop/robot_description" />
+    <param name="drop" value="^LINEAR_|$(arg hidden_links)" />
+  </node>
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
         if="$(arg real_robot_state_publisher)" />
   <node name="real_stand_in_controller" pkg="k_arm_teleop" type="fake_trajectory_controller.py"
@@ -41,13 +58,16 @@
   <group ns="virtual">
     <param name="robot_description"
            command="python3 $(find k_arm_teleop)/scripts/prefix_urdf.py $(arg robot_model) virtual/" />
+    <param name="display_description"
+           command="python3 $(find k_arm_teleop)/scripts/prefix_urdf.py $(arg robot_model) virtual/ '$(arg hidden_links)'" />
     <node name="fake_trajectory_controller" pkg="k_arm_teleop" type="fake_trajectory_controller.py">
       <rosparam command="load" file="$(arg config)" />
       <param name="target" value="virtual" />
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+    <!-- the ghost sits on the robot: on the real ARM_BODY with real:=true -->
     <node name="world_to_robot" pkg="tf2_ros" type="static_transform_publisher"
-          args="0 0 0 0 0 0 $(arg world_frame) virtual/ARM_BODY" />
+          args="0 0 0 0 0 0 $(arg virtual_parent) virtual/ARM_BODY" />
   </group>
 
   <!-- leader arm. servo_joint_states holds only real readings and is what the
@@ -73,7 +93,7 @@
     <node name="display_joint_states" pkg="k_arm_teleop" type="leader_display_joint_states.py">
       <rosparam command="load" file="$(arg config)" />
       <param name="frame_prefix" value="leader/" />
-      <param name="world_frame" value="$(arg world_frame)" />
+      <param name="world_frame" value="$(arg leader_parent)" />
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   </group>
@@ -87,7 +107,7 @@
       <rosparam command="load" file="$(arg config)" />
       <param name="guide" value="true" />
       <param name="frame_prefix" value="leader_guide/" />
-      <param name="world_frame" value="$(arg world_frame)" />
+      <param name="world_frame" value="$(arg leader_parent)" />
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   </group>
@@ -103,6 +123,7 @@
     <param name="arms/larm/enabled" value="$(eval arm == 'left')" />
   </node>
 
-  <node name="rviz" pkg="rviz" type="rviz" if="$(arg rviz)"
-        args="-d $(find k_arm_teleop)/rviz/teleop.rviz" />
+  <!-- with real:=true also show the robot's wrist and head cameras (compressed transport) -->
+  <arg name="rviz_config" default="$(eval find('k_arm_teleop') + ('/rviz/teleop_real.rviz' if real else '/rviz/teleop.rviz'))" />
+  <node name="rviz" pkg="rviz" type="rviz" if="$(arg rviz)" args="-d $(arg rviz_config)" />
 </launch>

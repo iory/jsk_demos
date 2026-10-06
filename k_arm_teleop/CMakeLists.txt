@@ -45,6 +45,7 @@ add_dependencies(${PROJECT_NAME}_rviz_plugin ${PROJECT_NAME}_generate_messages_c
 catkin_install_python(
   PROGRAMS
     node_scripts/fake_trajectory_controller.py
+    node_scripts/display_description.py
     node_scripts/feetech_leader_driver.py
     node_scripts/leader_display_joint_states.py
     node_scripts/recenter_leader.py

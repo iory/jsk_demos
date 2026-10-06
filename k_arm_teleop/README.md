@@ -45,6 +45,9 @@ roslaunch k_arm_teleop teleop.launch
 ```
 
 - ビルド時に uv が feetech-cli を PyPI から取るので、ネットワークが必要．
+- 実機（`real:=true`）の rviz で実機モデルをメッシュ付きで出すには、実機の `/robot_description` が参照する
+  `k_arm_ros_bridge_tutorials`（`models/K_ARM_DUALARM_LINEAR_meshes`）を同じワークスペースに置く．
+  このリポジトリには入れない（メッシュは再配布不可）．無くてもテレオペと録画は動き、実機モデルの表示だけがエラーになる．
 - `config/leader_calibration.yaml`（ゼロ点・向き・トリガー）は**このリーダーの個体**の値．同じリーダーなら別の PC でも
   そのまま使える（サーボ側の `homing_offset` は EEPROM に残っている）．別のリーダーを使うときはキャリブレーションと
   `recenter_leader.py` をやり直す．
@@ -89,7 +92,8 @@ roslaunch k_arm_teleop teleop.launch real:=true
 | `real_robot_state_publisher` | `not real` | 実機側の bringup が robot_state_publisher を出していないなら `true` |
 | `arm` | `right` | リーダー（サーボ id 1-8）でどちらの腕を動かすか．`right` / `left`．サーボの割り当ては `config/leader_servos_<arm>.yaml` |
 | `leader` | `feetech` | `feetech`: サーボから読む．`gui`: スライダー（机上テスト）．`external`: 何も起動しない（bag 再生など） |
-| `rviz` | `true` | rviz（TeleopPanel 付き）を起動 |
+| `rviz` | `true` | rviz（TeleopPanel 付き）を起動．`real:=true` では `rviz/teleop_real.rviz`（手首・頭カメラの画像付き） |
+| `port` | （空） | リーダーのシリアルポート．空なら `leader_bus.yaml` の `port`（`/dev/k_arm_leader`） |
 | `config` | `config/teleop.yaml` | 対応・速度・記録トピック |
 | `leader_bus` | `config/leader_bus.yaml` | ポート、サーボ id、可動域 |
 | `leader_calibration` | `config/leader_calibration.yaml` | ゼロ点・向き・トリガーの保存先（パネルの操作でここが更新される） |
@@ -139,6 +143,15 @@ rosrun k_arm_teleop recenter_leader.py --arm right --apply   # EEPROM と config
 - リーダーのデータが `leader_timeout` 以上途切れると `leader_lost` になり送信を止める．再開は `Start`（再び approach から）．
 - 追従中のステータスに `at joint limit: ...`（K_ARM の可動域の端）、`speed-limited: ...`（速度制限）が出る．
 - 学習側の実行ノードなど、他のノードが同じコントローラに指令を送るときはテレオペを STOP しておく．
+
+### 実機につないだときの表示（`real:=true`）
+
+- 実機の TF（`world` → 直動部 → 腕）をそのまま使う．こちらからは `world -> ARM_BODY` を出さず、`/robot_description` も上書きしない．
+- rviz は `ARM_BODY`（腕の付け根）基準．直動部と、リーダーで動かさない側の腕（`arm:=right` なら左腕）は表示しない
+  （`display_description.py` が実機の `/robot_description` から取り除いた表示用モデルを `/k_arm_teleop/robot_description` に書く）．
+- 仮想ロボット（半透明）とリーダー・ガイドは実機の `ARM_BODY` に重ねて表示する．
+- カメラ画像は圧縮トピック（`compressed`）で受ける．
+- 実機側の PC の時計がずれていると TF とカメラのタイムスタンプが合わず表示・録画が壊れる．全 PC を NTP / chrony で同期しておく．
 
 ### 記録される bag
 

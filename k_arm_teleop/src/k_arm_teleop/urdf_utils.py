@@ -1,5 +1,6 @@
 """Small URDF helpers that need nothing but the standard library."""
 
+import re
 import xml.etree.ElementTree as ET
 
 
@@ -64,4 +65,49 @@ def prefix_links(urdf_string, prefix):
     for gazebo in root.findall('gazebo'):
         if gazebo.get('reference') in links:
             gazebo.set('reference', prefix + gazebo.get('reference'))
+    return ET.tostring(root, encoding='unicode')
+
+
+def drop_links(urdf_string, pattern):
+    """Remove links whose name matches ``pattern`` (regex), and every joint touching them.
+
+    For display: the remaining links must still form one tree (e.g. dropping
+    the linear stage and one arm leaves the other arm, rooted at its first
+    link); rviz places each link by TF anyway.
+
+    Parameters
+    ----------
+    urdf_string : str
+        URDF XML.
+    pattern : str
+        Regular expression searched in link names; empty keeps everything.
+
+    Returns
+    -------
+    str
+        The URDF without those links.
+
+    Raises
+    ------
+    ValueError
+        If what is left is not a single tree.
+    """
+    root = ET.fromstring(urdf_string)
+    if not pattern:
+        return urdf_string
+    regex = re.compile(pattern)
+    dropped = {link.get('name') for link in root.findall('link') if regex.search(link.get('name'))}
+    for element in list(root):
+        if element.tag == 'link' and element.get('name') in dropped:
+            root.remove(element)
+        elif element.tag == 'joint' and ({element.find('parent').get('link'),
+                                          element.find('child').get('link')} & dropped):
+            root.remove(element)
+        elif element.tag == 'gazebo' and element.get('reference') in dropped:
+            root.remove(element)
+    links = {link.get('name') for link in root.findall('link')}
+    children = {joint.find('child').get('link') for joint in root.findall('joint')}
+    roots = links - children
+    if len(roots) != 1:
+        raise ValueError('dropping {!r} leaves {} roots: {}'.format(pattern, len(roots), sorted(roots)))
     return ET.tostring(root, encoding='unicode')
