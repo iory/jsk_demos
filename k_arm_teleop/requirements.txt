@@ -1,0 +1,4 @@
+colorama==0.4.6           # via feetech-cli
+feetech-cli==0.1.1        # via -r requirements.in
+pyserial==3.5             # via feetech-cli
+readchar==4.2.2           # via feetech-cli

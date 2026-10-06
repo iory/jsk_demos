@@ -1,0 +1,6 @@
+string joint
+# +1 or -1: sign of (raw count increase -> URDF joint angle increase)
+int8 direction
+---
+bool success
+string message

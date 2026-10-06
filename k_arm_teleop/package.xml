@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>k_arm_teleop</name>
+  <version>0.1.0</version>
+  <description>
+    Leader-follower teleoperation of K_ARM_DUALARM with a FEETECH leader arm
+    (teleop_leader_pair_description), for collecting imitation-learning data.
+    Includes a virtual (ghost) robot, an rviz panel and rosbag recording.
+  </description>
+  <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>catkin_virtualenv</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>qtbase5-dev</build_depend>
+  <build_depend>roslaunch</build_depend>
+
+  <depend>actionlib_msgs</depend>
+  <depend>control_msgs</depend>
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>rviz</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>trajectory_msgs</depend>
+
+  <exec_depend>actionlib</exec_depend>
+  <exec_depend>joint_state_publisher_gui</exec_depend>
+  <exec_depend>k_arm_descriptions</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rosbag</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>teleop_leader_pair_description</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+  <export>
+    <pip_requirements>requirements.txt</pip_requirements>
+    <rviz plugin="${prefix}/plugin_description.xml"/>
+  </export>
+</package>

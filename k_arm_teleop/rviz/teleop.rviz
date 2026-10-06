@@ -1,0 +1,71 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+    Splitter Ratio: 0.5
+  - Class: k_arm_teleop/TeleopPanel
+    Name: K_ARM Teleop
+    manager: /k_arm_teleop_manager
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Name: Grid
+      Enabled: true
+      Reference Frame: <Fixed Frame>
+    - Class: rviz/RobotModel
+      Name: K_ARM (real)
+      Enabled: true
+      Robot Description: /robot_description
+      Alpha: 1
+      Visual Enabled: true
+      Collision Enabled: false
+    - Class: rviz/RobotModel
+      Name: K_ARM (virtual)
+      Enabled: true
+      Robot Description: /virtual/robot_description
+      Alpha: 0.3
+      Visual Enabled: true
+      Collision Enabled: false
+    - Class: rviz/RobotModel
+      Name: Leader arm
+      Enabled: true
+      Robot Description: /teleop_leader/robot_description
+      Alpha: 1
+      Visual Enabled: true
+      Collision Enabled: false
+    - Class: rviz/RobotModel
+      Name: Calibration guide
+      Enabled: true
+      Robot Description: /teleop_leader_guide/robot_description
+      Alpha: 0.25
+      Visual Enabled: true
+      Collision Enabled: false
+    - Class: rviz/Marker
+      Name: Calibration guide label
+      Enabled: true
+      Marker Topic: /teleop_leader_guide/label
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 3.0
+      Focal Point: {X: 0, Y: 0.6, Z: -0.3}
+      Pitch: 0.35
+      Yaw: 0.0
+      Name: Current View
+      Target Frame: <Fixed Frame>
+Window Geometry:
+  Displays:
+    collapsed: false
+  K_ARM Teleop:
+    collapsed: false
+  Height: 1000
+  Width: 1600

@@ -1,0 +1,18 @@
+# feetech_leader_driver.py: servos of the right leader arm, base to tip.
+# direction: raw count increase -> URDF joint angle increase (+1) or decrease
+# (-1). Defaults only; a flip from the panel is stored in the calibration file
+# and wins.
+# clamp_to_range: for joints without a mechanical stop (ids 3, 5, 7 turn
+# endlessly: shoulder yaw, wrist yaw, wrist roll). The angle is still
+# tracked over any number of turns, but servo_joint_states (what the robot
+# follows) is held at the end of the joint's range (leader_bus.yaml
+# joint_ranges_deg); servo_status shows the real angle and flags it.
+servos:
+  - {id: 1, joint: RARM_JOINT0, direction: 1}
+  - {id: 2, joint: RARM_JOINT1, direction: 1}
+  - {id: 3, joint: RARM_JOINT2, direction: 1, clamp_to_range: true}
+  - {id: 4, joint: RARM_JOINT3, direction: 1}
+  - {id: 5, joint: RARM_JOINT4, direction: 1, clamp_to_range: true}
+  - {id: 6, joint: RARM_JOINT5, direction: 1}
+  - {id: 7, joint: RARM_JOINT6, direction: 1, clamp_to_range: true}
+  - {id: 8, joint: RARM_GRIPPER, direction: 1}

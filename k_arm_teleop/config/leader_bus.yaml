@@ -1,0 +1,33 @@
+# feetech_leader_driver.py: servos of the leader arm(s), base to tip.
+port: /dev/ttyACM0                     # "" -> first plausible USB serial adapter
+baudrate: 1000000                      # 0 -> probe every speed
+rate: 100.0                            # [Hz]
+torque_off_on_start: true              # the leader is moved by hand
+# The servo list (which leader joints ids 1-8 drive) is in
+# leader_servos_right.yaml / leader_servos_left.yaml, picked by
+# `roslaunch k_arm_teleop teleop.launch arm:=right|left`.
+
+# Movable range of each leader joint [deg], relative to the calibration pose
+# (arm hanging straight down, teleop.yaml leader_zero), in the direction of
+# the published angle. Used to start the angle tracking inside the range, to
+# flag a reading outside it (wrong direction or calibration), and as the
+# software stop of clamp_to_range joints. Joints not listed fall back to the
+# leader URDF limits.
+# Source: range table provided by the user (2026-10-06). Read relative to the
+# hanging pose: e.g. shoulder roll -10..145 deg then matches the K_ARM J1
+# (-10..190 deg), and shoulder yaw is symmetric about the hanging pose.
+joint_ranges_deg:
+  LARM_JOINT0: [-171.0, 55.0]    # J1 shoulder pitch
+  LARM_JOINT1: [-10.0, 145.0]    # J2 shoulder roll
+  LARM_JOINT2: [-90.0, 90.0]     # J3 shoulder yaw
+  LARM_JOINT3: [-97.0, 0.0]      # J4 elbow pitch
+  LARM_JOINT4: [-87.1, 87.3]     # J5 wrist yaw
+  LARM_JOINT5: [-80.0, 81.0]     # J6 wrist pitch
+  LARM_JOINT6: [-84.0, 90.0]     # J7 wrist roll
+  RARM_JOINT0: [-180.0, 45.0]
+  RARM_JOINT1: [-140.0, 10.0]
+  RARM_JOINT2: [-90.0, 89.0]
+  RARM_JOINT3: [-110.0, 0.0]
+  RARM_JOINT4: [-70.0, 60.0]
+  RARM_JOINT5: [-81.0, 85.0]
+  RARM_JOINT6: [-89.0, 89.0]

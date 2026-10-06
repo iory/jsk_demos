@@ -1,0 +1,5 @@
+string arm
+bool enabled
+---
+bool success
+string message

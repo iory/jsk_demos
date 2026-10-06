@@ -1,0 +1,5 @@
+<library path="lib/libk_arm_teleop_rviz_plugin">
+  <class name="k_arm_teleop/TeleopPanel" type="k_arm_teleop::TeleopPanel" base_class_type="rviz::Panel">
+    <description>Leader-follower teleoperation of K_ARM: target, start/stop, zero pose, leader calibration, rosbag recording.</description>
+  </class>
+</library>

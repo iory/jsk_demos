@@ -1,0 +1,127 @@
+# Leader (teleop_leader_pair_description) -> follower (K_ARM_DUALARM) mapping.
+#
+# Calibration pose: let the leader hang under gravity -- shoulder pointing
+# down, arm and wrist straight down, handle hanging down, trigger released.
+# That is the K_ARM zero pose. leader_zero is the leader URDF angle of this
+# pose (the leader URDF's own zero is a T-pose). feetech_leader_driver.py
+# and the calibration guide in rviz read the same values.
+#
+# Arm joints (J0-J3): follower = sign * (leader - leader_zero).
+# Wrist (J4-J6): the two wrists are built differently (leader: pitch + roll,
+# K_ARM: z-y-x), so the hand rotation relative to the forearm is matched
+# instead of copying angles (k_arm_teleop/kinematics.py, WristMap).
+#
+# Values solved from the two URDFs: every arm joint axis lines up, upper arm
+# and forearm hang down, the elbow bends forward like the K_ARM, and the
+# handle hangs down with the trigger facing forward. Checked numerically on
+# random poses (axes and hand rotation agree to 1e-5).
+leader_base:
+  # leader base_link -> K_ARM base (front +x, left +y, up +z): the leader URDF
+  # has its arms along -x/+x and up along +y.
+  rpy: [1.5708, 0.0, -1.5708]
+  xyz: [0.0, 0.9, 0.0]                 # where the leader is drawn in rviz [m]
+
+arms:
+  larm:
+    enabled: true                      # teleop.launch arm:= overrides this
+    controller: larm_controller        # <controller>/follow_joint_trajectory
+    joints:
+      - {follower: LARM_JOINT0, leader: LARM_JOINT0, sign: -1.0, leader_zero: 0.0}
+      - {follower: LARM_JOINT1, leader: LARM_JOINT1, sign: -1.0, leader_zero: 1.5708}
+      - {follower: LARM_JOINT2, leader: LARM_JOINT2, sign: 1.0, leader_zero: 1.5708}
+      - {follower: LARM_JOINT3, leader: LARM_JOINT3, sign: 1.0, leader_zero: 0.0}
+    wrist:
+      leader: [LARM_JOINT4, LARM_JOINT5, LARM_JOINT6]
+      follower: [LARM_JOINT4, LARM_JOINT5, LARM_JOINT6]
+      # handle roll pi: trigger facing forward, like the right arm (J6 turns endlessly)
+      leader_zero: [0.0, 0.0, 3.1416]
+    gripper:
+      enabled: true
+      controller: lgripper_controller
+      # The real robot's gripper interface is not known yet, so the gripper
+      # is only commanded on the virtual robot until this is set to true.
+      send_to_real: false
+      follower: left_gripper_slider_joint
+      leader: LARM_GRIPPER
+      leader_range: [0.0, 1.05]        # trigger released .. pulled [rad]
+      follower_range: [0.0, 0.015]     # slider [m]
+  rarm:
+    enabled: false                     # teleop.launch arm:= overrides this
+    controller: rarm_controller
+    joints:
+      - {follower: RARM_JOINT0, leader: RARM_JOINT0, sign: -1.0, leader_zero: 0.0}
+      - {follower: RARM_JOINT1, leader: RARM_JOINT1, sign: -1.0, leader_zero: -1.5708}
+      - {follower: RARM_JOINT2, leader: RARM_JOINT2, sign: -1.0, leader_zero: -1.5708}
+      - {follower: RARM_JOINT3, leader: RARM_JOINT3, sign: 1.0, leader_zero: 0.0}
+    wrist:
+      leader: [RARM_JOINT4, RARM_JOINT5, RARM_JOINT6]
+      follower: [RARM_JOINT4, RARM_JOINT5, RARM_JOINT6]
+      leader_zero: [0.0, 0.0, 0.0]
+    gripper:
+      enabled: true
+      controller: rgripper_controller
+      send_to_real: false
+      follower: right_gripper_slider_joint
+      leader: RARM_GRIPPER
+      leader_range: [0.0, 1.05]
+      follower_range: [0.0, 0.015]
+
+# Where the commands go. namespace is prepended to "<controller>/follow_joint_trajectory".
+targets:
+  real: {namespace: "", joint_states: /joint_states}
+  virtual: {namespace: /virtual, joint_states: /virtual/joint_states}
+
+leader_joint_states: /teleop_leader/servo_joint_states
+leader_calibrated_topic: /teleop_leader/calibrated
+leader_calibrate_service: /teleop_leader/calibrate_zero
+leader_timeout: 0.3                    # [s] without leader data -> leader_lost
+
+# Slow move from the current follower pose to the leader pose before following.
+approach:
+  velocity: 0.25                       # [rad/s] of the joint that moves most
+  min_duration: 3.0                    # [s]
+  tolerance: 0.08                      # [rad] start following below this
+  max_attempts: 5
+
+follow:
+  # topic: <controller>/command (JointTrajectoryController's streaming input)
+  # action: a new follow_joint_trajectory goal every cycle
+  interface: topic
+  rate: 50.0                           # [Hz]
+  # [s] time_from_start of each streamed point. The robot trails the leader by
+  # about this much plus one period (measured in sim: 30 Hz / 0.1 s -> 124 ms,
+  # 50 Hz / 0.04 s -> 48 ms).
+  lookahead: 0.04
+  # [rad/s] (m/s for the gripper slider) clamp on the streamed command, per
+  # target, with per-joint overrides. A wrist twist turns the leader's forearm
+  # roll and handle roll together, so K_ARM J4 needs much more than the arm
+  # (measured on the leader: J4 p95 5 rad/s, peaks 10 rad/s; arm joints < 3).
+  # The virtual robot is a simulation, so it is not held back.
+  max_velocity:
+    virtual: {default: 10.0}
+    real:
+      default: 1.5
+      LARM_JOINT4: 5.0
+      LARM_JOINT5: 3.0
+      LARM_JOINT6: 3.0
+      RARM_JOINT4: 5.0
+      RARM_JOINT5: 3.0
+      RARM_JOINT6: 3.0
+
+zero_pose:
+  velocity: 0.25
+  min_duration: 3.0
+
+follower_limit_margin: 0.02            # [rad] stay inside the URDF limits
+
+recording:
+  directory: ~/k_arm_bags
+  prefix: k_arm_teleop
+  topics:
+    - /joint_states
+    - /virtual/joint_states
+    - /teleop_leader/servo_joint_states
+    - /k_arm_teleop_manager/command
+    - /k_arm_teleop_manager/status
+    - /tf
+    - /tf_static

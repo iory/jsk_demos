@@ -1,0 +1,96 @@
+<launch>
+  <!-- real:=false starts a simulated stand-in for the robot's controllers, so
+       the "real" target can be tried without hardware. The panel says so. -->
+  <arg name="real" default="false" />
+  <!-- robot_state_publisher for the real robot; turn off if the robot's own bringup runs one. -->
+  <arg name="real_robot_state_publisher" default="$(eval not arg('real'))" />
+  <!-- feetech: leader arm on the servo bus. gui: sliders instead of the leader (desk testing).
+       external: start nothing; another node or a bag publishes /teleop_leader/servo_joint_states. -->
+  <arg name="leader" default="feetech" />
+  <!-- which arm the leader (servo ids 1-8) drives: right or left -->
+  <arg name="arm" default="right" />
+  <arg name="rviz" default="true" />
+  <arg name="config" default="$(find k_arm_teleop)/config/teleop.yaml" />
+  <arg name="leader_bus" default="$(find k_arm_teleop)/config/leader_bus.yaml" />
+  <arg name="leader_servos" default="$(find k_arm_teleop)/config/leader_servos_$(arg arm).yaml" />
+  <arg name="leader_calibration" default="$(env HOME)/.ros/k_arm_teleop/leader_calibration.yaml" />
+  <arg name="robot_model" default="$(find k_arm_descriptions)/urdf/K_ARM_DUALARM_primitive.urdf" />
+  <arg name="leader_model" default="$(find teleop_leader_pair_description)/urdf/teleop_leader_pair_description.urdf" />
+  <arg name="world_frame" default="world" />
+
+  <!-- K_ARM (real, or its simulated stand-in) -->
+  <param name="robot_description" textfile="$(arg robot_model)" />
+  <node name="world_to_robot" pkg="tf2_ros" type="static_transform_publisher"
+        args="0 0 0 0 0 0 $(arg world_frame) ARM_BODY" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        if="$(arg real_robot_state_publisher)" />
+  <node name="real_stand_in_controller" pkg="k_arm_teleop" type="fake_trajectory_controller.py"
+        unless="$(arg real)">
+    <rosparam command="load" file="$(arg config)" />
+  </node>
+
+  <!-- virtual (ghost) K_ARM: same joints, links prefixed with virtual/ -->
+  <group ns="virtual">
+    <param name="robot_description"
+           command="python3 $(find k_arm_teleop)/scripts/prefix_urdf.py $(arg robot_model) virtual/" />
+    <node name="fake_trajectory_controller" pkg="k_arm_teleop" type="fake_trajectory_controller.py">
+      <rosparam command="load" file="$(arg config)" />
+    </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+    <node name="world_to_robot" pkg="tf2_ros" type="static_transform_publisher"
+          args="0 0 0 0 0 0 $(arg world_frame) virtual/ARM_BODY" />
+  </group>
+
+  <!-- leader arm. servo_joint_states holds only real readings and is what the
+       manager follows. joint_states (display only) fills joints without a servo
+       with the calibration pose, so robot_state_publisher can draw the whole model. -->
+  <group ns="teleop_leader">
+    <param name="robot_description"
+           command="python3 $(find k_arm_teleop)/scripts/prefix_urdf.py $(arg leader_model) leader/" />
+    <node name="feetech_leader_driver" pkg="k_arm_teleop" type="feetech_leader_driver.py"
+          if="$(eval leader == 'feetech')" output="screen">
+      <rosparam command="load" file="$(arg leader_bus)" />
+      <rosparam command="load" file="$(arg leader_servos)" />
+      <rosparam command="load" file="$(arg config)" />
+      <param name="calibration_file" value="$(arg leader_calibration)" />
+      <remap from="joint_states" to="servo_joint_states" />
+    </node>
+    <node name="leader_sliders" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui"
+          if="$(eval leader == 'gui')">
+      <remap from="joint_states" to="servo_joint_states" />
+    </node>
+    <!-- also publishes world -> leader/base_link from teleop.yaml leader_base -->
+    <node name="display_joint_states" pkg="k_arm_teleop" type="leader_display_joint_states.py">
+      <rosparam command="load" file="$(arg config)" />
+      <param name="frame_prefix" value="leader/" />
+      <param name="world_frame" value="$(arg world_frame)" />
+    </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  </group>
+
+  <!-- calibration guide: a translucent leader fixed in the calibration pose,
+       overlaid on the leader, showing how to hold it for "Calibrate leader zero" -->
+  <group ns="teleop_leader_guide">
+    <param name="robot_description"
+           command="python3 $(find k_arm_teleop)/scripts/prefix_urdf.py $(arg leader_model) leader_guide/" />
+    <node name="guide_joint_states" pkg="k_arm_teleop" type="leader_display_joint_states.py">
+      <rosparam command="load" file="$(arg config)" />
+      <param name="guide" value="true" />
+      <param name="frame_prefix" value="leader_guide/" />
+      <param name="world_frame" value="$(arg world_frame)" />
+    </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  </group>
+
+  <node name="k_arm_teleop_manager" pkg="k_arm_teleop" type="teleop_manager.py" output="screen">
+    <rosparam command="load" file="$(arg config)" />
+    <param name="real_is_simulated" value="$(eval not arg('real'))" />
+    <param name="leader_source" value="$(arg leader)" />
+    <!-- only the arm the leader is wired to starts enabled (the panel can change it) -->
+    <param name="arms/rarm/enabled" value="$(eval arm == 'right')" />
+    <param name="arms/larm/enabled" value="$(eval arm == 'left')" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" if="$(arg rviz)"
+        args="-d $(find k_arm_teleop)/rviz/teleop.rviz" />
+</launch>
