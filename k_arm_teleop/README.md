@@ -3,10 +3,24 @@
 FEETECH サーボのリーダーアーム（`teleop_leader_pair_description`）で K_ARM_DUALARM を
 動かし、模倣学習用のデータを rosbag で取るためのパッケージ．
 
+## TL;DR（新しい PC で）
+
+```bash
+mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src
+git clone -b k-imitation-demo https://github.com/iory/jsk_demos.git
+git clone -b uv https://github.com/iory/catkin_virtualenv.git
+source /opt/ros/one/setup.bash
+cd ~/catkin_ws && catkin config --extend /opt/ros/one && catkin build k_arm_teleop
+source ~/catkin_ws/devel/setup.bash
+sudo usermod -aG dialout $USER                                          # 初回のみ．再ログインが必要
+sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply  # リーダーの USB を挿してから
+roslaunch k_arm_teleop teleop.launch                                    # 実機に送るなら real:=true
 ```
-feetech_leader_driver.py ──/teleop_leader/servo_joint_states──> teleop_manager.py ──> <ns>/larm_controller/follow_joint_trajectory
-   (feetech-cli, id 1-8)                                          ^  approach → follow     <ns>/larm_controller/command
-                                                                  |
+
+```
+feetech_leader_driver.py ──/teleop_leader/servo_joint_states──> teleop_manager.py ──> <ns>/rarm_controller/follow_joint_trajectory
+   (feetech-cli, id 1-8)                                          ^  approach → follow     <ns>/rarm_controller/command
+                                                                  |                       （arm:=left なら larm_controller）
                                                         rviz TeleopPanel (services + ~status)
 ```
 
