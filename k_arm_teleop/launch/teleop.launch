@@ -4,6 +4,8 @@
   <arg name="real" default="false" />
   <!-- robot_state_publisher for the real robot; turn off if the robot's own bringup runs one. -->
   <arg name="real_robot_state_publisher" default="$(eval not arg('real'))" />
+  <!-- set /robot_description to the K_ARM model; off with real:=true so the robot's own one stays -->
+  <arg name="load_robot_description" default="$(eval not arg('real'))" />
   <!-- feetech: leader arm on the servo bus. gui: sliders instead of the leader (desk testing).
        external: start nothing; another node or a bag publishes /teleop_leader/servo_joint_states. -->
   <arg name="leader" default="feetech" />
@@ -21,7 +23,8 @@
   <arg name="world_frame" default="world" />
 
   <!-- K_ARM (real, or its simulated stand-in) -->
-  <param name="robot_description" textfile="$(arg robot_model)" />
+  <!-- With real:=true the robot's own bringup owns /robot_description; do not overwrite it. -->
+  <param name="robot_description" textfile="$(arg robot_model)" if="$(arg load_robot_description)" />
   <node name="world_to_robot" pkg="tf2_ros" type="static_transform_publisher"
         args="0 0 0 0 0 0 $(arg world_frame) ARM_BODY" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
@@ -88,6 +91,8 @@
     <rosparam command="load" file="$(arg config)" />
     <param name="real_is_simulated" value="$(eval not arg('real'))" />
     <param name="leader_source" value="$(arg leader)" />
+    <!-- joint limits and wrist kinematics of the follower, independent of /robot_description -->
+    <param name="follower_description" textfile="$(arg robot_model)" />
     <!-- only the arm the leader is wired to starts enabled (the panel can change it) -->
     <param name="arms/rarm/enabled" value="$(eval arm == 'right')" />
     <param name="arms/larm/enabled" value="$(eval arm == 'left')" />

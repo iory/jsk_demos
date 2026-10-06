@@ -172,7 +172,9 @@ class TeleopManager(object):
         self.targets = rospy.get_param('~targets')
         self.real_is_simulated = rospy.get_param('~real_is_simulated', False)
         self.leader_source = rospy.get_param('~leader_source', 'feetech')
-        self.limits = parse_joints(rospy.get_param('/robot_description'))
+        # the K_ARM model this node maps onto (teleop.launch sets it from the URDF file)
+        self.follower_description = rospy.get_param('~follower_description')
+        self.limits = parse_joints(self.follower_description)
         self.margin = rospy.get_param('~follower_limit_margin', 0.02)
         self.leader_timeout = rospy.get_param('~leader_timeout', 0.3)
         self.approach = rospy.get_param('~approach')
@@ -185,7 +187,7 @@ class TeleopManager(object):
         missing = [j for arm in self.arms.values() for j in self._arm_joints(arm)
                    if j not in self.limits]
         if missing:
-            raise RuntimeError('follower joints {} are not in /robot_description'.format(missing))
+            raise RuntimeError('follower joints {} are not in ~follower_description'.format(missing))
         self._build_wrist_maps(rospy.get_param('~leader_base'))
 
         self.leader = JointStateCache(rospy.get_param('~leader_joint_states'))
@@ -237,7 +239,7 @@ class TeleopManager(object):
     def _build_wrist_maps(self, leader_base):
         """Wrist maps need both URDFs and the leader base rotation (teleop.yaml leader_base)."""
         leader = UrdfKinematics(rospy.get_param(self.leader_description))
-        follower = UrdfKinematics(rospy.get_param('/robot_description'))
+        follower = UrdfKinematics(self.follower_description)
         base_rotation = rpy_to_matrix(*leader_base['rpy'])
         zero_pose = leader_zero_pose(rospy.get_param('~arms'))
         for arm in self.arms.values():
