@@ -1,0 +1,1455 @@
+<?xml version="1.0"?>
+<robot name="teleop_leader_pair_description">
+  <link name="Handle_SO101_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Handle_SO101_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Handle_SO101_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.001945003175 -5.730506625e-06 0.001967674628" rpy="0 0 0" />
+      <mass value="0.0696618" />
+      <inertia ixx="1.60552e-05" ixy="-2.50596e-09" ixz="-1.33732e-05" iyy="4.83909e-05" iyz="1.3822e-09" izz="3.89485e-05" />
+    </inertial>
+  </link>
+  <link name="Handle_SO101_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Handle_SO101_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Handle_SO101_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.001945003175 -5.730506625e-06 0.001967674628" rpy="0 0 0" />
+      <mass value="0.0696618" />
+      <inertia ixx="1.60552e-05" ixy="-2.50596e-09" ixz="-1.33732e-05" iyy="4.83909e-05" iyz="1.3822e-09" izz="3.89485e-05" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_10">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_11">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_12">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_13">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_14">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_15">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_16">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_3">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_4">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_5">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_6">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_7">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_8">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_case_9">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_case_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.001270431353 -7.412634442e-07 -0.001724311912" rpy="0 0 0" />
+      <mass value="0.0347973" />
+      <inertia ixx="4.61384e-06" ixy="-1.56464e-13" ixz="-7.16093e-10" iyy="8.67274e-06" iyz="-1.03388e-13" izz="7.52839e-06" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.03317752144 -1.28608894e-18 -5.204170428e-18" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="3.79037e-08" ixy="-1.12079e-24" ixz="-7.78525e-24" iyy="1.98315e-08" iyz="3.82363e-15" izz="1.98316e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_10">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_2.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_2.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="1.387778781e-17 2.360605692e-18 0.001377521445" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="1.98316e-08" ixy="-3.82363e-15" ixz="6.67865e-24" iyy="1.98315e-08" iyz="1.09242e-24" izz="3.79037e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_11">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_3.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_3.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.2045335214 -8.297971935e-19 -1.734723476e-18" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="3.79037e-08" ixy="1.09242e-24" ixz="5.57205e-24" iyy="1.98315e-08" iyz="-3.82363e-15" izz="1.98316e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_12">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_4.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_4.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="1.387778781e-17 2.816897439e-18 -0.001377521445" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="1.98316e-08" ixy="3.82363e-15" ixz="-6.67865e-24" iyy="1.98315e-08" iyz="-1.12079e-24" izz="3.79037e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_13">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_5.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_5.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.1855335214 2.945683327e-18 -1.734723476e-18" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="3.79037e-08" ixy="-3.30563e-24" ixz="-5.57206e-24" iyy="1.98315e-08" iyz="-3.82363e-15" izz="1.98316e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_14">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_2.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_2.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-4.163336342e-17 2.360605692e-18 0.001377521445" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="1.98316e-08" ixy="-3.82363e-15" ixz="6.67865e-24" iyy="1.98315e-08" iyz="1.09242e-24" izz="3.79037e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_15">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_6.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_6.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.1287335214 -8.297971935e-19 -1.734723476e-18" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="3.79037e-08" ixy="1.09242e-24" ixz="5.57205e-24" iyy="1.98315e-08" iyz="-3.82363e-15" izz="1.98316e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_16">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_7.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_7.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-6.346387994e-08 -1.387778781e-17 0.01727752144" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="1.98315e-08" ixy="3.82363e-15" ixz="-6.63829e-14" iyy="1.98316e-08" iyz="1.40383e-20" izz="3.79037e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_8.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_8.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-1.387778781e-17 -8.297971935e-19 0.001377521445" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="1.98316e-08" ixy="-3.82363e-15" ixz="-6.67865e-24" iyy="1.98315e-08" iyz="-1.09242e-24" izz="3.79037e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_3">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_9.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_9.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.2045335214 -1.28608894e-18 -5.204170428e-18" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="3.79037e-08" ixy="-1.12079e-24" ixz="-7.78525e-24" iyy="1.98315e-08" iyz="3.82363e-15" izz="1.98316e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_4">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_10.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_10.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-1.387778781e-17 -1.28608894e-18 -0.001377521445" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="1.98316e-08" ixy="3.82363e-15" ixz="6.67865e-24" iyy="1.98315e-08" iyz="1.12079e-24" izz="3.79037e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_5">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_11.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_11.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.1855335214 -8.297971935e-19 1.734723476e-18" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="3.79037e-08" ixy="-1.09242e-24" ixz="7.78525e-24" iyy="1.98315e-08" iyz="3.82363e-15" izz="1.98316e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_6">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_8.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_8.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="4.163336342e-17 -8.297971935e-19 0.001377521445" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="1.98316e-08" ixy="-3.82363e-15" ixz="-6.67865e-24" iyy="1.98315e-08" iyz="-1.09242e-24" izz="3.79037e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_7">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_12.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_12.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.1287335214 -1.28608894e-18 -5.204170428e-18" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="3.79037e-08" ixy="-1.12079e-24" ixz="-7.78525e-24" iyy="1.98315e-08" iyz="3.82363e-15" izz="1.98316e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_8">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_13.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_13.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="6.346387994e-08 0 -0.01727752144" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="1.98315e-08" ixy="-3.82363e-15" ixz="-6.63829e-14" iyy="1.98316e-08" iyz="-1.40383e-20" izz="3.79037e-08" />
+    </inertial>
+  </link>
+  <link name="STS3215_horn_9">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_14.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/STS3215_horn_1_14.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.03317752144 -8.297971935e-19 -1.734723476e-18" rpy="0 0 0" />
+      <mass value="0.000860559" />
+      <inertia ixx="3.79037e-08" ixy="1.09242e-24" ixz="5.57205e-24" iyy="1.98315e-08" iyz="-3.82363e-15" izz="1.98316e-08" />
+    </inertial>
+  </link>
+  <link name="Trigger_SO101_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Trigger_SO101_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Trigger_SO101_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.00105448522 -0.001630188267 -0.0008514865032" rpy="0 0 0" />
+      <mass value="0.0111771" />
+      <inertia ixx="3.98347e-06" ixy="6.84557e-07" ixz="7.17617e-07" iyy="2.52188e-06" iyz="1.33169e-06" izz="3.79946e-06" />
+    </inertial>
+  </link>
+  <link name="Trigger_SO101_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Trigger_SO101_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Trigger_SO101_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.00105448522 -0.001630188267 -0.0008514865032" rpy="0 0 0" />
+      <mass value="0.0111771" />
+      <inertia ixx="3.98347e-06" ixy="6.84557e-07" ixz="7.17617e-07" iyy="2.52188e-06" iyz="1.33169e-06" izz="3.79946e-06" />
+    </inertial>
+  </link>
+  <link name="Wrist_Roll_SO101_backplate_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Wrist_Roll_SO101_backplate_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Wrist_Roll_SO101_backplate_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.003489757415 -0.0005019427924 0.0003807167936" rpy="0 0 0" />
+      <mass value="0.0398195" />
+      <inertia ixx="1.18367e-05" ixy="-3.90898e-07" ixz="-3.05296e-06" iyy="1.47004e-05" iyz="-2.64184e-07" izz="1.71463e-05" />
+    </inertial>
+  </link>
+  <link name="Wrist_Roll_SO101_backplate_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Wrist_Roll_SO101_backplate_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/Wrist_Roll_SO101_backplate_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.003489757415 -0.0005019427924 0.0003807167936" rpy="0 0 0" />
+      <mass value="0.0398195" />
+      <inertia ixx="1.18367e-05" ixy="-3.90898e-07" ixz="-3.05296e-06" iyy="1.47004e-05" iyz="-2.64184e-07" izz="1.71463e-05" />
+    </inertial>
+  </link>
+  <link name="cradle_pitch_sts3215_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-4.893305308e-08 -0.001479062287 0.0004306942875" rpy="0 0 0" />
+      <mass value="0.0112436" />
+      <inertia ixx="2.5425e-06" ixy="-1.77048e-12" ixz="1.72437e-13" iyy="2.92595e-06" iyz="1.851e-07" izz="1.93873e-06" />
+    </inertial>
+  </link>
+  <link name="cradle_pitch_sts3215_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-4.893305308e-08 -0.001479062287 0.0004306942875" rpy="0 0 0" />
+      <mass value="0.0112436" />
+      <inertia ixx="2.5425e-06" ixy="-1.77048e-12" ixz="1.72437e-13" iyy="2.92595e-06" iyz="1.851e-07" izz="1.93873e-06" />
+    </inertial>
+  </link>
+  <link name="cradle_pitch_sts3215_3">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-4.893305308e-08 -0.001479062287 0.0004306942875" rpy="0 0 0" />
+      <mass value="0.0112436" />
+      <inertia ixx="2.5425e-06" ixy="-1.77048e-12" ixz="1.72437e-13" iyy="2.92595e-06" iyz="1.851e-07" izz="1.93873e-06" />
+    </inertial>
+  </link>
+  <link name="cradle_pitch_sts3215_4">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-4.893305308e-08 -0.001479062287 0.0004306942875" rpy="0 0 0" />
+      <mass value="0.0112436" />
+      <inertia ixx="2.5425e-06" ixy="-1.77048e-12" ixz="1.72437e-13" iyy="2.92595e-06" iyz="1.851e-07" izz="1.93873e-06" />
+    </inertial>
+  </link>
+  <link name="cradle_pitch_sts3215_5">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-4.893305308e-08 -0.001479062287 0.0004306942875" rpy="0 0 0" />
+      <mass value="0.0112436" />
+      <inertia ixx="2.5425e-06" ixy="-1.77048e-12" ixz="1.72437e-13" iyy="2.92595e-06" iyz="1.851e-07" izz="1.93873e-06" />
+    </inertial>
+  </link>
+  <link name="cradle_pitch_sts3215_6">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/cradle_pitch_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-4.893305308e-08 -0.001479062287 0.0004306942875" rpy="0 0 0" />
+      <mass value="0.0112436" />
+      <inertia ixx="2.5425e-06" ixy="-1.77048e-12" ixz="1.72437e-13" iyy="2.92595e-06" iyz="1.851e-07" izz="1.93873e-06" />
+    </inertial>
+  </link>
+  <link name="passive_horn_sts3215_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="5.432519478e-07 1.384004046e-06 0" rpy="0 0 0" />
+      <mass value="0.000559125" />
+      <inertia ixx="1.55388e-08" ixy="0" ixz="-1.25587e-25" iyy="1.55388e-08" iyz="1.12104e-41" izz="3.06667e-08" />
+    </inertial>
+  </link>
+  <link name="passive_horn_sts3215_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="5.432519478e-07 1.384004046e-06 0" rpy="0 0 0" />
+      <mass value="0.000559125" />
+      <inertia ixx="1.55388e-08" ixy="0" ixz="-1.25587e-25" iyy="1.55388e-08" iyz="1.12104e-41" izz="3.06667e-08" />
+    </inertial>
+  </link>
+  <link name="passive_horn_sts3215_3">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="5.432519478e-07 1.384004046e-06 0" rpy="0 0 0" />
+      <mass value="0.000559125" />
+      <inertia ixx="1.55388e-08" ixy="0" ixz="-1.25587e-25" iyy="1.55388e-08" iyz="1.12104e-41" izz="3.06667e-08" />
+    </inertial>
+  </link>
+  <link name="passive_horn_sts3215_4">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="5.432519478e-07 1.384004046e-06 0" rpy="0 0 0" />
+      <mass value="0.000559125" />
+      <inertia ixx="1.55388e-08" ixy="0" ixz="-1.25587e-25" iyy="1.55388e-08" iyz="1.12104e-41" izz="3.06667e-08" />
+    </inertial>
+  </link>
+  <link name="passive_horn_sts3215_5">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="5.432519478e-07 1.384004046e-06 0" rpy="0 0 0" />
+      <mass value="0.000559125" />
+      <inertia ixx="1.55388e-08" ixy="0" ixz="-1.25587e-25" iyy="1.55388e-08" iyz="1.12104e-41" izz="3.06667e-08" />
+    </inertial>
+  </link>
+  <link name="passive_horn_sts3215_6">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/passive_horn_sts3215_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="5.432519478e-07 1.384004046e-06 0" rpy="0 0 0" />
+      <mass value="0.000559125" />
+      <inertia ixx="1.55388e-08" ixy="0" ixz="-1.25587e-25" iyy="1.55388e-08" iyz="1.12104e-41" izz="3.06667e-08" />
+    </inertial>
+  </link>
+  <link name="proto_yoke_slide_l19_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l19_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l19_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="9.806686637e-07 -0.001588957639 0.001533413428" rpy="0 0 0" />
+      <mass value="0.0469964" />
+      <inertia ixx="3.9915e-05" ixy="7.20367e-12" ixz="6.48076e-11" iyy="1.89165e-05" iyz="-6.46734e-06" izz="3.4901e-05" />
+    </inertial>
+  </link>
+  <link name="proto_yoke_slide_l19_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l19_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l19_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="9.806686637e-07 -0.001588957639 0.001533413428" rpy="0 0 0" />
+      <mass value="0.0469964" />
+      <inertia ixx="3.9915e-05" ixy="7.20367e-12" ixz="6.48076e-11" iyy="1.89165e-05" iyz="-6.46734e-06" izz="3.4901e-05" />
+    </inertial>
+  </link>
+  <link name="proto_yoke_slide_l76_low_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l76_low_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l76_low_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="8.11716585e-07 -0.001222138561 0.0008114715735" rpy="0 0 0" />
+      <mass value="0.0642835" />
+      <inertia ixx="0.000138349" ixy="8.90309e-11" ixz="1.41719e-12" iyy="2.41377e-05" iyz="-1.32009e-05" izz="0.000133285" />
+    </inertial>
+  </link>
+  <link name="proto_yoke_slide_l76_low_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l76_low_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l76_low_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="8.11716585e-07 -0.001222138561 0.0008114715735" rpy="0 0 0" />
+      <mass value="0.0642835" />
+      <inertia ixx="0.000138349" ixy="8.90309e-11" ixz="1.41719e-12" iyy="2.41377e-05" iyz="-1.32009e-05" izz="0.000133285" />
+    </inertial>
+  </link>
+  <link name="proto_yoke_slide_l95_1">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l95_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l95_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="3.007583565e-07 -0.001248433705 0.0006841059339" rpy="0 0 0" />
+      <mass value="0.0711301" />
+      <inertia ixx="0.000199001" ixy="-2.90743e-11" ixz="2.52933e-10" iyy="2.63759e-05" iyz="-1.63987e-05" izz="0.00019375" />
+    </inertial>
+  </link>
+  <link name="proto_yoke_slide_l95_2">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l95_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/proto_yoke_slide_l95_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="3.007583565e-07 -0.001248433705 0.0006841059339" rpy="0 0 0" />
+      <mass value="0.0711301" />
+      <inertia ixx="0.000199001" ixy="-2.90743e-11" ixz="2.52933e-10" iyy="2.63759e-05" iyz="-1.63987e-05" izz="0.00019375" />
+    </inertial>
+  </link>
+  <link name="base_link">
+    <!-- sw2robot density="1000" inertia="solidworks" -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/shoulder_bar_onepiece_1.dae" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://teleop_leader_pair_description/meshes/shoulder_bar_onepiece_1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-3.528178534e-08 0.02318793613 -0.02212046129" rpy="0 0 0" />
+      <mass value="0.254827" />
+      <inertia ixx="0.000336992" ixy="1.55408e-10" ixz="-2.52799e-10" iyy="0.00281008" iyz="4.49699e-05" izz="0.00272383" />
+    </inertial>
+  </link>
+  <joint name="shoulder_bar_onepiece_1__STS3215_case_1" type="fixed">
+    <origin xyz="0.1385968105 0.05499925857 0.01040633354" rpy="4.102069795e-10 -1.570796327 3.141592654" />
+    <parent link="base_link" />
+    <child link="STS3215_case_1" />
+  </joint>
+  <joint name="RARM_JOINT0" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.01759681047" rpy="4.102069795e-10 -1.570796327 3.141592654" />
+    <parent link="STS3215_case_1" />
+    <child link="STS3215_horn_1" />
+    <axis xyz="1 0 0" />
+    <limit lower="-3.14159" upper="0.7854" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_1__cradle_pitch_sts3215_1" type="fixed">
+    <origin xyz="0.04857526945 -3.75334568e-08 0.001435498752" rpy="0 0 -1.570796327" />
+    <parent link="STS3215_horn_1" />
+    <child link="cradle_pitch_sts3215_1" />
+  </joint>
+  <joint name="cradle_pitch_sts3215_1__STS3215_case_2" type="fixed">
+    <origin xyz="-7.789644432e-07 0.01583106409 0.001461311718" rpy="0 0 1.570796327" />
+    <parent link="cradle_pitch_sts3215_1" />
+    <child link="STS3215_case_2" />
+  </joint>
+  <joint name="RARM_JOINT1" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 0.01420318953" rpy="0 0 0" />
+    <parent link="STS3215_case_2" />
+    <child link="STS3215_horn_2" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.44346" upper="0.17453" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_2__proto_yoke_slide_l95_1" type="fixed">
+    <origin xyz="0.0874503892 2.423277622e-07 -0.02023554795" rpy="0 0 -1.570796327" />
+    <parent link="STS3215_horn_2" />
+    <child link="proto_yoke_slide_l95_1" />
+  </joint>
+  <joint name="STS3215_horn_2__passive_horn_sts3215_1" type="fixed">
+    <origin xyz="-5.432519478e-07 -1.384004046e-06 -0.03255" rpy="0 0 0" />
+    <parent link="STS3215_horn_2" />
+    <child link="passive_horn_sts3215_1" />
+  </joint>
+  <joint name="STS3215_horn_2__STS3215_case_3" type="fixed">
+    <origin xyz="0.1537528105 -7.414316992e-07 -0.03169366646" rpy="4.102069795e-10 -1.570796327 3.141592654" />
+    <parent link="STS3215_horn_2" />
+    <child link="STS3215_case_3" />
+  </joint>
+  <joint name="RARM_JOINT2" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.1889528105" rpy="4.102069795e-10 -1.570796327 3.141592654" />
+    <parent link="STS3215_case_3" />
+    <child link="STS3215_horn_3" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.5708" upper="1.55334" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_3__cradle_pitch_sts3215_2" type="fixed">
+    <origin xyz="0.2199312695 3.75334568e-08 -0.001435498754" rpy="-3.141592653 0 1.570796327" />
+    <parent link="STS3215_horn_3" />
+    <child link="cradle_pitch_sts3215_2" />
+  </joint>
+  <joint name="cradle_pitch_sts3215_2__STS3215_case_4" type="fixed">
+    <origin xyz="-7.789644432e-07 0.01583106409 0.001461311718" rpy="0 0 1.570796327" />
+    <parent link="cradle_pitch_sts3215_2" />
+    <child link="STS3215_case_4" />
+  </joint>
+  <joint name="RARM_JOINT3" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 0.01420318953" rpy="3.141592653 0 0" />
+    <parent link="STS3215_case_4" />
+    <child link="STS3215_horn_4" />
+    <axis xyz="0 0 -1" />
+    <limit lower="-1.91986" upper="0" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_4__proto_yoke_slide_l76_low_1" type="fixed">
+    <origin xyz="0.07668254397 -8.194311692e-07 0.02043050739" rpy="-3.141592653 0 1.570796327" />
+    <parent link="STS3215_horn_4" />
+    <child link="proto_yoke_slide_l76_low_1" />
+  </joint>
+  <joint name="STS3215_horn_4__passive_horn_sts3215_2" type="fixed">
+    <origin xyz="-5.432519478e-07 1.383997216e-06 0.03255" rpy="-3.141592653 0 0" />
+    <parent link="STS3215_horn_4" />
+    <child link="passive_horn_sts3215_2" />
+  </joint>
+  <joint name="STS3215_horn_4__STS3215_case_5" type="fixed">
+    <origin xyz="0.1347528105 7.414323952e-07 0.03169366646" rpy="3.141592654 1.570796327 3.141592654" />
+    <parent link="STS3215_horn_4" />
+    <child link="STS3215_case_5" />
+  </joint>
+  <joint name="RARM_JOINT4" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.1699528105" rpy="-3.141592654 -1.570796327 3.141592654" />
+    <parent link="STS3215_case_5" />
+    <child link="STS3215_horn_5" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.22173" upper="1.0472" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_5__cradle_pitch_sts3215_3" type="fixed">
+    <origin xyz="0.2009312694 -3.75334568e-08 0.001435498752" rpy="0 0 -1.570796327" />
+    <parent link="STS3215_horn_5" />
+    <child link="cradle_pitch_sts3215_3" />
+  </joint>
+  <joint name="cradle_pitch_sts3215_3__STS3215_case_6" type="fixed">
+    <origin xyz="-7.789644432e-07 0.01583106409 0.001461311718" rpy="0 0 1.570796327" />
+    <parent link="cradle_pitch_sts3215_3" />
+    <child link="STS3215_case_6" />
+  </joint>
+  <joint name="RARM_JOINT5" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 0.01420318953" rpy="0 0 0" />
+    <parent link="STS3215_case_6" />
+    <child link="STS3215_horn_6" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.41372" upper="1.48353" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_6__proto_yoke_slide_l19_1" type="fixed">
+    <origin xyz="0.04713678357 9.606492592e-07 -0.02239808602" rpy="0 0 -1.570796327" />
+    <parent link="STS3215_horn_6" />
+    <child link="proto_yoke_slide_l19_1" />
+  </joint>
+  <joint name="STS3215_horn_6__passive_horn_sts3215_3" type="fixed">
+    <origin xyz="-5.432519478e-07 -1.384004046e-06 -0.03255" rpy="0 0 0" />
+    <parent link="STS3215_horn_6" />
+    <child link="passive_horn_sts3215_3" />
+  </joint>
+  <joint name="STS3215_horn_6__STS3215_case_7" type="fixed">
+    <origin xyz="0.07795281047 -7.414316992e-07 -0.03169366646" rpy="4.102069795e-10 -1.570796327 3.141592654" />
+    <parent link="STS3215_horn_6" />
+    <child link="STS3215_case_7" />
+  </joint>
+  <joint name="RARM_JOINT6" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.1131528105" rpy="-4.102067346e-10 -1.570796327 3.141592654" />
+    <parent link="STS3215_case_7" />
+    <child link="STS3215_horn_7" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.55334" upper="1.55334" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_7__Wrist_Roll_SO101_backplate_1" type="fixed">
+    <origin xyz="0.1471707952 -0.006682803261 -0.000180725499" rpy="1.570796327 0 1.570796327" />
+    <parent link="STS3215_horn_7" />
+    <child link="Wrist_Roll_SO101_backplate_1" />
+  </joint>
+  <joint name="STS3215_horn_7__Handle_SO101_1" type="fixed">
+    <origin xyz="0.195637919 -0.04695072517 4.423648242e-06" rpy="1.570796327 0 1.570796327" />
+    <parent link="STS3215_horn_7" />
+    <child link="Handle_SO101_1" />
+  </joint>
+  <joint name="STS3215_horn_7__STS3215_case_8" type="fixed">
+    <origin xyz="0.1535567477 0.005606333537 -0.001796810469" rpy="3.14158898 0 1.570796327" />
+    <parent link="STS3215_horn_7" />
+    <child link="STS3215_case_8" />
+  </joint>
+  <joint name="RARM_GRIPPER" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.001696810471" rpy="3.141592653 -3.673205103e-06 1.570796327" />
+    <parent link="STS3215_case_8" />
+    <child link="STS3215_horn_8" />
+    <axis xyz="4e-06 0 -1" />
+    <limit lower="0" upper="1.05" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_8__Trigger_SO101_1" type="fixed">
+    <origin xyz="0.02266805768 -0.005379779161 -0.009684152171" rpy="3.14158984 -2.361090727e-06 -2.268927975" />
+    <parent link="STS3215_horn_8" />
+    <child link="Trigger_SO101_1" />
+  </joint>
+  <joint name="shoulder_bar_onepiece_1__STS3215_case_9" type="fixed">
+    <origin xyz="-0.1385968105 0.05500074143 0.01040633354" rpy="-3.141592654 -1.570796327 3.141592654" />
+    <parent link="base_link" />
+    <child link="STS3215_case_9" />
+  </joint>
+  <joint name="LARM_JOINT0" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.01759681047" rpy="3.141592654 1.570796327 3.141592654" />
+    <parent link="STS3215_case_9" />
+    <child link="STS3215_horn_9" />
+    <axis xyz="1 0 0" />
+    <limit lower="-2.98451" upper="0.95993" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_9__cradle_pitch_sts3215_4" type="fixed">
+    <origin xyz="-0.04857526945 3.753149796e-08 0.001435498752" rpy="0 0 1.570796327" />
+    <parent link="STS3215_horn_9" />
+    <child link="cradle_pitch_sts3215_4" />
+  </joint>
+  <joint name="cradle_pitch_sts3215_4__STS3215_case_10" type="fixed">
+    <origin xyz="-7.789644432e-07 0.01583106409 0.001461311718" rpy="0 0 1.570796327" />
+    <parent link="cradle_pitch_sts3215_4" />
+    <child link="STS3215_case_10" />
+  </joint>
+  <joint name="LARM_JOINT1" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 0.01420318953" rpy="0 0 -3.141592653" />
+    <parent link="STS3215_case_10" />
+    <child link="STS3215_horn_10" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.17453" upper="2.53073" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_10__proto_yoke_slide_l95_2" type="fixed">
+    <origin xyz="-0.0874503892 -2.423780743e-07 -0.02023554795" rpy="0 0 1.570796327" />
+    <parent link="STS3215_horn_10" />
+    <child link="proto_yoke_slide_l95_2" />
+  </joint>
+  <joint name="STS3215_horn_10__passive_horn_sts3215_4" type="fixed">
+    <origin xyz="5.432519472e-07 1.384004046e-06 -0.03255" rpy="0 0 -3.141592653" />
+    <parent link="STS3215_horn_10" />
+    <child link="passive_horn_sts3215_4" />
+  </joint>
+  <joint name="STS3215_horn_10__STS3215_case_11" type="fixed">
+    <origin xyz="-0.1537528105 7.414323952e-07 -0.03169366646" rpy="-3.141592654 -1.570796327 3.141592654" />
+    <parent link="STS3215_horn_10" />
+    <child link="STS3215_case_11" />
+  </joint>
+  <joint name="LARM_JOINT2" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.1889528105" rpy="3.141592654 1.570796327 3.141592654" />
+    <parent link="STS3215_case_11" />
+    <child link="STS3215_horn_11" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.5708" upper="1.5708" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_11__cradle_pitch_sts3215_5" type="fixed">
+    <origin xyz="-0.2199312694 -3.753149796e-08 -0.001435498751" rpy="3.141592653 0 -1.570796327" />
+    <parent link="STS3215_horn_11" />
+    <child link="cradle_pitch_sts3215_5" />
+  </joint>
+  <joint name="cradle_pitch_sts3215_5__STS3215_case_12" type="fixed">
+    <origin xyz="-7.789644432e-07 0.01583106409 0.001461311718" rpy="0 0 1.570796327" />
+    <parent link="cradle_pitch_sts3215_5" />
+    <child link="STS3215_case_12" />
+  </joint>
+  <joint name="LARM_JOINT3" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 0.01420318953" rpy="-3.141592653 0 -3.141592653" />
+    <parent link="STS3215_case_12" />
+    <child link="STS3215_horn_12" />
+    <axis xyz="0 0 -1" />
+    <limit lower="-1.69297" upper="0" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_12__proto_yoke_slide_l76_low_2" type="fixed">
+    <origin xyz="-0.07668254395 8.194770641e-07 0.02043050748" rpy="3.141592653 0 -1.570796327" />
+    <parent link="STS3215_horn_12" />
+    <child link="proto_yoke_slide_l76_low_2" />
+  </joint>
+  <joint name="STS3215_horn_12__passive_horn_sts3215_5" type="fixed">
+    <origin xyz="5.432519483e-07 -1.383997216e-06 0.03255" rpy="-3.141592653 0 -3.141592653" />
+    <parent link="STS3215_horn_12" />
+    <child link="passive_horn_sts3215_5" />
+  </joint>
+  <joint name="STS3215_horn_12__STS3215_case_13" type="fixed">
+    <origin xyz="-0.1347528105 -7.414330913e-07 0.03169366646" rpy="-4.102069795e-10 1.570796327 3.141592654" />
+    <parent link="STS3215_horn_12" />
+    <child link="STS3215_case_13" />
+  </joint>
+  <joint name="LARM_JOINT4" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.1699528105" rpy="4.102067346e-10 1.570796327 3.141592654" />
+    <parent link="STS3215_case_13" />
+    <child link="STS3215_horn_13" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.52018" upper="1.52367" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_13__cradle_pitch_sts3215_6" type="fixed">
+    <origin xyz="-0.2009312694 3.753149796e-08 0.001435498752" rpy="0 0 1.570796327" />
+    <parent link="STS3215_horn_13" />
+    <child link="cradle_pitch_sts3215_6" />
+  </joint>
+  <joint name="cradle_pitch_sts3215_6__STS3215_case_14" type="fixed">
+    <origin xyz="-7.789644432e-07 0.01583106409 0.001461311718" rpy="0 0 1.570796327" />
+    <parent link="cradle_pitch_sts3215_6" />
+    <child link="STS3215_case_14" />
+  </joint>
+  <joint name="LARM_JOINT5" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 0.01420318953" rpy="0 0 -3.141592653" />
+    <parent link="STS3215_case_14" />
+    <child link="STS3215_horn_14" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.39626" upper="1.41372" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_14__proto_yoke_slide_l19_2" type="fixed">
+    <origin xyz="-0.04713678357 -9.606830343e-07 -0.02239808602" rpy="0 0 1.570796327" />
+    <parent link="STS3215_horn_14" />
+    <child link="proto_yoke_slide_l19_2" />
+  </joint>
+  <joint name="STS3215_horn_14__passive_horn_sts3215_6" type="fixed">
+    <origin xyz="5.432519472e-07 1.384004046e-06 -0.03255" rpy="0 0 -3.141592653" />
+    <parent link="STS3215_horn_14" />
+    <child link="passive_horn_sts3215_6" />
+  </joint>
+  <joint name="STS3215_horn_14__STS3215_case_15" type="fixed">
+    <origin xyz="-0.07795281047 7.414323952e-07 -0.03169366646" rpy="-3.141592654 -1.570796327 3.141592654" />
+    <parent link="STS3215_horn_14" />
+    <child link="STS3215_case_15" />
+  </joint>
+  <joint name="LARM_JOINT6" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.1131528105" rpy="3.141592654 1.570796327 3.141592654" />
+    <parent link="STS3215_case_15" />
+    <child link="STS3215_horn_15" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.46608" upper="1.5708" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_15__Wrist_Roll_SO101_backplate_2" type="fixed">
+    <origin xyz="-0.1471707952 -0.006682803268 0.0001807254921" rpy="-1.570796327 0 1.570796327" />
+    <parent link="STS3215_horn_15" />
+    <child link="Wrist_Roll_SO101_backplate_2" />
+  </joint>
+  <joint name="STS3215_horn_15__Handle_SO101_2" type="fixed">
+    <origin xyz="-0.195637919 -0.0469507252 -4.423675103e-06" rpy="-1.570796327 0 1.570796327" />
+    <parent link="STS3215_horn_15" />
+    <child link="Handle_SO101_2" />
+  </joint>
+  <joint name="STS3215_horn_15__STS3215_case_16" type="fixed">
+    <origin xyz="-0.1535567477 0.005606333537 0.001796810469" rpy="-3.673205103e-06 0 1.570796327" />
+    <parent link="STS3215_horn_15" />
+    <child link="STS3215_case_16" />
+  </joint>
+  <joint name="LARM_GRIPPER" type="revolute">
+    <origin xyz="0.01459366646 -7.414323952e-07 -0.001696810471" rpy="0 3.673205103e-06 -1.570796327" />
+    <parent link="STS3215_case_16" />
+    <child link="STS3215_horn_16" />
+    <axis xyz="4e-06 0 -1" />
+    <limit lower="0" upper="1.05" effort="3" velocity="5" />
+  </joint>
+  <joint name="STS3215_horn_16__Trigger_SO101_2" type="fixed">
+    <origin xyz="-0.02266805768 -0.005379779166 0.009684152177" rpy="-2.813838359e-06 2.361090727e-06 -0.8726646784" />
+    <parent link="STS3215_horn_16" />
+    <child link="Trigger_SO101_2" />
+  </joint>
+</robot>
