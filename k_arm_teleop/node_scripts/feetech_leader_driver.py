@@ -30,6 +30,7 @@ from std_srvs.srv import Trigger
 from std_srvs.srv import TriggerResponse
 import yaml
 
+from k_arm_teleop.mapping import COUNTS_PER_REV
 from k_arm_teleop.mapping import counts_to_angle
 from k_arm_teleop.mapping import wrap_counts
 from k_arm_teleop.mapping import leader_zero_pose
@@ -37,6 +38,8 @@ from k_arm_teleop.msg import LeaderServoStatus
 from k_arm_teleop.msg import ServoState
 from k_arm_teleop.srv import SetServoDirection
 from k_arm_teleop.srv import SetServoDirectionResponse
+from k_arm_teleop.srv import MoveLeader
+from k_arm_teleop.srv import MoveLeaderResponse
 from k_arm_teleop.srv import SetString
 from k_arm_teleop.srv import SetStringResponse
 from k_arm_teleop.urdf_utils import parse_joints
@@ -44,6 +47,7 @@ from k_arm_teleop.urdf_utils import parse_joints
 
 RETRY_PERIOD = 1.0     # [s] between attempts to reopen the bus / reach a missing servo
 STATUS_PERIOD = 0.2    # [s] between servo_status messages
+MAX_MOVE_LAG = 400        # [count] (~35 deg) behind its goal while moving -> stop
 MIN_TRIGGER_TRAVEL = 100  # [count] released and pulled must be at least this far apart
 RANGE_MARGIN = 0.2     # [rad] beyond the physical range before a joint is flagged
 
@@ -117,6 +121,14 @@ class FeetechLeaderDriver(object):
         rospy.Service('calibrate_zero', Trigger, self._calibrate)
         rospy.Service('set_direction', SetServoDirection, self._set_direction)
         rospy.Service('calibrate_trigger', SetString, self._calibrate_trigger)
+        rospy.Service('move_to', MoveLeader, self._move_to)
+        rospy.Service('release', Trigger, self._release)
+        # Powered motion of the leader (move_to): None, or the plan being
+        # executed / held. Run from the spin loop, which owns the bus.
+        self.motion = None
+        self.motion_message = ''
+        self.move_torque_limit = int(rospy.get_param('~move_torque_limit', 500))
+        self.pending_release = False
 
     def _load_calibration(self):
         if not os.path.exists(self.calibration_file):
@@ -295,6 +307,107 @@ class FeetechLeaderDriver(object):
         state['errors'] += 1
         state['last_error'] = str(error)
 
+    # -- powered motion --------------------------------------------------------
+
+    def _counts_per_rad(self, joint):
+        """Signed encoder counts per radian of published angle."""
+        if self._trigger_ready(joint):
+            points = self.trigger_points[joint]
+            lower, upper = self.trigger_ranges[joint]
+            return wrap_counts(points['pulled'] - points['released']) / float(upper - lower)
+        return self.directions[joint] * COUNTS_PER_REV / (2.0 * math.pi)
+
+    def _move_to(self, request):
+        """Plan a powered move of the leader; the spin loop executes it."""
+        if len(request.name) != len(request.position):
+            return MoveLeaderResponse(False, 'name and position differ in length')
+        if not self.calibrated:
+            return MoveLeaderResponse(False, 'leader is not calibrated')
+        by_joint = {s['joint']: s for s in self.servos}
+        unknown = [n for n in request.name if n not in by_joint]
+        if unknown:
+            return MoveLeaderResponse(False, 'unknown joints {}'.format(unknown))
+        plan = {}
+        problems = []
+        for name, goal in zip(request.name, request.position):
+            servo = by_joint[name]
+            state = self.state[servo['id']]
+            if not state['connected'] or not state['tracking']:
+                problems.append('{} is not answering'.format(name))
+                continue
+            lower, upper = self.ranges[name]
+            if not lower - RANGE_MARGIN <= goal <= upper + RANGE_MARGIN:
+                problems.append('{} target {:.0f} deg is outside its range [{:.0f}, {:.0f}]'.format(
+                    name, math.degrees(goal), math.degrees(lower), math.degrees(upper)))
+                continue
+            start = float(state['raw'])
+            end = start + (goal - state['angle']) * self._counts_per_rad(name)
+            # Goals are absolute counts 0..4095: a path over the 0/4095 seam
+            # would make the servo turn the long way round (into its stop).
+            if not 0 <= end <= COUNTS_PER_REV - 1:
+                problems.append('{} would cross the encoder 0/4095 seam (count {:.0f} -> {:.0f}); '
+                                'run recenter_leader.py first'.format(name, start, end))
+                continue
+            plan[servo['id']] = (start, end)
+        if problems:
+            return MoveLeaderResponse(False, '; '.join(problems))
+        if not plan:
+            return MoveLeaderResponse(False, 'nothing to move')
+        with self.lock:
+            self.motion = {'plan': plan, 't0': None, 'duration': max(0.1, request.duration),
+                           'phase': 'moving'}
+            self.motion_message = 'moving {} joints in {:.1f} s'.format(len(plan), request.duration)
+        return MoveLeaderResponse(True, self.motion_message)
+
+    def _release(self, _request):
+        with self.lock:
+            self.pending_release = True
+        return TriggerResponse(True, 'releasing the leader (torque off)')
+
+    def _run_motion(self, now):
+        """Advance the powered move; called from the spin loop after reading positions."""
+        with self.lock:
+            motion = self.motion
+            release = self.pending_release
+            self.pending_release = False
+        if release:
+            self._torque_off('released')
+            return
+        if motion is None:
+            return
+        ids = sorted(motion['plan'])
+        if motion['t0'] is None:
+            for servo_id in ids:
+                self.bus.write_register(servo_id, 'torque_limit', self.move_torque_limit)
+            motion['t0'] = now
+        s = min(1.0, (now - motion['t0']) / motion['duration'])
+        s = s * s * (3.0 - 2.0 * s)  # smoothstep: start and stop gently
+        goals = [int(round(start + (end - start) * s)) for start, end in
+                 (motion['plan'][i] for i in ids)]
+        # a servo far behind its goal is blocked (or held): give up rather than push
+        lagging = [i for i, goal in zip(ids, goals)
+                   if abs(self.state[i]['raw'] - goal) > MAX_MOVE_LAG]
+        if lagging and motion['phase'] == 'moving':
+            self._torque_off('servos {} could not follow the move (blocked?)'.format(lagging))
+            return
+        self.bus.sync_write_positions(ids, goals)
+        if s >= 1.0 and motion['phase'] == 'moving':
+            motion['phase'] = 'holding'
+            with self.lock:
+                self.motion_message = 'holding the pose; Release to move it by hand'
+
+    def _torque_off(self, reason):
+        for servo in self.servos:
+            if self.state[servo['id']]['connected']:
+                try:
+                    self.bus.set_torque(servo['id'], False)
+                except FeetechError as error:
+                    self._mark_failed(servo, error)
+        with self.lock:
+            self.motion = None
+            self.motion_message = reason
+        rospy.loginfo('leader torque off: %s', reason)
+
     def _published_angle(self, servo):
         """Angle for servo_joint_states: held inside the range for clamp_to_range joints."""
         angle = self.state[servo['id']]['angle']
@@ -314,6 +427,9 @@ class FeetechLeaderDriver(object):
         msg.bus_error = self.bus_error
         msg.calibrated = self.calibrated
         msg.all_connected = all(st['connected'] for st in self.state.values())
+        with self.lock:
+            msg.motion = self.motion['phase'] if self.motion is not None else ''
+            msg.motion_message = self.motion_message
         for servo in self.servos:
             st = self.state[servo['id']]
             msg.servos.append(ServoState(
@@ -372,6 +488,17 @@ class FeetechLeaderDriver(object):
                             value, zero, self.directions[servo['joint']], center=reference - cal)
                     state['tracking'] = True
                     raw[servo['joint']] = value
+                if self.bus is not None:
+                    try:
+                        self._run_motion(now)
+                    except FeetechError as error:
+                        rospy.logerr('leader move failed: %s', error)
+                        self._torque_off('move failed: {}'.format(error))
+                    except (serial.SerialException, OSError) as error:
+                        self._drop_bus(error)
+                        with self.lock:
+                            self.motion = None
+                            self.motion_message = 'bus lost during the move'
                 # one servo's voltage / temperature at a time, ~1 s per servo
                 if now - last_health >= RETRY_PERIOD / len(self.servos):
                     last_health = now

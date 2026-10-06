@@ -20,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_python_setup()
 
 add_message_files(FILES LeaderServoStatus.msg ServoState.msg TeleopStatus.msg)
-add_service_files(FILES SetArmEnabled.srv SetServoDirection.srv SetString.srv)
+add_service_files(FILES MoveLeader.srv SetArmEnabled.srv SetServoDirection.srv SetString.srv)
 generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(CATKIN_DEPENDS message_runtime std_msgs)
@@ -47,6 +47,7 @@ catkin_install_python(
     node_scripts/fake_trajectory_controller.py
     node_scripts/feetech_leader_driver.py
     node_scripts/leader_display_joint_states.py
+    node_scripts/recenter_leader.py
     node_scripts/teleop_manager.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 

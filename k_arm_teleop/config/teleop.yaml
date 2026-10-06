@@ -76,6 +76,16 @@ targets:
 leader_joint_states: /teleop_leader/servo_joint_states
 leader_calibrated_topic: /teleop_leader/calibrated
 leader_calibrate_service: /teleop_leader/calibrate_zero
+leader_move:                           # powered moves of the leader (panel buttons)
+  move_service: /teleop_leader/move_to
+  release_service: /teleop_leader/release
+  status_topic: /teleop_leader/servo_status
+  velocity: 0.4                        # [rad/s] of the joint that moves most
+  min_duration: 2.0                    # [s]
+  # "Leader -> init pose": follower joint angles to bring the leader to.
+  # Joints not listed are 0 (the calibration pose, arm hanging) and the
+  # gripper is open.
+  init_pose: {}
 leader_timeout: 0.3                    # [s] without leader data -> leader_lost
 
 # Slow move from the current follower pose to the leader pose before following.

@@ -1,0 +1,7 @@
+string[] name
+float64[] position
+# [s] time to get there
+float64 duration
+---
+bool success
+string message

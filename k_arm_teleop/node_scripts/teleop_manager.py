@@ -36,6 +36,7 @@ from trajectory_msgs.msg import JointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
 from k_arm_teleop.mapping import build_arm_maps
+from k_arm_teleop.mapping import follower_to_leader
 from k_arm_teleop.mapping import clamp
 from k_arm_teleop.kinematics import rpy_to_matrix
 from k_arm_teleop.kinematics import UrdfKinematics
@@ -43,7 +44,9 @@ from k_arm_teleop.kinematics import WristMap
 from k_arm_teleop.mapping import leader_to_follower
 from k_arm_teleop.mapping import leader_zero_pose
 from k_arm_teleop.mapping import wrist_follower_joints
+from k_arm_teleop.msg import LeaderServoStatus
 from k_arm_teleop.msg import TeleopStatus
+from k_arm_teleop.srv import MoveLeader
 from k_arm_teleop.srv import SetArmEnabled
 from k_arm_teleop.srv import SetArmEnabledResponse
 from k_arm_teleop.srv import SetString
@@ -52,6 +55,8 @@ from k_arm_teleop.urdf_utils import parse_joints
 
 
 TARGETS = ('virtual', 'real')
+# [rad] the leader wrist solution must reproduce the hand rotation this well
+WRIST_SOLVE_TOLERANCE = 0.05
 IDLE = 'idle'
 APPROACHING = 'approaching'
 FOLLOWING = 'following'
@@ -181,6 +186,10 @@ class TeleopManager(object):
         self.follow = rospy.get_param('~follow')
         self.zero_pose = rospy.get_param('~zero_pose')
         self.calibrate_service = rospy.get_param('~leader_calibrate_service')
+        self.leader_move = rospy.get_param('~leader_move')
+        self.leader_motion = ''
+        rospy.Subscriber(self.leader_move['status_topic'], LeaderServoStatus,
+                         self._leader_status_callback, queue_size=1)
         self.leader_description = rospy.get_param('~leader_description',
                                                   '/teleop_leader/robot_description')
 
@@ -221,6 +230,9 @@ class TeleopManager(object):
         rospy.Service('~stop', Trigger, self._stop)
         rospy.Service('~go_zero', Trigger, self._go_zero)
         rospy.Service('~calibrate_leader_zero', Trigger, self._calibrate_leader)
+        rospy.Service('~leader_to_init', Trigger, self._leader_to_init)
+        rospy.Service('~leader_to_robot', Trigger, self._leader_to_robot)
+        rospy.Service('~leader_release', Trigger, self._leader_release)
         rospy.Service('~start_recording', Trigger, self._start_recording)
         rospy.Service('~stop_recording', Trigger, self._stop_recording)
         rospy.Service('~set_record_directory', SetString, self._set_record_directory)
@@ -406,6 +418,11 @@ class TeleopManager(object):
             if self.target == 'real' and not self.leader_calibrated:
                 return TriggerResponse(False, 'leader is not calibrated; refusing to drive the '
                                               'real robot')
+            if self.leader_motion == 'moving':
+                return TriggerResponse(False, 'the leader is still moving to its pose')
+            if self.leader_motion == 'holding':
+                # hold the leader before pressing Start: its torque goes off here
+                self._call_leader_trigger(self.leader_move['release_service'])
             for arm in self.arms.values():
                 if arm['wrist_map'] is not None:
                     arm['wrist_map'].reset()
@@ -450,6 +467,78 @@ class TeleopManager(object):
             self._set_phase(MOVING_TO_ZERO, 'moving to the zero pose ({:.2f} rad in {:.1f} s)'
                             .format(distance, duration))
             return TriggerResponse(True, self.message)
+
+    # -- powered leader moves ------------------------------------------------------
+
+    def _leader_status_callback(self, msg):
+        self.leader_motion = msg.motion
+
+    def _call_leader_trigger(self, service):
+        try:
+            rospy.wait_for_service(service, timeout=1.0)
+            return rospy.ServiceProxy(service, Trigger)()
+        except (rospy.ROSException, rospy.ServiceException) as error:
+            return TriggerResponse(False, '{} failed: {}'.format(service, error))
+
+    def _move_leader(self, follower_positions, label):
+        """Move the leader (under power) to the pose that maps to ``follower_positions``."""
+        with self.lock:
+            if self.phase in ACTIVE_PHASES:
+                return TriggerResponse(False, 'stop before moving the leader')
+            if self.leader_source != 'feetech':
+                return TriggerResponse(False, 'leader source is "{}": nothing to move'.format(
+                    self.leader_source))
+            leader_now, last = self.leader.snapshot()
+            if last is None or not self._leader_alive():
+                return TriggerResponse(False, 'no data from the leader arm')
+            targets = {}
+            for name, arm in self.arms.items():
+                if not arm['enabled']:
+                    continue
+                try:
+                    pose, wrist_error = follower_to_leader(arm, follower_positions, leader_now)
+                except KeyError as error:
+                    return TriggerResponse(False, '{}: no value for {}'.format(name, error))
+                if wrist_error > WRIST_SOLVE_TOLERANCE:
+                    return TriggerResponse(False, '{}: the leader wrist cannot reach that hand '
+                                           'rotation ({:.2f} rad off)'.format(name, wrist_error))
+                targets.update(pose)
+            targets = {n: v for n, v in targets.items() if n in leader_now}
+            if not targets:
+                return TriggerResponse(False, 'no enabled arm on the leader')
+            distance = max(abs(targets[n] - leader_now[n]) for n in targets)
+            duration = max(float(self.leader_move['min_duration']),
+                           distance / float(self.leader_move['velocity']))
+        try:
+            rospy.wait_for_service(self.leader_move['move_service'], timeout=1.0)
+            response = rospy.ServiceProxy(self.leader_move['move_service'], MoveLeader)(
+                list(targets), [targets[n] for n in targets], duration)
+        except (rospy.ROSException, rospy.ServiceException) as error:
+            return TriggerResponse(False, 'leader move failed: {}'.format(error))
+        if not response.success:
+            return TriggerResponse(False, response.message)
+        return TriggerResponse(True, 'leader -> {}: {:.2f} rad in {:.1f} s'.format(
+            label, distance, duration))
+
+    def _leader_to_init(self, _request):
+        pose = {}
+        for arm in self.arms.values():
+            for joint in [j.follower for j in arm['joints']] + wrist_follower_joints(arm):
+                pose[joint] = 0.0
+            if arm['gripper'] is not None:
+                pose[arm['gripper']['follower']] = arm['gripper']['follower_range'][0]
+        pose.update(self.leader_move.get('init_pose') or {})
+        return self._move_leader(pose, 'init pose')
+
+    def _leader_to_robot(self, _request):
+        try:
+            positions = self._follower_positions(self.target)
+        except RuntimeError as error:
+            return TriggerResponse(False, str(error))
+        return self._move_leader(positions, '{} robot pose'.format(self.target))
+
+    def _leader_release(self, _request):
+        return self._call_leader_trigger(self.leader_move['release_service'])
 
     def _calibrate_leader(self, _request):
         with self.lock:

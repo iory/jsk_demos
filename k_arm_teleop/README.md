@@ -74,6 +74,29 @@ roslaunch k_arm_teleop teleop.launch real:=true
 8. **記録**: ディレクトリを選んで `Start recording`．パネルにディレクトリ内の bag 数・合計サイズ・空き容量、
    記録中は経過時間とサイズが出る．記録トピックは `config/teleop.yaml` の `recording.topics`．
 
+### リーダーを動かす（サーボに通電）
+
+パネルの Leader arm 欄:
+
+- `Leader -> init pose`: `teleop.yaml` の `leader_move.init_pose`（K_ARM の関節角で指定．既定は全 0 = 腕を垂らした姿勢）に対応する
+  リーダーの姿勢へ動かす．
+- `Leader -> robot pose`: 選択中の target（real / virtual）の今の関節角に対応する姿勢へ動かす（K_ARM → リーダーの逆変換．
+  手首は手先の回転が一致する角度を数値で解く）．これで Start 時の approach がほぼ不要になる．
+- 移動後はその姿勢で保持する．ハンドルを持ってから `Release leader`（トルク OFF）か `Start`（保持中ならトルクを切ってから追従）．
+- 安全: トルク上限は `move_torque_limit`（既定 500/1000）、速度は `leader_move.velocity`（0.4 rad/s）．
+  移動中にサーボが指令から 400 カウント（約 35°）以上遅れたら（ぶつかった・押さえられた）即トルク OFF．
+
+**初回に 1 度だけ: エンコーダの境目をずらす**．サーボの位置指令は 0〜4095 の 1 回転なので、関節の可動域がカウントの
+0/4095 の境目をまたぐと、サーボが逆回りしてストッパーにぶつかる．ドライバはそういう移動を拒否する
+（「would cross the encoder 0/4095 seam」）．`recenter_leader.py` で各サーボの `homing_offset`（EEPROM）を書き換え、
+可動域の中央を 2048 にする．キャリブレーションファイルのカウントも同じ量だけ換算するので、キャリブレーションはそのまま使える．
+
+```bash
+# teleop.launch を止めてから（バスを占有するため）
+rosrun k_arm_teleop recenter_leader.py --arm right           # 確認のみ（dry run）
+rosrun k_arm_teleop recenter_leader.py --arm right --apply   # EEPROM と config/leader_calibration.yaml を更新
+```
+
 - リーダーのデータが `leader_timeout` 以上途切れると `leader_lost` になり送信を止める．再開は `Start`（再び approach から）．
 - 追従中のステータスに `at joint limit: ...`（K_ARM の可動域の端）、`speed-limited: ...`（速度制限）が出る．
 - 学習側の実行ノードなど、他のノードが同じコントローラに指令を送るときはテレオペを STOP しておく．

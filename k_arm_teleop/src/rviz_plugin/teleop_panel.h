@@ -44,6 +44,9 @@ private Q_SLOTS:
   void onStop();
   void onGoZero();
   void onCalibrate();
+  void onLeaderToInit();
+  void onLeaderToRobot();
+  void onLeaderRelease();
   void onBrowse();
   void onApplyDirectory();
   void onRecordToggle();
@@ -61,6 +64,7 @@ private:
   void callSetArm(const std::string& arm, bool enabled);
   void report(bool ok, const std::string& message);
   void rebuildArms();
+  bool confirmLeaderMove(const QString& where);
 
   ros::NodeHandle nh_;
   ros::Subscriber status_sub_;
@@ -86,6 +90,10 @@ private:
   QPushButton* stop_button_;
   QPushButton* zero_button_;
   QPushButton* calibrate_button_;
+  QPushButton* leader_init_button_;
+  QPushButton* leader_robot_button_;
+  QPushButton* leader_release_button_;
+  QLabel* leader_motion_label_;
   QLabel* leader_label_;
   QLabel* tracking_label_;
   QLabel* servo_summary_label_;

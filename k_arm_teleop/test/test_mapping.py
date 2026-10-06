@@ -94,3 +94,42 @@ def test_zyx_split_round_trip_and_wrist_map_zero():
                          rpy_to_matrix(*cfg['leader_base']['rpy']))
         # the calibration pose is the follower's zero pose
         assert np.allclose(list(wrist.follower_wrist(zero).values()), 0.0, atol=1e-6)
+
+
+def test_follower_to_leader_round_trip():
+    import numpy as np
+    import yaml
+
+    from k_arm_teleop.kinematics import UrdfKinematics
+    from k_arm_teleop.kinematics import WristMap
+    from k_arm_teleop.kinematics import rpy_to_matrix
+    from k_arm_teleop.mapping import follower_to_leader
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    src = os.path.join(here, '..', '..')
+    leader_urdf = UrdfKinematics(open(os.path.join(
+        src, 'teleop_leader_pair_description', 'urdf', 'teleop_leader_pair_description.urdf')).read())
+    follower_urdf = open(os.path.join(
+        src, 'k_arm_descriptions', 'urdf', 'K_ARM_DUALARM_primitive.urdf')).read()
+    limits = parse_joints(follower_urdf)
+    cfg = yaml.safe_load(open(os.path.join(here, '..', 'config', 'teleop.yaml')))
+    zero = leader_zero_pose(cfg['arms'])
+    arms = build_arm_maps(cfg['arms'])
+    rng = np.random.default_rng(0)
+    for name, arm in arms.items():
+        leader_joints = [j.leader for j in arm['joints']] + arm['wrist']['leader']
+        follower_joints = [j.follower for j in arm['joints']] + arm['wrist']['follower']
+        arm['wrist_map'] = WristMap(leader_urdf, UrdfKinematics(follower_urdf), leader_joints,
+                                    follower_joints, zero, rpy_to_matrix(*cfg['leader_base']['rpy']))
+        for _ in range(5):
+            # a follower pose well inside the limits
+            target = {j: 0.5 * float(rng.uniform(*limits[j])) for j in follower_joints}
+            target[arm['gripper']['follower']] = 0.006
+            seed = dict(zero)
+            leader, error = follower_to_leader(arm, target, seed)
+            assert error < 1e-6
+            arm['wrist_map'].reset()
+            back = leader_to_follower(arm, leader, limits, 0.0)
+            for j in follower_joints:
+                assert abs(back['arm'][j] - target[j]) < 1e-4, (name, j, back['arm'][j], target[j])
+            assert abs(back['gripper'][arm['gripper']['follower']] - 0.006) < 1e-9

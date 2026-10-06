@@ -6,3 +6,6 @@ bool calibrated
 # joint_states is published only while every servo is connected.
 bool all_connected
 ServoState[] servos
+# Leader motion under power: "" (free, torque off), "moving" or "holding".
+string motion
+string motion_message

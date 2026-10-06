@@ -98,6 +98,21 @@ class UrdfKinematics(object):
             self.link_rotation(child, positions))
 
 
+def rotation_log(rotation):
+    """Rotation vector (axis * angle) of a rotation matrix."""
+    cos = max(-1.0, min(1.0, (np.trace(rotation) - 1.0) / 2.0))
+    angle = math.acos(cos)
+    if angle < 1e-9:
+        return np.zeros(3)
+    axis = np.array([rotation[2, 1] - rotation[1, 2], rotation[0, 2] - rotation[2, 0],
+                     rotation[1, 0] - rotation[0, 1]])
+    if math.sin(angle) < 1e-6:
+        # angle ~ pi: take the axis from the diagonal
+        axis = np.sqrt(np.maximum((np.diag(rotation) + 1.0) / 2.0, 0.0))
+        return axis / np.linalg.norm(axis) * angle
+    return axis / (2.0 * math.sin(angle)) * angle
+
+
 def zyx_angles(rotation):
     """Split R = Rz(a) Ry(b) Rx(c) into (a, b, c)."""
     b = math.asin(max(-1.0, min(1.0, -rotation[2, 0])))
@@ -150,6 +165,57 @@ class WristMap(object):
     def reset(self):
         """Forget the last wrist solution (call when following restarts)."""
         self._last = None
+
+    def leader_wrist(self, follower_angles, seed, iterations=50, tolerance=1e-6):
+        """Leader wrist angles that give the hand rotation of ``follower_angles``.
+
+        The inverse of follower_wrist(): solved numerically (Gauss-Newton on
+        the rotation error), starting from ``seed`` so the leader moves to the
+        nearest solution.
+
+        Parameters
+        ----------
+        follower_angles : dict
+            ``{follower wrist joint: angle}`` (J4, J5, J6).
+        seed : dict
+            ``{leader wrist joint: angle}`` to start from, normally the leader's
+            current angles.
+
+        Returns
+        -------
+        tuple of (dict, float)
+            ``{leader wrist joint: angle}`` and the remaining rotation error [rad].
+        """
+        a, b, c = (follower_angles[n] for n in self.f_wrist)
+        follower_rel = axis_angle_to_matrix([0, 0, 1], a).dot(
+            axis_angle_to_matrix([0, 1, 0], b)).dot(axis_angle_to_matrix([1, 0, 0], c))
+        offset = self.forearm_offset
+        # follower_rel = C^T L L0^T C  =>  L = C follower_rel C^T L0
+        target = offset.dot(follower_rel).dot(offset.T).dot(self.leader_wrist_zero)
+
+        q = np.array([seed[n] for n in self.l_wrist], dtype=float)
+
+        def error(angles):
+            current = self.leader.relative_rotation(
+                self.l_wrist[0], self.l_wrist[-1], dict(zip(self.l_wrist, angles)))
+            return rotation_log(target.T.dot(current))
+
+        residual = error(q)
+        for _ in range(iterations):
+            if np.linalg.norm(residual) < tolerance:
+                break
+            jacobian = np.zeros((3, 3))
+            step = 1e-6
+            for i in range(3):
+                dq = np.zeros(3)
+                dq[i] = step
+                jacobian[:, i] = (error(q + dq) - residual) / step
+            # damped least squares, so a singular wrist does not blow up
+            update = np.linalg.solve(jacobian.T.dot(jacobian) + 1e-6 * np.eye(3),
+                                     jacobian.T.dot(residual))
+            q = q - update
+            residual = error(q)
+        return dict(zip(self.l_wrist, q)), float(np.linalg.norm(residual))
 
     def follower_wrist(self, leader_positions, limits=None, previous=None):
         """Follower wrist angles (J4, J5, J6) for the leader's current wrist.

@@ -176,3 +176,44 @@ def leader_to_follower(arm, leader_positions, limits, margin, previous=None):
         lower, upper = limits[gripper['follower']]
         gripper_targets[gripper['follower']] = clamp(value, lower, upper)
     return {'arm': arm_targets, 'gripper': gripper_targets, 'clamped': clamped}
+
+
+def follower_to_leader(arm, follower_positions, leader_seed):
+    """Leader angles that put the follower at ``follower_positions`` (inverse map).
+
+    Parameters
+    ----------
+    arm : dict
+        One entry of :func:`build_arm_maps` with ``wrist_map`` set.
+    follower_positions : dict
+        ``{follower joint: value}``.
+    leader_seed : dict
+        Current leader angles; the wrist is solved from there so the leader
+        takes the nearest equivalent pose.
+
+    Returns
+    -------
+    tuple of (dict, float)
+        ``{leader joint: angle}`` and the wrist rotation error left [rad].
+
+    Raises
+    ------
+    KeyError
+        If a follower or seed joint is missing.
+    """
+    leader = {}
+    for joint in arm['joints']:
+        leader[joint.leader] = follower_positions[joint.follower] / joint.sign + joint.leader_zero
+    wrist_error = 0.0
+    if arm.get('wrist'):
+        follower_wrist = {n: follower_positions[n] for n in arm['wrist']['follower']}
+        seed = {n: leader_seed[n] for n in arm['wrist']['leader']}
+        wrist, wrist_error = arm['wrist_map'].leader_wrist(follower_wrist, seed)
+        leader.update(wrist)
+    gripper = arm['gripper']
+    if gripper is not None and gripper['follower'] in follower_positions:
+        l0, l1 = gripper['leader_range']
+        f0, f1 = gripper['follower_range']
+        ratio = clamp((follower_positions[gripper['follower']] - f0) / (f1 - f0), 0.0, 1.0)
+        leader[gripper['leader']] = l0 + ratio * (l1 - l0)
+    return leader, wrist_error

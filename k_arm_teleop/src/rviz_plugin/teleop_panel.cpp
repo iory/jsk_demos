@@ -142,6 +142,19 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   leader->addLayout(trigger_layout_);
   leader->addWidget(tracking_label_);
   leader->addWidget(calibrate_button_);
+  // powered moves of the leader
+  leader_motion_label_ = new QLabel;
+  leader_init_button_ = new QPushButton("Leader -> init pose");
+  leader_robot_button_ = new QPushButton("Leader -> robot pose");
+  leader_release_button_ = new QPushButton("Release leader (torque off)");
+  leader_init_button_->setToolTip("Drive the leader (servos powered) to the init pose (teleop.yaml leader_move.init_pose).");
+  leader_robot_button_->setToolTip("Drive the leader to the pose matching the current joint angles of the selected target robot.");
+  QHBoxLayout* move_row = new QHBoxLayout;
+  move_row->addWidget(leader_init_button_);
+  move_row->addWidget(leader_robot_button_);
+  leader->addWidget(leader_motion_label_);
+  leader->addLayout(move_row);
+  leader->addWidget(leader_release_button_);
   leader_box->setLayout(leader);
   layout->addWidget(leader_box);
 
@@ -189,6 +202,9 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   connect(stop_button_, SIGNAL(clicked()), this, SLOT(onStop()));
   connect(zero_button_, SIGNAL(clicked()), this, SLOT(onGoZero()));
   connect(calibrate_button_, SIGNAL(clicked()), this, SLOT(onCalibrate()));
+  connect(leader_init_button_, SIGNAL(clicked()), this, SLOT(onLeaderToInit()));
+  connect(leader_robot_button_, SIGNAL(clicked()), this, SLOT(onLeaderToRobot()));
+  connect(leader_release_button_, SIGNAL(clicked()), this, SLOT(onLeaderRelease()));
   connect(browse_button_, SIGNAL(clicked()), this, SLOT(onBrowse()));
   connect(apply_dir_button_, SIGNAL(clicked()), this, SLOT(onApplyDirectory()));
   connect(dir_edit_, &QLineEdit::textEdited, this, [this]() { dir_edited_ = true; });
@@ -234,6 +250,14 @@ void TeleopPanel::refreshServos()
   else if (!st.all_connected)
     summary += "  <span style='color:#c62828'>(joint_states paused until all answer)</span>";
   servo_summary_label_->setText(summary);
+  if (st.motion.empty())
+    leader_motion_label_->setText(QString("leader: free (torque off)%1")
+                                      .arg(st.motion_message.empty() ? QString() :
+                                                                       " - " + QString::fromStdString(st.motion_message)));
+  else
+    leader_motion_label_->setText(QString("<b style='color:#ef6c00'>leader %1</b> - %2")
+                                      .arg(QString::fromStdString(st.motion),
+                                           QString::fromStdString(st.motion_message)));
 
   servo_table_->setRowCount(static_cast<int>(st.servos.size()));
   for (int row = 0; row < static_cast<int>(st.servos.size()); ++row)
@@ -421,6 +445,9 @@ void TeleopPanel::refresh()
   zero_button_->setEnabled(alive && !active);
   stop_button_->setEnabled(alive);
   calibrate_button_->setEnabled(alive && !active && s.leader_source == "feetech");
+  leader_init_button_->setEnabled(alive && !active && s.leader_source == "feetech");
+  leader_robot_button_->setEnabled(alive && !active && s.leader_source == "feetech");
+  leader_release_button_->setEnabled(alive && s.leader_source == "feetech");
 
   if (alive)
   {
@@ -574,6 +601,34 @@ void TeleopPanel::onCalibrate()
                             "Store this pose as zero?",
                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
     callTrigger("calibrate_leader_zero");
+}
+
+bool TeleopPanel::confirmLeaderMove(const QString& where)
+{
+  return QMessageBox::question(this, "Move the leader",
+                               QString("The leader arm will move under power to %1.\n"
+                                       "Keep hands and cables clear. It holds the pose afterwards; "
+                                       "hold the handle and press Release (or Start) to take over.\n\nMove it?")
+                                   .arg(where),
+                               QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes;
+}
+
+void TeleopPanel::onLeaderToInit()
+{
+  if (confirmLeaderMove("the init pose"))
+    callTrigger("leader_to_init");
+}
+
+void TeleopPanel::onLeaderToRobot()
+{
+  QString which = status_.target == "real" ? "the REAL robot's current pose" : "the virtual robot's current pose";
+  if (confirmLeaderMove(which))
+    callTrigger("leader_to_robot");
+}
+
+void TeleopPanel::onLeaderRelease()
+{
+  callTrigger("leader_release");
 }
 
 void TeleopPanel::onBrowse()
