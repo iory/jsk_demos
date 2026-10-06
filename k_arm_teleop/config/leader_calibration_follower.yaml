@@ -1,0 +1,26 @@
+# feetech_leader_driver.py
+# zero_raw: encoder count at the calibration pose.
+# direction: +1 if the URDF joint angle grows with the count, -1 otherwise.
+# trigger: counts with the gripper trigger released / pulled.
+direction:
+  RARM_GRIPPER: 1
+  RARM_JOINT0: 1
+  RARM_JOINT1: -1
+  RARM_JOINT2: -1
+  RARM_JOINT3: -1
+  RARM_JOINT4: 1
+  RARM_JOINT5: -1
+  RARM_JOINT6: -1
+trigger:
+  RARM_GRIPPER:
+    pulled: 1412
+    released: 2684
+zero_raw:
+  RARM_GRIPPER: 2121
+  RARM_JOINT0: 2816
+  RARM_JOINT1: 1308
+  RARM_JOINT2: 2042
+  RARM_JOINT3: 1422
+  RARM_JOINT4: 2105
+  RARM_JOINT5: 2071
+  RARM_JOINT6: 2048

@@ -103,7 +103,8 @@ roslaunch k_arm_teleop teleop.launch real:=true
 | `port` | （空） | リーダーのシリアルポート．空なら `leader_bus.yaml` の `port`（`/dev/k_arm_leader`） |
 | `config` | `config/teleop.yaml` | 対応・速度・記録トピック |
 | `leader_bus` | `config/leader_bus.yaml` | ポート、サーボ id、可動域 |
-| `leader_calibration` | `config/leader_calibration.yaml` | ゼロ点・向き・トリガーの保存先（パネルの操作でここが更新される） |
+| `leader_device` | `leader` | リーダーに使う腕．`leader`: `/dev/k_arm_leader` と `config/leader_calibration.yaml`．`follower`: フォロワーの腕を `/dev/k_arm_follower` と `config/leader_calibration_follower.yaml` で使う |
+| `leader_calibration` | `config/leader_calibration.yaml`（`leader_device:=follower` なら `_follower` 付き） | ゼロ点・向き・トリガーの保存先（パネルの操作でここが更新される） |
 
 サーボが見えるかの確認は feetech-cli で: `uvx --from feetech-cli feetech --port /dev/k_arm_leader scan`（id 1-8 が見えればよい）．
 基板のジャンパが USB 側になっていないと何も応答しない．
@@ -145,6 +146,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 # teleop.launch を止めてから（バスを占有するため）
 rosrun k_arm_teleop recenter_leader.py --arm right           # 確認のみ（dry run）
 rosrun k_arm_teleop recenter_leader.py --arm right --apply   # EEPROM と config/leader_calibration.yaml を更新
+rosrun k_arm_teleop recenter_leader.py --device follower      # フォロワーの腕をリーダーに使うとき
 ```
 
 - リーダーのデータが `leader_timeout` 以上途切れると `leader_lost` になり送信を止める．再開は `Start`（再び approach から）．

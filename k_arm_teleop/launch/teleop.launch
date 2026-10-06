@@ -16,15 +16,19 @@
   <arg name="leader" default="feetech" />
   <!-- which arm the leader (servo ids 1-8) drives: right or left -->
   <arg name="arm" default="right" />
+  <!-- which teleop arm hardware is the leader: leader (/dev/k_arm_leader,
+       config/leader_calibration.yaml) or follower (/dev/k_arm_follower,
+       config/leader_calibration_follower.yaml). Each has its own calibration. -->
+  <arg name="leader_device" default="leader" />
   <!-- serial device of the leader; empty: the one in leader_bus.yaml -->
-  <arg name="port" default="" />
+  <arg name="port" default="$(eval '' if arg('leader_device') == 'leader' else '/dev/k_arm_' + arg('leader_device'))" />
   <arg name="rviz" default="true" />
   <arg name="config" default="$(find k_arm_teleop)/config/teleop.yaml" />
   <arg name="leader_bus" default="$(find k_arm_teleop)/config/leader_bus.yaml" />
   <arg name="leader_servos" default="$(find k_arm_teleop)/config/leader_servos_$(arg arm).yaml" />
   <!-- zero counts, directions and trigger points of this leader; the panel's
        calibrate / flip / trigger buttons write here, so changes show up in git -->
-  <arg name="leader_calibration" default="$(find k_arm_teleop)/config/leader_calibration.yaml" />
+  <arg name="leader_calibration" default="$(eval find('k_arm_teleop') + '/config/leader_calibration' + ('' if arg('leader_device') == 'leader' else '_' + arg('leader_device')) + '.yaml')" />
   <arg name="robot_model" default="$(find k_arm_descriptions)/urdf/K_ARM_DUALARM_primitive.urdf" />
   <arg name="leader_model" default="$(find teleop_leader_pair_description)/urdf/teleop_leader_pair_description.urdf" />
   <arg name="world_frame" default="world" />

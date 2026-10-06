@@ -16,6 +16,7 @@ needs the serial bus to itself.
 
     rosrun k_arm_teleop recenter_leader.py --arm right            # show the plan
     rosrun k_arm_teleop recenter_leader.py --arm right --apply    # write EEPROM + calibration
+    rosrun k_arm_teleop recenter_leader.py --device follower      # the follower arm used as leader
 """
 
 import argparse
@@ -40,11 +41,20 @@ def parse_args():
     parser.add_argument('--arm', choices=('right', 'left'), default='right')
     parser.add_argument('--bus', default=os.path.join(config, 'leader_bus.yaml'))
     parser.add_argument('--servos', help='default: config/leader_servos_<arm>.yaml')
-    parser.add_argument('--calibration', default=os.path.join(config, 'leader_calibration.yaml'))
+    parser.add_argument('--device', default='leader',
+                        help='which arm hardware: leader (/dev/k_arm_leader, leader_calibration.yaml) '
+                             'or follower (/dev/k_arm_follower, leader_calibration_follower.yaml)')
+    parser.add_argument('--calibration', help='default: from --device')
+    parser.add_argument('--port', help='default: leader_bus.yaml for the leader, /dev/k_arm_<device> otherwise')
     parser.add_argument('--teleop', default=os.path.join(config, 'teleop.yaml'))
     parser.add_argument('--apply', action='store_true', help='write the servos and the file')
     parser.add_argument('--yes', action='store_true', help='do not ask before writing')
     args = parser.parse_args()
+    if args.calibration is None:
+        suffix = '' if args.device == 'leader' else '_' + args.device
+        args.calibration = os.path.join(config, 'leader_calibration{}.yaml'.format(suffix))
+    if args.port is None and args.device != 'leader':
+        args.port = '/dev/k_arm_' + args.device
     if args.servos is None:
         args.servos = os.path.join(config, 'leader_servos_{}.yaml'.format(args.arm))
     return args
@@ -140,7 +150,7 @@ def main():
             print('nothing written')
             return
 
-    port = bus_config.get('port') or None
+    port = args.port or bus_config.get('port') or None
     baudrate = bus_config.get('baudrate') or None
     with FeetechServoController(port=port, baudrate=baudrate) as bus:
         found = bus.scan()
