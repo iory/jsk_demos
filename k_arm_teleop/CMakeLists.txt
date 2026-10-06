@@ -52,7 +52,7 @@ catkin_install_python(
     node_scripts/teleop_manager.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-install(PROGRAMS scripts/prefix_urdf.py scripts/install_leader_udev.py
+install(PROGRAMS scripts/prefix_urdf.py scripts/install_leader_udev.py scripts/wrist_check.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(TARGETS ${PROJECT_NAME}_rviz_plugin
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
