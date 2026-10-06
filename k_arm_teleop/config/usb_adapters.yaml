@@ -1,0 +1,7 @@
+# USB serial adapters of the teleop arms, by the adapter's serial number
+# (udevadm: ID_SERIAL_SHORT). scripts/install_leader_udev.py names each one
+# /dev/k_arm_<role> from this list, on any PC, and adds an adapter given with
+# --role. The leader and the follower carry the same servos (ids 1-8), so
+# the serial number is the only way to tell their adapters apart.
+5971081343: leader
+5B90150174: follower

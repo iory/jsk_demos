@@ -13,7 +13,7 @@ source /opt/ros/one/setup.bash
 cd ~/catkin_ws && catkin config --extend /opt/ros/one && catkin build k_arm_teleop
 source ~/catkin_ws/devel/setup.bash
 sudo usermod -aG dialout $USER                                          # 初回のみ．再ログインが必要
-sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply  # アダプタを挿してサーボの電源を入れてから
+sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply  # USB アダプタを挿してから
 roslaunch k_arm_teleop teleop.launch                                    # 実機に送るなら real:=true
 ```
 
@@ -39,7 +39,7 @@ source /opt/ros/one/setup.bash
 cd ~/catkin_ws && catkin config --extend /opt/ros/one && catkin build k_arm_teleop
 source devel/setup.bash
 sudo usermod -aG dialout $USER   # シリアルポートの権限（初回のみ．再ログインが必要）
-# USB アダプタを挿してサーボの電源を入れ、/dev/k_arm_leader と /dev/k_arm_follower の名前を付ける（PC ごとに初回のみ）
+# USB アダプタを挿して、/dev/k_arm_leader と /dev/k_arm_follower の名前を付ける（PC ごとに初回のみ）
 sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply
 roslaunch k_arm_teleop teleop.launch
 ```
@@ -53,10 +53,11 @@ roslaunch k_arm_teleop teleop.launch
   `recenter_leader.py` をやり直す．
 - シリアルポートは `config/leader_bus.yaml` の `port`（既定 `/dev/k_arm_leader`）．`install_leader_udev.py` が、
   つないでいるアダプタのシリアル番号に一致する udev ルール（`/etc/udev/rules.d/99-k_arm_leader.rules`）を書き、
-  どの USB ポートに挿しても同じ名前になる．まだ名前のないアダプタそれぞれにサーボの ping（読み出しのみ）を送り、
-  リーダーのサーボ（id 1-8）が全部応答すればリーダー（`/dev/k_arm_leader`）、一部だけならフォロワー
-  （`/dev/k_arm_follower`）と判定する．サーボの電源を入れ、teleop.launch は止めておく．判定させずに決めるなら
-  `--role leader|follower`．`--apply` なしなら書くルールを表示するだけ．
+  どの USB ポートに挿しても同じ名前になる．どのアダプタがリーダー（`/dev/k_arm_leader`）かフォロワー
+  （`/dev/k_arm_follower`）かは `config/usb_adapters.yaml`（アダプタのシリアル番号 → 役割）で決まる
+  （両方とも同じサーボ id 1-8 なのでバス上では見分けられない）．載っていない新しいアダプタは一度だけ
+  `--role leader|follower` を付けて実行すると、`--apply` でこのファイルにも追記されるのでコミットする．
+  `--apply` なしなら書くルールを表示するだけ．
   `--list` で、つないでいるアダプタと書いたルールの対応を表示する．アダプタが複数あるときは
   `--device /dev/ttyACM1`、別の名前にするなら `--name k_arm_leader_left` のように指定する．
   すでに別の名前が付いたアダプタや、別のアダプタが持っている名前は上書きしない（入れ替えるときは `--replace`）．

@@ -6,16 +6,17 @@ a udev rule matching exactly that adapter, so the name follows the adapter
 whatever ttyACM number or USB port it gets. The rule also opens the device
 to the dialout group (MODE 0660), so the user only needs to be in dialout.
 
-Without --role, every connected adapter that has no name yet is pinged for
-the leader's servos (ids from config/leader_servos_right.yaml, 1-8): an
-adapter where all of them answer is the leader, one where fewer (but some)
-answer is the follower. Adapters already named by this tool keep their name.
-The servos must be powered and the port free (stop teleop.launch).
+Which adapter is which comes from config/usb_adapters.yaml (serial number ->
+role): the leader and the follower carry the same servos, so nothing on the
+bus tells them apart. Without --role, every connected adapter listed there
+is named; adapters already named by this tool keep their name. A new adapter
+needs --role once; --apply then also adds it to usb_adapters.yaml (commit
+that, and other PCs know it too).
 
     install_leader_udev.py --list                       # adapters and rules now
     install_leader_udev.py                              # show what it would write
     sudo install_leader_udev.py --apply                 # write it
-    sudo install_leader_udev.py --role follower --apply # skip the detection
+    sudo install_leader_udev.py --role follower --apply # a new adapter
     install_leader_udev.py --role leader --device /dev/ttyACM1 --name k_arm_leader_left
 
 It refuses to move a name to a different adapter without --replace, and to
@@ -27,32 +28,29 @@ import argparse
 import glob
 import os
 import re
-import select
 import subprocess
 import sys
-import termios
-import time
 
 RULE_DIR = '/etc/udev/rules.d'
 NAMES = {'leader': 'k_arm_leader', 'follower': 'k_arm_follower'}
 MARK = 'written by k_arm_teleop install_leader_udev.py'
 SERIAL = re.compile(r'ATTRS\{serial\}=="([^"]*)"')
 SYMLINK = re.compile(r'SYMLINK\+="([^"]*)"')
-CONFIG = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'config')
-BAUDRATES = {1000000: termios.B1000000, 500000: termios.B500000, 115200: termios.B115200}
+ADAPTERS = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'config',
+                                         'usb_adapters.yaml'))
+ADAPTER_LINE = re.compile(r'^\s*["\']?([^"\'\s:#]+)["\']?\s*:\s*(\w+)\s*(#.*)?$')
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--role', choices=sorted(NAMES),
-                        help='which arm the adapter drives, instead of detecting it: {}'.format(
+                        help='which arm the adapter drives, for an adapter not in {}: {}'.format(
+                            os.path.basename(ADAPTERS),
                             ', '.join('{} -> /dev/{}'.format(k, v) for k, v in sorted(NAMES.items()))))
     parser.add_argument('--device', help='serial device of the adapter (default: every one, or the '
                                          'only one with --role)')
     parser.add_argument('--name', help='name of the link under /dev (default: from the role)')
-    parser.add_argument('--baudrate', type=int, default=1000000, choices=sorted(BAUDRATES),
-                        help='servo bus speed for the detection')
     parser.add_argument('--apply', action='store_true',
                         help='write the rule(s) and reload udev (needs root)')
     parser.add_argument('--replace', action='store_true',
@@ -89,6 +87,34 @@ def properties(device):
     return props
 
 
+def known_adapters():
+    """{serial: role} from usb_adapters.yaml, read without a YAML library (sudo's python)."""
+    adapters = {}
+    if not os.path.exists(ADAPTERS):
+        return adapters
+    with open(ADAPTERS) as f:
+        for number, line in enumerate(f, 1):
+            if not line.strip() or line.lstrip().startswith('#'):
+                continue
+            match = ADAPTER_LINE.match(line)
+            if match is None or match.group(2) not in NAMES:
+                sys.exit('{}:{}: expected "<serial>: {}"'.format(
+                    ADAPTERS, number, '|'.join(sorted(NAMES))))
+            adapters[match.group(1)] = match.group(2)
+    return adapters
+
+
+def remember_adapter(serial, role):
+    """Add ``serial: role`` to usb_adapters.yaml, keeping the file's owner (written under sudo)."""
+    stat = os.stat(ADAPTERS) if os.path.exists(ADAPTERS) else None
+    with open(ADAPTERS, 'a') as f:
+        f.write('{}: {}\n'.format(serial, role))
+    if stat is not None:
+        os.chown(ADAPTERS, stat.st_uid, stat.st_gid)
+    print('added "{}: {}" to {}; commit it so other PCs know this adapter'.format(
+        serial, role, os.path.normpath(ADAPTERS)))
+
+
 def installed_rules():
     """{path: (name, serial)} for the rules this tool wrote."""
     rules = {}
@@ -105,53 +131,16 @@ def installed_rules():
     return rules
 
 
-def leader_ids():
-    """Servo ids of the leader, read from the servo file without a YAML library (sudo's python)."""
-    with open(os.path.join(CONFIG, 'leader_servos_right.yaml')) as f:
-        ids = sorted({int(i) for i in re.findall(r'\bid:\s*(\d+)', f.read())})
-    if not ids:
-        sys.exit('no servo ids in {}'.format(os.path.join(CONFIG, 'leader_servos_right.yaml')))
-    return ids
-
-
-def ping(device, ids, baudrate):
-    """Ids that answer a FEETECH (SCS protocol) PING on ``device``. Nothing is written to a servo."""
-    try:
-        fd = os.open(device, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
-    except OSError as error:
-        sys.exit('cannot open {}: {} (is teleop.launch using it?)'.format(device, error))
-    try:
-        attrs = termios.tcgetattr(fd)
-        attrs[0] = attrs[1] = attrs[3] = 0  # raw: no input / output / local processing
-        attrs[2] = termios.CS8 | termios.CREAD | termios.CLOCAL
-        attrs[4] = attrs[5] = BAUDRATES[baudrate]
-        termios.tcsetattr(fd, termios.TCSANOW, attrs)
-        found = []
-        for servo_id in ids:
-            termios.tcflush(fd, termios.TCIOFLUSH)
-            body = [servo_id, 2, 0x01]  # id, length, PING
-            os.write(fd, bytes([0xFF, 0xFF] + body + [~sum(body) & 0xFF]))
-            reply = b''
-            deadline = time.time() + 0.05
-            while len(reply) < 6 and time.time() < deadline:
-                if select.select([fd], [], [], deadline - time.time())[0]:
-                    reply += os.read(fd, 64)
-            start = reply.find(bytes([0xFF, 0xFF, servo_id]))
-            if start >= 0 and len(reply) >= start + 6:
-                found.append(servo_id)
-        return found
-    finally:
-        os.close(fd)
-
-
 def show_list():
     rules = installed_rules()
     by_serial = {serial: name for name, serial in rules.values()}
+    known = known_adapters()
     print('connected adapters:')
     for device in serial_devices():
         serial = properties(device)['ID_SERIAL_SHORT']
-        print('  {:<14} serial {:<14} {}'.format(
-            device, serial, '/dev/' + by_serial[serial] if serial in by_serial else '(no name)'))
+        print('  {:<14} serial {:<14} {:<22} {}'.format(
+            device, serial, '/dev/' + by_serial[serial] if serial in by_serial else '(no name)',
+            'listed as ' + known[serial] if serial in known else 'not in ' + os.path.basename(ADAPTERS)))
     if not serial_devices():
         print('  (none)')
     print('rules written by this tool:')
@@ -187,31 +176,24 @@ def plan_rule(device, role, name, replace):
     return path, rule
 
 
-def detect(devices, baudrate):
-    """[(device, role)] for the adapters without a name, from which servos answer."""
+def from_list(devices):
+    """[(device, role)] for the connected adapters without a name, from usb_adapters.yaml."""
     named = {serial for _, serial in installed_rules().values()}
-    expected = leader_ids()
+    known = known_adapters()
     roles = []
+    unknown = []
     for device in devices:
         serial = properties(device)['ID_SERIAL_SHORT']
         if serial in named:
             print('{} (serial {}): already named, kept'.format(device, serial))
-            continue
-        found = ping(device, expected, baudrate)
-        if found == expected:
-            role = 'leader'
-        elif found:
-            role = 'follower'
+        elif serial in known:
+            print('{} (serial {}): listed as the {}'.format(device, serial, known[serial]))
+            roles.append((device, known[serial]))
         else:
-            sys.exit('{} (serial {}): no servo answers at {} bps. Power the servos, free the port, '
-                     'or pass --role.'.format(device, serial, baudrate))
-        print('{} (serial {}): servos {} answer -> {}'.format(device, serial, found, role))
-        roles.append((device, role))
-    for role in NAMES:
-        same = [d for d, r in roles if r == role]
-        if len(same) > 1:
-            sys.exit('{} all look like the {}; plug in one at a time or pass --role --device'.format(
-                ', '.join(same), role))
+            unknown.append('{} (serial {})'.format(device, serial))
+    if unknown:
+        sys.exit('{} not in {}: say which arm it drives with --role leader|follower '
+                 '(and --device if several are connected)'.format(', '.join(unknown), ADAPTERS))
     return roles
 
 
@@ -220,13 +202,22 @@ def main():
     if args.list:
         show_list()
         return
+    new_adapters = []
     if args.role is not None:
-        targets = [(args.device or find_device(), args.role)]
+        device = args.device or find_device()
+        serial = properties(device)['ID_SERIAL_SHORT']
+        listed = known_adapters().get(serial)
+        if listed is not None and listed != args.role:
+            sys.exit('{} (serial {}) is listed as the {} in {}; fix that file if it changed'.format(
+                device, serial, listed, ADAPTERS))
+        if listed is None:
+            new_adapters.append((serial, args.role))
+        targets = [(device, args.role)]
     else:
         devices = [args.device] if args.device else serial_devices()
         if not devices:
             sys.exit('no /dev/ttyACM* or /dev/ttyUSB* found: plug the adapter in')
-        targets = detect(devices, args.baudrate)
+        targets = from_list(devices)
         if not targets:
             print('nothing to do: every connected adapter already has a name (see --list)')
             return
@@ -234,6 +225,8 @@ def main():
              for device, role in targets
              for name in [args.name or NAMES[role]]]
     if not args.apply:
+        for serial, role in new_adapters:
+            print('--apply also adds "{}: {}" to {}'.format(serial, role, os.path.normpath(ADAPTERS)))
         print('dry run; run with sudo and --apply to install')
         return
     if os.geteuid() != 0:
@@ -241,6 +234,8 @@ def main():
     for _, (path, rule) in rules:
         with open(path, 'w') as f:
             f.write(rule)
+    for serial, role in new_adapters:
+        remember_adapter(serial, role)
     subprocess.check_call(['udevadm', 'control', '--reload-rules'])
     subprocess.check_call(['udevadm', 'trigger', '--subsystem-match=tty'])
     subprocess.call(['udevadm', 'settle', '--timeout=5'])
