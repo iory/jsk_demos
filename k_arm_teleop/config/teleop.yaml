@@ -38,11 +38,29 @@ arms:
     gripper:
       enabled: true
       controller: lgripper_controller
-      # The real robot's gripper interface is not known yet, so the gripper is
-      # not sent to the real hardware until this is true (the virtual robot and
-      # the simulated stand-in of real:=false always get it). The panel says so
-      # while following the real robot.
-      send_to_real: false
+      # false keeps the real gripper still (the virtual robot and the simulated
+      # stand-in of real:=false always get the trajectory controller).
+      send_to_real: true
+      # Real gripper: a Dynamixel under effort control (torque), not a trajectory
+      # controller. Topics checked on the robot (2026-10-06): the
+      # JointGroupEffortController runs and waits for commands.
+      real:
+        command_topic: /gripper_left/joint_group_effort_controller/command   # std_msgs/Float64MultiArray
+        servo_topic: /gripper_left/dynamixel_general_control/servo            # std_msgs/Bool, set on Start
+        state_topic: /gripper_left/joint_states                               # recorded
+        close_effort: -0.4               # trigger pulled all the way: closing torque
+        # The Dynamixel runs in current mode: 0 only goes limp, so opening is a
+        # push the other way, held until the gripper stops (open end) or
+        # open_timeout, then 0 so it does not stall there.
+        open_effort: 0.3
+        release_fraction: 0.05           # trigger below this counts as let go
+        open_min_time: 0.3               # [s] push at least this long
+        open_stall_velocity: 0.05        # [rad/s] slower than this = reached the open end
+        open_timeout: 2.0                # [s] stop pushing after this anyway
+        # binary: open / close with hysteresis (the gripper is used open or closed);
+        # proportional: closing effort follows the trigger
+        mode: binary
+        binary_thresholds: [0.4, 0.6]    # trigger fraction to open below / close above
       follower: left_gripper_slider_joint
       leader: LARM_GRIPPER
       leader_range: [0.0, 1.05]        # trigger released .. pulled [rad]
@@ -62,7 +80,27 @@ arms:
     gripper:
       enabled: true
       controller: rgripper_controller
-      send_to_real: false
+      send_to_real: true
+      # Real gripper: a Dynamixel under effort control (torque), not a trajectory
+      # controller. Topics checked on the robot (2026-10-06): the
+      # JointGroupEffortController runs and waits for commands.
+      real:
+        command_topic: /gripper_right/joint_group_effort_controller/command   # std_msgs/Float64MultiArray
+        servo_topic: /gripper_right/dynamixel_general_control/servo            # std_msgs/Bool, set on Start
+        state_topic: /gripper_right/joint_states                               # recorded
+        close_effort: -0.4               # trigger pulled all the way: closing torque
+        # The Dynamixel runs in current mode: 0 only goes limp, so opening is a
+        # push the other way, held until the gripper stops (open end) or
+        # open_timeout, then 0 so it does not stall there.
+        open_effort: 0.3
+        release_fraction: 0.05           # trigger below this counts as let go
+        open_min_time: 0.3               # [s] push at least this long
+        open_stall_velocity: 0.05        # [rad/s] slower than this = reached the open end
+        open_timeout: 2.0                # [s] stop pushing after this anyway
+        # binary: open / close with hysteresis (the gripper is used open or closed);
+        # proportional: closing effort follows the trigger
+        mode: binary
+        binary_thresholds: [0.4, 0.6]    # trigger fraction to open below / close above
       follower: right_gripper_slider_joint
       leader: RARM_GRIPPER
       leader_range: [0.0, 1.05]
@@ -147,6 +185,11 @@ recording:
     - /k_arm_teleop_manager/command          # action label: joint targets sent (50 Hz)
     - /k_arm_teleop_manager/status
     - /teleop_leader/servo_joint_states      # leader readings (100 Hz)
+    # grippers (Dynamixel, effort control)
+    - /gripper_right/joint_states
+    - /gripper_right/joint_group_effort_controller/command
+    - /gripper_left/joint_states
+    - /gripper_left/joint_group_effort_controller/command
     - /virtual/joint_states
     # wrist camera (right)
     - /wrist_right_camera/color/image_raw/compressed

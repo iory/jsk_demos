@@ -91,6 +91,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 | `real` | `false` | `true`: 実機に送る．`false`: 実機の代わりに `fake_trajectory_controller.py` を起動 |
 | `real_robot_state_publisher` | `not real` | 実機側の bringup が robot_state_publisher を出していないなら `true` |
 | `arm` | `right` | リーダー（サーボ id 1-8）でどちらの腕を動かすか．`right` / `left`．サーボの割り当ては `config/leader_servos_<arm>.yaml` |
+| `gripper_only` | `false` | `true`: Real robot には腕の指令を送らず、グリッパー（トリガー）だけ動かす |
 | `leader` | `feetech` | `feetech`: サーボから読む．`gui`: スライダー（机上テスト）．`external`: 何も起動しない（bag 再生など） |
 | `rviz` | `true` | rviz（TeleopPanel 付き）を起動．`real:=true` では `rviz/teleop_real.rviz`（手首・頭カメラの画像付き） |
 | `port` | （空） | リーダーのシリアルポート．空なら `leader_bus.yaml` の `port`（`/dev/k_arm_leader`） |
@@ -190,8 +191,12 @@ rosrun k_arm_teleop recenter_leader.py --arm right --apply   # EEPROM と config
   ハンドルが真下でトリガーが前）．ランダムな姿勢で腕の関節軸と手先の回転が一致することは数値で確認済み（誤差 1e-5）．
   残る仮定は「リーダーのベースのどちらが上・前か」と「トリガーを前に向けるか」なので、ガイドと実物が同じ見た目か確認する．
 - **サーボの向き**: パネルの flip で合わせる（手順 3）．上腕ヨー（id 3）と肩ピッチ（id 1）は未確認．
-- **グリッパー**: 実機のグリッパーのインターフェースが不明なので `send_to_real: false`（実機（`real:=true`）にはグリッパーを送らず、
-  追従中のステータスにそう出る．virtual と `real:=false` の代用品には送る）．コントローラ名を合わせて `true` にする．
+- **グリッパー**: 実機は Dynamixel のトルク制御（`teleop.yaml` の `gripper.real`）．追従中、トリガーの引き量を
+  `/gripper_<side>/joint_group_effort_controller/command` のトルク（開 0 〜 閉 -0.4、`mode: proportional` は比例、
+  `binary` はしきい値でヒステリシス付き開閉）にして 50 Hz で送り、Start 時に `/gripper_<side>/dynamixel_general_control/servo`
+  を ON にする．STOP やリーダーが途切れたときは最後のトルクを保持する（つかんだ物を落とさない）．
+  行動ラベル `/k_arm_teleop_manager/command` にはグリッパーの閉じ具合（スライダー関節の値）と送ったトルク（effort）が入る．
+  virtual と `real:=false` の代用品はスライダー関節の軌道で動かす．`send_to_real: false` で実機のグリッパーを止められる．
 - 右腕の `leader_zero`・`sign` も左と同じ方法で URDF から解いた値．右で使うときもガイドと実物の見た目、向き（flip）を確認する．
 
 ## Test

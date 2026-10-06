@@ -147,3 +147,34 @@ def test_drop_links_keeps_one_tree():
     with pytest.raises(ValueError):
         drop_links(URDF, '^l1$')
     assert drop_links(URDF, '') == URDF
+
+
+def test_gripper_effort_close_open_then_relax():
+    from k_arm_teleop.mapping import gripper_effort
+
+    real = {'open_effort': 0.2, 'close_effort': -0.4, 'open_min_time': 0.3,
+            'open_stall_velocity': 0.05, 'open_timeout': 2.0}
+    state = {}
+    assert math.isclose(gripper_effort(0.5, real, state, 0.0), -0.2)
+    assert math.isclose(gripper_effort(1.0, real, state, 0.1), -0.4)
+    # let go: push open while it still moves
+    assert gripper_effort(0.0, real, state, 1.0, velocity=1.0) == 0.2
+    assert gripper_effort(0.0, real, state, 1.2, velocity=0.0) == 0.2  # before open_min_time
+    # stopped at the open end: relax and stay relaxed
+    assert gripper_effort(0.0, real, state, 1.4, velocity=0.0) == 0.0
+    assert gripper_effort(0.0, real, state, 5.0, velocity=0.0) == 0.0
+    # pull again, let go again: opens again; without velocity it relaxes on the timeout
+    assert gripper_effort(0.8, real, state, 6.0) < 0
+    assert gripper_effort(0.0, real, state, 6.1) == 0.2
+    assert gripper_effort(0.0, real, state, 8.2) == 0.0
+
+
+def test_gripper_effort_binary_hysteresis():
+    from k_arm_teleop.mapping import gripper_effort
+
+    real = {'open_effort': 0.2, 'close_effort': -0.4, 'mode': 'binary',
+            'binary_thresholds': [0.4, 0.6], 'open_timeout': 2.0}
+    state = {}
+    seen = [gripper_effort(f, real, state, t) for t, f in enumerate((0.5, 0.7, 0.5, 0.3), start=10)]
+    # 0.5 from the start: not closed yet -> opening push; 0.7 closes; 0.5 stays closed; 0.3 opens
+    assert seen == [0.2, -0.4, -0.4, 0.2]

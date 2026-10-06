@@ -30,6 +30,7 @@ from control_msgs.msg import FollowJointTrajectoryGoal
 import rospy
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Bool
+from std_msgs.msg import Float64MultiArray
 from std_srvs.srv import Trigger
 from std_srvs.srv import TriggerResponse
 from trajectory_msgs.msg import JointTrajectory
@@ -37,6 +38,8 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 
 from k_arm_teleop.mapping import build_arm_maps
 from k_arm_teleop.mapping import follower_to_leader
+from k_arm_teleop.mapping import gripper_effort
+from k_arm_teleop.mapping import trigger_fraction
 from k_arm_teleop.mapping import clamp
 from k_arm_teleop.kinematics import rpy_to_matrix
 from k_arm_teleop.kinematics import UrdfKinematics
@@ -176,6 +179,8 @@ class TeleopManager(object):
         self.arms = build_arm_maps(rospy.get_param('~arms'))
         self.targets = rospy.get_param('~targets')
         self.real_is_simulated = rospy.get_param('~real_is_simulated', False)
+        # real target: only the grippers move, no arm command goes out
+        self.gripper_only = rospy.get_param('~gripper_only', False)
         self.leader_source = rospy.get_param('~leader_source', 'feetech')
         # the K_ARM model this node maps onto (teleop.launch sets it from the URDF file)
         self.follower_description = rospy.get_param('~follower_description')
@@ -186,6 +191,25 @@ class TeleopManager(object):
         self.follow = rospy.get_param('~follow')
         self.zero_pose = rospy.get_param('~zero_pose')
         self.calibrate_service = rospy.get_param('~leader_calibrate_service')
+        # real grippers under effort control (gripper.real in teleop.yaml)
+        self.gripper_effort_pubs = {}
+        self.gripper_servo_pubs = {}
+        self.gripper_state = {}
+        self.gripper_velocity = {}
+        self.gripper_effort_sent = {}
+        if not self.real_is_simulated:
+            for name, arm in self.arms.items():
+                real = (arm['gripper'] or {}).get('real')
+                if real:
+                    self.gripper_effort_pubs[name] = rospy.Publisher(
+                        real['command_topic'], Float64MultiArray, queue_size=1)
+                    self.gripper_servo_pubs[name] = rospy.Publisher(
+                        real['servo_topic'], Bool, queue_size=1, latch=True)
+                    # velocity tells when an opening push has reached the open end
+                    rospy.Subscriber(real['state_topic'], JointState,
+                                     lambda msg, n=name: self.gripper_velocity.__setitem__(
+                                         n, msg.velocity[0] if msg.velocity else None),
+                                     queue_size=1)
         self.leader_move = rospy.get_param('~leader_move')
         self.leader_motion = ''
         rospy.Subscriber(self.leader_move['status_topic'], LeaderServoStatus,
@@ -263,6 +287,36 @@ class TeleopManager(object):
             arm['wrist_map'] = WristMap(leader, follower, leader_joints, follower_joints,
                                         zero_pose, base_rotation)
 
+    def _effort_grippers(self):
+        """(arm name, gripper) whose real effort-controlled gripper the current target drives."""
+        if self.target != 'real' or self.real_is_simulated:
+            return []
+        return [(name, arm['gripper']) for name, arm in sorted(self.arms.items())
+                if arm['enabled'] and arm['gripper'] is not None
+                and arm['gripper'].get('send_to_real', False) and 'real' in arm['gripper']]
+
+    def _send_gripper_efforts(self, msg):
+        """Trigger -> effort for the real grippers; adds them to the command message."""
+        leader, _ = self.leader.snapshot()
+        for name, gripper in self._effort_grippers():
+            try:
+                fraction = trigger_fraction(gripper, leader)
+            except KeyError:
+                continue
+            velocity = self.gripper_velocity.get(name)
+            effort = gripper_effort(fraction, gripper['real'], self.gripper_state.setdefault(name, {}),
+                                    rospy.get_time(), velocity)
+            self.gripper_effort_pubs[name].publish(Float64MultiArray(data=[effort]))
+            f0, f1 = gripper['follower_range']
+            # the action label: how far closed (as the slider joint) and the torque sent;
+            # in binary mode the open / close decision, not the raw trigger
+            if gripper['real'].get('mode', 'proportional') == 'binary':
+                fraction = 1.0 if self.gripper_state[name].get('closed', False) else 0.0
+            msg.name.append(gripper['follower'])
+            msg.position.append(f0 + fraction * (f1 - f0))
+            msg.effort.append(effort)
+            self.gripper_effort_sent[name] = effort
+
     def _grippers_held_back(self):
         """Grippers of enabled arms that the current target does not get."""
         if self.target != 'real' or self.real_is_simulated:
@@ -281,12 +335,17 @@ class TeleopManager(object):
         for arm in self.arms.values():
             if not arm['enabled']:
                 continue
-            entries.append((arm['controller'], self._arm_joints(arm), 'arm'))
+            if not (self.gripper_only and target == 'real'):
+                entries.append((arm['controller'], self._arm_joints(arm), 'arm'))
             gripper = arm['gripper']
-            # send_to_real only guards the hardware: the simulated stand-in gets
-            # the gripper like the virtual robot does
-            if gripper is not None and (target != 'real' or self.real_is_simulated
-                                        or gripper.get('send_to_real', False)):
+            # The virtual robot and the simulated stand-in move the gripper with a
+            # trajectory controller. The real gripper is effort controlled
+            # (gripper.real, see _send_gripper_efforts), unless it has no 'real'
+            # section and send_to_real asks for its trajectory controller.
+            if gripper is None:
+                continue
+            on_hardware = target == 'real' and not self.real_is_simulated
+            if not on_hardware or (gripper.get('send_to_real', False) and 'real' not in gripper):
                 entries.append((gripper['controller'], [gripper['follower']], 'gripper'))
         return entries
 
@@ -370,6 +429,10 @@ class TeleopManager(object):
         self.pending_goals = []
 
     def _slow_move(self, target, goal_positions, velocity, min_duration):
+        if not goal_positions:
+            # nothing to move (gripper_only): no need for the target's joint states
+            self.pending_goals = []
+            return 0.0, 0.0
         current = self._follower_positions(target)
         missing = [j for j in goal_positions if j not in current]
         if missing:
@@ -413,7 +476,7 @@ class TeleopManager(object):
         with self.lock:
             if self.phase in ACTIVE_PHASES:
                 return TriggerResponse(False, 'already {}'.format(self.phase))
-            if not self._controller_entries(self.target):
+            if not self._controller_entries(self.target) and not self._effort_grippers():
                 return TriggerResponse(False, 'no arm is enabled')
             if not self._leader_alive():
                 return TriggerResponse(False, 'no data from the leader arm')
@@ -422,6 +485,10 @@ class TeleopManager(object):
                                               'real robot')
             if self.leader_motion == 'moving':
                 return TriggerResponse(False, 'the leader is still moving to its pose')
+            if self.target == 'real' and not self.real_is_simulated:
+                # like the robot's GripperInterface.move_in: servo on before any torque
+                for name, gripper in self._effort_grippers():
+                    self.gripper_servo_pubs[name].publish(Bool(data=True))
             if self.leader_motion == 'holding':
                 # hold the leader before pressing Start: its torque goes off here
                 self._call_leader_trigger(self.leader_move['release_service'])
@@ -438,8 +505,11 @@ class TeleopManager(object):
                 self._set_phase(ERROR, str(error))
                 return TriggerResponse(False, str(error))
             self.approach_attempts = 1
-            self._set_phase(APPROACHING, 'moving to the leader pose ({:.2f} rad in {:.1f} s)'
-                            .format(distance, duration))
+            if not self._controller_entries(self.target):
+                self._set_phase(APPROACHING, 'gripper only: following the trigger')
+            else:
+                self._set_phase(APPROACHING, 'moving to the leader pose ({:.2f} rad in {:.1f} s)'
+                                .format(distance, duration))
             return TriggerResponse(True, self.message)
 
     def _stop(self, _request):
@@ -621,6 +691,8 @@ class TeleopManager(object):
         msg.header.stamp = rospy.Time.now()
         msg.name = sorted(command)
         msg.position = [command[n] for n in msg.name]
+        msg.effort = [0.0] * len(msg.name)
+        self._send_gripper_efforts(msg)
         self.command_pub.publish(msg)
 
     def _step(self, dt):
@@ -650,7 +722,8 @@ class TeleopManager(object):
                 self._set_phase(ERROR, state)
                 return
             targets = self._leader_targets()
-            gap = max(abs(targets[j] - follower.get(j, float('inf'))) for j in targets)
+            # nothing to approach (gripper_only: the effort gripper follows at once)
+            gap = max([abs(targets[j] - follower.get(j, float('inf'))) for j in targets] or [0.0])
             if gap <= self.approach['tolerance']:
                 self.last_command = {j: follower[j] for j in targets}
                 self._set_phase(FOLLOWING, 'following the leader')
@@ -668,6 +741,8 @@ class TeleopManager(object):
             self._stream(self._leader_targets(), dt)
             # say which joints the leader drives past the robot's limits
             notes = []
+            if self.gripper_only and self.target == 'real':
+                notes.append('gripper only: the arm is not commanded')
             held_back = self._grippers_held_back()
             if held_back:
                 notes.append('gripper not sent to the real robot (send_to_real: false): {}'.format(

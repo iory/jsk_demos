@@ -217,3 +217,74 @@ def follower_to_leader(arm, follower_positions, leader_seed):
         ratio = clamp((follower_positions[gripper['follower']] - f0) / (f1 - f0), 0.0, 1.0)
         leader[gripper['leader']] = l0 + ratio * (l1 - l0)
     return leader, wrist_error
+
+
+def trigger_fraction(gripper, leader_positions):
+    """How far the leader trigger is pulled, 0 (released) .. 1 (pulled).
+
+    Raises
+    ------
+    KeyError
+        If the trigger has not been read.
+    """
+    l0, l1 = gripper['leader_range']
+    return clamp((leader_positions[gripper['leader']] - l0) / (l1 - l0), 0.0, 1.0)
+
+
+def gripper_effort(fraction, real, state, now, velocity=None):
+    """Effort command of an effort-controlled (current mode) gripper.
+
+    Zero effort only lets the gripper go limp where it is, so opening needs a
+    push the other way: when the trigger is let go, ``open_effort`` is applied
+    until the gripper stops moving (|velocity| below ``open_stall_velocity``
+    after ``open_min_time``) or ``open_timeout`` passes, then the effort drops
+    to 0 so it does not stall against the open end.
+
+    Parameters
+    ----------
+    fraction : float
+        Trigger pulled, 0 .. 1.
+    real : dict
+        The gripper's ``real`` section of teleop.yaml.
+    state : dict
+        Per-gripper memory, updated in place ('closed', 'opening_since').
+        Start with ``{}``.
+    now : float
+        Current time [s].
+    velocity : float or None
+        Gripper joint velocity [rad/s] if known.
+
+    Returns
+    -------
+    float
+        The effort to send.
+    """
+    open_effort = float(real.get('open_effort', 0.2))
+    close_effort = float(real['close_effort'])
+    release = float(real.get('release_fraction', 0.05))
+    if real.get('mode', 'proportional') == 'binary':
+        low, high = real.get('binary_thresholds', [0.4, 0.6])
+        if fraction >= high:
+            state['closed'] = True
+        elif fraction <= low:
+            state['closed'] = False
+        wants_close = state.get('closed', False)
+        close_command = close_effort
+    else:
+        wants_close = fraction > release
+        close_command = close_effort * fraction
+    if wants_close:
+        state['opening_since'] = None
+        state['opened'] = False
+        return close_command
+    if state.get('opened', False):
+        return 0.0
+    if state.get('opening_since') is None:
+        state['opening_since'] = now
+    elapsed = now - state['opening_since']
+    stalled = (velocity is not None and elapsed >= float(real.get('open_min_time', 0.3))
+               and abs(velocity) < float(real.get('open_stall_velocity', 0.05)))
+    if stalled or elapsed >= float(real.get('open_timeout', 2.0)):
+        state['opened'] = True
+        return 0.0
+    return open_effort
