@@ -19,6 +19,10 @@ direction:
   RARM_JOINT4: -1
   RARM_JOINT5: -1
   RARM_JOINT6: -1
+trigger:
+  RARM_GRIPPER:
+    pulled: 3107
+    released: 218
 zero_raw:
   LARM_GRIPPER: 3639
   LARM_JOINT0: 3523
