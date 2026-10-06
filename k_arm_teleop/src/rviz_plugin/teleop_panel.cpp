@@ -140,6 +140,9 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   servo_table_->verticalHeader()->setDefaultSectionSize(servo_table_->fontMetrics().height() + 6);
   servo_table_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   servo_table_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  // wrap long status lines rather than widen the dock past the screen
+  for (QLabel* label : { leader_label_, tracking_label_, servo_summary_label_ })
+    label->setWordWrap(true);
   leader->addWidget(leader_label_);
   leader->addWidget(servo_summary_label_);
   leader->addWidget(servo_table_);
@@ -149,6 +152,7 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   leader->addWidget(calibrate_button_);
   // powered moves of the leader
   leader_motion_label_ = new QLabel;
+  leader_motion_label_->setWordWrap(true);
   leader_init_button_ = new QPushButton("Leader -> init pose");
   leader_robot_button_ = new QPushButton("Leader -> robot pose");
   leader_release_button_ = new QPushButton("Release leader (torque off)");
@@ -217,7 +221,8 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   policy_start_button_ = new QPushButton("Start picking");
   policy_start_button_->setToolTip("/kpick_policy/start: pick the detected apple nearest the image centre.");
   policy_stop_button_ = new QPushButton("Stop picking");
-  policy_stop_button_->setStyleSheet("background-color: #c62828; color: white; font-weight: bold;");
+  // red only while it can be pressed, so a disabled button does not look live
+  policy_stop_button_->setStyleSheet("QPushButton:enabled { background-color: #c62828; color: white; font-weight: bold; }");
   policy->addWidget(policy_start_button_, 4, 0, 1, 2);
   policy->addWidget(policy_stop_button_, 4, 2);
   policy_label_ = new QLabel;
@@ -492,7 +497,7 @@ void TeleopPanel::refreshPolicy()
   bool running = alive && !p.policy.empty();
   bool teleop_active = have_status_ && (status_.phase == "approaching" || status_.phase == "following" ||
                                         status_.phase == "moving_to_zero");
-  train_button_->setEnabled(alive && !p.training && !(have_status_ && status_.recording));
+  train_button_->setEnabled(alive && !p.training && have_status_ && !status_.recording && status_.bag_count > 0);
   cancel_train_button_->setEnabled(alive && p.training);
   result_combo_->setEnabled(alive && !running);
   report_button_->setEnabled(result_combo_->count() > 0);
