@@ -53,6 +53,7 @@ catkin_install_python(
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(PROGRAMS scripts/prefix_urdf.py scripts/install_leader_udev.py scripts/wrist_check.py
+  scripts/stream_test.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(TARGETS ${PROJECT_NAME}_rviz_plugin
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
