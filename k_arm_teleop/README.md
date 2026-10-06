@@ -53,7 +53,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 | `rviz` | `true` | rviz（TeleopPanel 付き）を起動 |
 | `config` | `config/teleop.yaml` | 対応・速度・記録トピック |
 | `leader_bus` | `config/leader_bus.yaml` | ポート、サーボ id、可動域 |
-| `leader_calibration` | `~/.ros/k_arm_teleop/leader_calibration.yaml` | ゼロ点・向き・トリガーの保存先 |
+| `leader_calibration` | `config/leader_calibration.yaml` | ゼロ点・向き・トリガーの保存先（パネルの操作でここが更新される） |
 
 サーボが見えるかの確認は feetech-cli で: `cd ~/src/github.com/iory/feetech-cli && uv run feetech scan`（id 1-8 が見えればよい）．
 基板のジャンパが USB 側になっていないと何も応答しない．
@@ -63,7 +63,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 1. **サーボの確認**: パネルの Leader arm の表で 8/8 servos・電圧・温度を確認．
 2. **リーダーのキャリブレーション（初回、または向きを変えたとき）**: rviz の薄いリーダーモデル（Calibration guide）と同じ姿勢、
    つまり重力に任せて腕・肘・手首・ハンドルをまっすぐ真下に垂らし、トリガーを離した姿勢（= K_ARM のゼロ姿勢）で
-   `Calibrate leader zero`．`~/.ros/k_arm_teleop/leader_calibration.yaml` に保存される（サーボの EEPROM は書かない）．
+   `Calibrate leader zero`．`config/leader_calibration.yaml` に保存される（サーボの EEPROM は書かない）．
    未キャリブレーションの間は real に Start できない．
 3. **向きの確認**: 1 関節ずつ動かし、rviz のリーダーモデルが実物と同じ向きに動かない関節は表の `flip`．
    上腕ヨー（id 3）は肘を曲げた状態で回すと分かりやすい．角度がオレンジ = 可動域外（向きかキャリブレーションの誤り）．
@@ -106,7 +106,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
   - `leader_base`: リーダーのベース → K_ARM の向き（対応計算と rviz 表示の両方で使う）と表示位置．
   - `follow`: 50 Hz、到達時間 0.04 s（遅れ約 50〜70 ms）．`max_velocity` は送り先・関節ごと（virtual 10 rad/s、
     real は腕 1.5、手首 J4 5 / J5・J6 3 rad/s）．
-- `~/.ros/k_arm_teleop/leader_calibration.yaml`: `zero_raw`（ゼロ点）、`direction`（flip の結果）、`trigger`（2 点）．
+- `config/leader_calibration.yaml`: `zero_raw`（ゼロ点）、`direction`（flip の結果）、`trigger`（2 点）．リーダーのハードウェア固有の値．
   左右で 1 ファイルを共有し、保存時は今つないでいない腕の値を残す（右でキャリブレーションしても左の値は消えない）
 
 ### 未確認の点（実機で要確認）
