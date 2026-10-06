@@ -91,6 +91,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 | `real` | `false` | `true`: 実機に送る．`false`: 実機の代わりに `fake_trajectory_controller.py` を起動 |
 | `real_robot_state_publisher` | `not real` | 実機側の bringup が robot_state_publisher を出していないなら `true` |
 | `arm` | `right` | リーダー（サーボ id 1-8）でどちらの腕を動かすか．`right` / `left`．サーボの割り当ては `config/leader_servos_<arm>.yaml` |
+| `wrist_only` | `false` | `true`: 手首（とグリッパー）だけリーダーに追従．肩・肘は Start 時のロボットの姿勢で固定（virtual でも同じ） |
 | `gripper_only` | `false` | `true`: Real robot には腕の指令を送らず、グリッパー（トリガー）だけ動かす |
 | `leader` | `feetech` | `feetech`: サーボから読む．`gui`: スライダー（机上テスト）．`external`: 何も起動しない（bag 再生など） |
 | `rviz` | `true` | rviz（TeleopPanel 付き）を起動．`real:=true` では `rviz/teleop_real.rviz`（手首・頭カメラの画像付き） |

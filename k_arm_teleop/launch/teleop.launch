@@ -4,6 +4,9 @@
   <arg name="real" default="false" />
   <!-- with the Real robot target only the grippers move; no arm command is sent -->
   <arg name="gripper_only" default="false" />
+  <!-- only the wrists (and grippers) follow the leader; shoulder and elbow hold the pose
+       the robot had at Start (any target) -->
+  <arg name="wrist_only" default="false" />
   <!-- robot_state_publisher for the real robot; turn off if the robot's own bringup runs one. -->
   <arg name="real_robot_state_publisher" default="$(eval not arg('real'))" />
   <!-- set /robot_description to the K_ARM model; off with real:=true so the robot's own one stays -->
@@ -119,6 +122,7 @@
     <param name="real_is_simulated" value="$(eval not arg('real'))" />
     <param name="leader_source" value="$(arg leader)" />
     <param name="gripper_only" value="$(arg gripper_only)" />
+    <param name="wrist_only" value="$(arg wrist_only)" />
     <!-- joint limits and wrist kinematics of the follower, independent of /robot_description -->
     <param name="follower_description" textfile="$(arg robot_model)" />
     <!-- only the arm the leader is wired to starts enabled (the panel can change it) -->

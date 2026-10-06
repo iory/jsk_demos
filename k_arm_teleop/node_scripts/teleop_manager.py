@@ -181,6 +181,9 @@ class TeleopManager(object):
         self.real_is_simulated = rospy.get_param('~real_is_simulated', False)
         # real target: only the grippers move, no arm command goes out
         self.gripper_only = rospy.get_param('~gripper_only', False)
+        # only the wrists follow the leader; shoulder and elbow stay where Start found them
+        self.wrist_only = rospy.get_param('~wrist_only', False)
+        self.held_positions = {}
         self.leader_source = rospy.get_param('~leader_source', 'feetech')
         # the K_ARM model this node maps onto (teleop.launch sets it from the URDF file)
         self.follower_description = rospy.get_param('~follower_description')
@@ -386,7 +389,9 @@ class TeleopManager(object):
                 mapped.update(result['gripper'])
                 clamped.extend(result['clamped'])
         commanded = [j for _, joints, _ in self._controller_entries(self.target) for j in joints]
-        self.clamped = [j for j in clamped if j in commanded]
+        # wrist_only: the arm joints keep the robot's pose captured at Start
+        mapped.update(self.held_positions)
+        self.clamped = [j for j in clamped if j in commanded and j not in self.held_positions]
         return {j: mapped[j] for j in commanded}
 
     def _follower_positions(self, target):
@@ -496,6 +501,16 @@ class TeleopManager(object):
                 if arm['wrist_map'] is not None:
                     arm['wrist_map'].reset()
             self.last_command = {}
+            self.held_positions = {}
+            if self.wrist_only and self._controller_entries(self.target):
+                try:
+                    robot = self._follower_positions(self.target)
+                    self.held_positions = {
+                        j.follower: robot[j.follower]
+                        for arm in self.arms.values() if arm['enabled'] for j in arm['joints']}
+                except (RuntimeError, KeyError) as error:
+                    self._set_phase(ERROR, 'wrist_only needs the robot pose: {}'.format(error))
+                    return TriggerResponse(False, self.message)
             try:
                 self._check_servers(self.target)
                 distance, duration = self._slow_move(
@@ -743,6 +758,8 @@ class TeleopManager(object):
             notes = []
             if self.gripper_only and self.target == 'real':
                 notes.append('gripper only: the arm is not commanded')
+            elif self.held_positions:
+                notes.append('wrist only: shoulder / elbow held')
             held_back = self._grippers_held_back()
             if held_back:
                 notes.append('gripper not sent to the real robot (send_to_real: false): {}'.format(
