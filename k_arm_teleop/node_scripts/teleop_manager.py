@@ -250,11 +250,19 @@ class TeleopManager(object):
             arm['wrist_map'] = WristMap(leader, follower, leader_joints, follower_joints,
                                         zero_pose, base_rotation)
 
+    def _grippers_held_back(self):
+        """Grippers of enabled arms that the current target does not get."""
+        if self.target != 'real' or self.real_is_simulated:
+            return []
+        return [arm['gripper']['follower'] for arm in self.arms.values()
+                if arm['enabled'] and arm['gripper'] is not None
+                and not arm['gripper'].get('send_to_real', False)]
+
     def _controller_entries(self, target):
         """[(controller, joints, kind)] that are commanded on ``target``.
 
         kind is 'arm' or 'gripper'. A gripper with send_to_real false is left
-        out on the real target.
+        out on the real robot (not on its simulated stand-in).
         """
         entries = []
         for arm in self.arms.values():
@@ -262,7 +270,10 @@ class TeleopManager(object):
                 continue
             entries.append((arm['controller'], self._arm_joints(arm), 'arm'))
             gripper = arm['gripper']
-            if gripper is not None and (target != 'real' or gripper.get('send_to_real', False)):
+            # send_to_real only guards the hardware: the simulated stand-in gets
+            # the gripper like the virtual robot does
+            if gripper is not None and (target != 'real' or self.real_is_simulated
+                                        or gripper.get('send_to_real', False)):
                 entries.append((gripper['controller'], [gripper['follower']], 'gripper'))
         return entries
 
@@ -555,6 +566,10 @@ class TeleopManager(object):
             self._stream(self._leader_targets(), dt)
             # say which joints the leader drives past the robot's limits
             notes = []
+            held_back = self._grippers_held_back()
+            if held_back:
+                notes.append('gripper not sent to the real robot (send_to_real: false): {}'.format(
+                    ', '.join(held_back)))
             if self.clamped:
                 notes.append('at joint limit: {}'.format(', '.join(self.clamped)))
             if self.speed_limited:

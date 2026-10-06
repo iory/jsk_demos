@@ -38,8 +38,10 @@ arms:
     gripper:
       enabled: true
       controller: lgripper_controller
-      # The real robot's gripper interface is not known yet, so the gripper
-      # is only commanded on the virtual robot until this is set to true.
+      # The real robot's gripper interface is not known yet, so the gripper is
+      # not sent to the real hardware until this is true (the virtual robot and
+      # the simulated stand-in of real:=false always get it). The panel says so
+      # while following the real robot.
       send_to_real: false
       follower: left_gripper_slider_joint
       leader: LARM_GRIPPER
