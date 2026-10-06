@@ -72,7 +72,7 @@ QString phaseColor(const std::string& phase)
 }  // namespace
 
 TeleopPanel::TeleopPanel(QWidget* parent)
-  : rviz::Panel(parent), have_servo_status_(false), have_status_(false), dir_edited_(false)
+  : rviz::Panel(parent), have_servo_status_(false), have_status_(false), dir_edited_(false), blink_(0)
 {
   QVBoxLayout* layout = new QVBoxLayout;
 
@@ -174,8 +174,11 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   bag_stats_label_ = new QLabel;
   current_bag_label_ = new QLabel;
   current_bag_label_->setWordWrap(true);
-  record->addWidget(bag_stats_label_, 2, 0, 1, 4);
-  record->addWidget(current_bag_label_, 3, 0, 1, 4);
+  record_warning_label_ = new QLabel;
+  record_warning_label_->setWordWrap(true);
+  record->addWidget(record_warning_label_, 2, 0, 1, 4);
+  record->addWidget(bag_stats_label_, 3, 0, 1, 4);
+  record->addWidget(current_bag_label_, 4, 0, 1, 4);
   record_box->setLayout(record);
   layout->addWidget(record_box);
 
@@ -466,6 +469,23 @@ void TeleopPanel::refresh()
   browse_button_->setEnabled(alive && !s.recording);
   apply_dir_button_->setEnabled(alive && !s.recording);
   record_button_->setEnabled(alive);
+  // Recording without action labels, or following without recording, is the
+  // usual way an episode is lost: make both loud.
+  ++blink_;
+  bool following = alive && s.phase == "following";
+  QString warning;
+  if (alive && following && !s.recording)
+    warning = "<b style='color:#ef6c00'>following but NOT recording</b>";
+  else if (alive && s.recording && !following)
+    warning = QString("<b style='color:#c62828'>recording without action labels</b> (teleop is %1: "
+                      "/k_arm_teleop_manager/command is only published while following)")
+                  .arg(QString::fromStdString(s.phase));
+  if (alive && s.recording && s.target != "real")
+    warning += QString(warning.isEmpty() ? "" : "<br>") +
+               "<span style='color:#ef6c00'>target is virtual: the real robot is not moving</span>";
+  record_warning_label_->setText(warning);
+  record_warning_label_->setVisible(!warning.isEmpty());
+
   if (alive && s.recording)
   {
     record_button_->setText("Stop recording");
@@ -477,7 +497,10 @@ void TeleopPanel::refresh()
   else
   {
     record_button_->setText("Start recording");
-    record_button_->setStyleSheet("");
+    // blink while following without recording
+    record_button_->setStyleSheet(following && (blink_ / 3) % 2 == 0 ?
+                                      "background-color: #ef6c00; color: white; font-weight: bold;" :
+                                      "");
     current_bag_label_->setText("not recording");
   }
   if (alive)
@@ -652,6 +675,20 @@ void TeleopPanel::onApplyDirectory()
 
 void TeleopPanel::onRecordToggle()
 {
+  if (!status_.recording && have_status_)
+  {
+    QStringList problems;
+    if (status_.phase != "following")
+      problems << QString("Teleop is %1, not following: the bag will have no action labels "
+                          "(/k_arm_teleop_manager/command is only published while following).")
+                      .arg(QString::fromStdString(status_.phase));
+    if (status_.target != "real")
+      problems << "The target is the virtual robot: the real robot is not moving.";
+    if (!problems.isEmpty() &&
+        QMessageBox::warning(this, "Start recording", problems.join("\n\n") + "\n\nRecord anyway?",
+                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+      return;
+  }
   callTrigger(status_.recording ? "stop_recording" : "start_recording");
 }
 

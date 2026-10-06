@@ -106,6 +106,8 @@ private:
   QPushButton* record_button_;
   QLabel* bag_stats_label_;
   QLabel* current_bag_label_;
+  QLabel* record_warning_label_;
+  int blink_;
   QLabel* result_label_;
   QTimer* timer_;
 };
