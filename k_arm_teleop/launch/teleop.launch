@@ -11,6 +11,8 @@
   <arg name="leader" default="feetech" />
   <!-- which arm the leader (servo ids 1-8) drives: right or left -->
   <arg name="arm" default="right" />
+  <!-- serial device of the leader; empty: the one in leader_bus.yaml -->
+  <arg name="port" default="" />
   <arg name="rviz" default="true" />
   <arg name="config" default="$(find k_arm_teleop)/config/teleop.yaml" />
   <arg name="leader_bus" default="$(find k_arm_teleop)/config/leader_bus.yaml" />
@@ -56,6 +58,7 @@
           if="$(eval leader == 'feetech')" output="screen">
       <rosparam command="load" file="$(arg leader_bus)" />
       <rosparam command="load" file="$(arg leader_servos)" />
+      <param name="port" value="$(arg port)" if="$(eval arg('port') != '')" />
       <rosparam command="load" file="$(arg config)" />
       <param name="calibration_file" value="$(arg leader_calibration)" />
       <remap from="joint_states" to="servo_joint_states" />

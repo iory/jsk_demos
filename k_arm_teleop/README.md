@@ -15,6 +15,26 @@ feetech_leader_driver.py ──/teleop_leader/servo_joint_states──> teleop_m
 | virtual | `/virtual/<controller>`（`fake_trajectory_controller.py`） | 半透明の K_ARM (virtual) |
 | real | `/<controller>`（実機の JointTrajectoryController） | K_ARM (real) |
 
+## 別の環境で使う
+
+```bash
+mkdir -p ~/catkin_ws/src && cd ~/catkin_ws/src
+git clone -b k-imitation-demo https://github.com/iory/jsk_demos.git
+git clone -b uv https://github.com/iory/catkin_virtualenv.git   # uv 対応版（標準版ではない）
+source /opt/ros/one/setup.bash
+cd ~/catkin_ws && catkin config --extend /opt/ros/one && catkin build k_arm_teleop
+source devel/setup.bash
+sudo usermod -aG dialout $USER   # シリアルポートの権限（初回のみ．再ログインが必要）
+roslaunch k_arm_teleop teleop.launch
+```
+
+- ビルド時に uv が feetech-cli を PyPI から取るので、ネットワークが必要．
+- `config/leader_calibration.yaml`（ゼロ点・向き・トリガー）は**このリーダーの個体**の値．同じリーダーなら別の PC でも
+  そのまま使える（サーボ側の `homing_offset` は EEPROM に残っている）．別のリーダーを使うときはキャリブレーションと
+  `recenter_leader.py` をやり直す．
+- シリアルポートは `config/leader_bus.yaml` の `port`（このリーダーの USB アダプタの `/dev/serial/by-id/...`）．
+  別のアダプタなら `teleop.launch port:=/dev/ttyACM0` などで指定する．
+
 ## Build
 
 Python の依存（feetech-cli）は `catkin_virtualenv`（uv）で入る．`catkin_make` ではなく `catkin build`．

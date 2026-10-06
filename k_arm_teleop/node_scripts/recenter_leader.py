@@ -7,7 +7,9 @@ servo turn the long way round, into its mechanical stop, so
 feetech_leader_driver.py refuses such moves. This tool rewrites each
 servo's ``homing_offset`` (EEPROM) so the middle of the joint's range reads
 2048, and converts the counts stored in the calibration file (zero_raw,
-trigger points) by the same amount, so the calibration stays valid.
+trigger points) by the same amount, so the calibration stays valid. The
+counts stored for the other arm under the same servo ids are converted
+too: it is the same hardware.
 
 Dry run by default; ``--apply`` writes. Stop teleop.launch first: the tool
 needs the serial bus to itself.
@@ -151,9 +153,21 @@ def main():
             before, after = shift_servo(bus, servo['id'], shift)
             print('servo {} ({}): reads {} -> {}'.format(servo['id'], servo['joint'], before, after))
 
-    for servo, shift in plan:
-        joint = servo['joint']
-        calibration['zero_raw'][joint] = (calibration['zero_raw'][joint] - shift) % COUNTS
+    # The offset moves every reading of a servo, whichever arm its counts were
+    # stored for: shift the entries of both servo files that use these ids.
+    shift_by_id = {servo['id']: shift for servo, shift in plan}
+    config = os.path.dirname(args.servos)
+    joints = []
+    for side in ('right', 'left'):
+        path = os.path.join(config, 'leader_servos_{}.yaml'.format(side))
+        if os.path.exists(path):
+            joints += [(s['joint'], s['id']) for s in load(path)['servos']]
+    for joint, servo_id in joints:
+        shift = shift_by_id.get(servo_id, 0)
+        if not shift:
+            continue
+        if joint in (calibration.get('zero_raw') or {}):
+            calibration['zero_raw'][joint] = (calibration['zero_raw'][joint] - shift) % COUNTS
         trigger = (calibration.get('trigger') or {}).get(joint)
         if trigger:
             for point in list(trigger):
