@@ -1,9 +1,11 @@
 # feetech_leader_driver.py: servos of the leader arm(s), base to tip.
-# The leader's own USB adapter by serial number, so the name does not change
-# with the port it is plugged into (find others in /dev/serial/by-id/).
+# Name given to the leader's USB adapter by scripts/install_leader_udev.py
+# (a udev rule matching the adapter's serial number), so it does not depend
+# on the ttyACM number or USB port. Without the rule, use the adapter's
+# /dev/serial/by-id/... path, or teleop.launch port:=/dev/ttyACM0.
 # "" picks the first plausible USB serial adapter: avoid that on a robot PC
-# with other serial devices. Override with teleop.launch port:=...
-port: /dev/serial/by-id/usb-1a86_USB_Single_Serial_5971081343-if00
+# with other serial devices.
+port: /dev/k_arm_leader
 baudrate: 1000000                      # 0 -> probe every speed
 rate: 100.0                            # [Hz]
 torque_off_on_start: true              # the leader is moved by hand

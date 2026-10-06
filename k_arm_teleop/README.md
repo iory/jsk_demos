@@ -25,6 +25,8 @@ source /opt/ros/one/setup.bash
 cd ~/catkin_ws && catkin config --extend /opt/ros/one && catkin build k_arm_teleop
 source devel/setup.bash
 sudo usermod -aG dialout $USER   # シリアルポートの権限（初回のみ．再ログインが必要）
+# リーダーの USB アダプタを挿して、/dev/k_arm_leader という名前を付ける（PC ごとに初回のみ）
+sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply
 roslaunch k_arm_teleop teleop.launch
 ```
 
@@ -32,8 +34,11 @@ roslaunch k_arm_teleop teleop.launch
 - `config/leader_calibration.yaml`（ゼロ点・向き・トリガー）は**このリーダーの個体**の値．同じリーダーなら別の PC でも
   そのまま使える（サーボ側の `homing_offset` は EEPROM に残っている）．別のリーダーを使うときはキャリブレーションと
   `recenter_leader.py` をやり直す．
-- シリアルポートは `config/leader_bus.yaml` の `port`（このリーダーの USB アダプタの `/dev/serial/by-id/...`）．
-  別のアダプタなら `teleop.launch port:=/dev/ttyACM0` などで指定する．
+- シリアルポートは `config/leader_bus.yaml` の `port`（既定 `/dev/k_arm_leader`）．`install_leader_udev.py` が、
+  つないでいるアダプタのシリアル番号に一致する udev ルール（`/etc/udev/rules.d/99-k_arm_leader.rules`）を書き、
+  どの USB ポートに挿しても同じ名前になる．`--apply` なしなら書くルールを表示するだけ．アダプタが複数あるときは
+  `--device /dev/ttyACM1`、別の名前にするなら `--name k_arm_leader_left` のように指定する．
+  ルールを入れていない環境では `teleop.launch port:=/dev/ttyACM0` などで指定する．
 
 ## Build
 
@@ -75,7 +80,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 | `leader_bus` | `config/leader_bus.yaml` | ポート、サーボ id、可動域 |
 | `leader_calibration` | `config/leader_calibration.yaml` | ゼロ点・向き・トリガーの保存先（パネルの操作でここが更新される） |
 
-サーボが見えるかの確認は feetech-cli で: `cd ~/src/github.com/iory/feetech-cli && uv run feetech scan`（id 1-8 が見えればよい）．
+サーボが見えるかの確認は feetech-cli で: `uvx --from feetech-cli feetech --port /dev/k_arm_leader scan`（id 1-8 が見えればよい）．
 基板のジャンパが USB 側になっていないと何も応答しない．
 
 ## 手順
