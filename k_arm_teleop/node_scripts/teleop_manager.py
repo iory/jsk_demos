@@ -245,6 +245,7 @@ class TeleopManager(object):
         self.pending_goals = []
         self.approach_attempts = 0
         self.last_command = {}
+        self.last_send = 0.0  # [s] when a trajectory last went to the controllers
         self.max_tracking_error = 0.0
         self.clamped = []
         self.speed_limited = []
@@ -501,6 +502,7 @@ class TeleopManager(object):
                 if arm['wrist_map'] is not None:
                     arm['wrist_map'].reset()
             self.last_command = {}
+            self.last_send = 0.0
             self.held_positions = {}
             if self.wrist_only and self._controller_entries(self.target):
                 try:
@@ -690,9 +692,13 @@ class TeleopManager(object):
             if command[joint] != value:
                 self.speed_limited.append(joint)
         self.last_command = command
-        lookahead = rospy.Duration(float(self.follow['lookahead']))
+        lookahead = rospy.Duration(float(self.follow['lookahead'][self.target]))
         use_action = self.follow.get('interface', 'topic') == 'action'
-        for controller, joints, _ in self._controller_entries(self.target):
+        now = rospy.get_time()
+        send = now - self.last_send >= 1.0 / float(self.follow['send_rate'][self.target]) - 0.5 * dt
+        if send:
+            self.last_send = now
+        for controller, joints, _ in self._controller_entries(self.target) if send else []:
             trajectory = JointTrajectory()
             trajectory.joint_names = joints
             trajectory.points = [JointTrajectoryPoint(

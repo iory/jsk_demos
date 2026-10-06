@@ -140,11 +140,23 @@ follow:
   # topic: <controller>/command (JointTrajectoryController's streaming input)
   # action: a new follow_joint_trajectory goal every cycle
   interface: topic
-  rate: 50.0                           # [Hz]
-  # [s] time_from_start of each streamed point. The robot trails the leader by
-  # about this much plus one period (measured in sim: 30 Hz / 0.1 s -> 124 ms,
-  # 50 Hz / 0.04 s -> 48 ms).
-  lookahead: 0.04
+  # [Hz] loop rate: leader read, /k_arm_teleop_manager/command (recorded as
+  # the action label) and the grippers
+  rate: 50.0
+  # [Hz] per target, how often a trajectory goes to the arm controllers. The
+  # real robot's HrpsysJointTrajectoryBridge fell behind at 50 Hz: its servo
+  # reference replayed the commands later and later (1.5 s growing to 4 s
+  # within 30 s of wrist motion), so it gets fewer, longer segments.
+  send_rate:
+    virtual: 50.0
+    real: 10.0
+  # [s] per target, time_from_start of each streamed point. Keep it about one
+  # send period so each segment ends as the next one arrives. The robot trails
+  # the leader by about this much plus one period (measured in sim: 30 Hz /
+  # 0.1 s -> 124 ms, 50 Hz / 0.04 s -> 48 ms).
+  lookahead:
+    virtual: 0.04
+    real: 0.1
   # [rad/s] (m/s for the gripper slider) clamp on the streamed command, per
   # target, with per-joint overrides. A wrist twist turns the leader's forearm
   # roll and handle roll together, so K_ARM J4 needs much more than the arm
