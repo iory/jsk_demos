@@ -1,0 +1,16 @@
+# Setup for the picking policy (supernova tree-vla-il) on this robot. Passed
+# to the server with kpick_train.sh -c (scripts/kpick.sh does) and to the
+# robot node with config:= (launch/kpick_right.launch does).
+#
+# k_arm_right (tree-vla-il configs/real/k_arm_right.yaml, field-pipeline
+# 1e4f6a2) has the right arm, the right wrist camera and /rarm_controller:
+# the left-arm policy runs on the right arm through a mirror image.
+# ASSUMPTION there: the right wrist D405 is mounted as the mirror of the left.
+# Only what this robot adds is here.
+base: k_arm_right
+
+command:
+  gripper:
+    # 0 open .. 1 closed, turned into effort by gripper_command_bridge.py
+    type: float64
+    topic: /k_arm_gripper_bridge/command

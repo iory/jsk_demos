@@ -1,0 +1,23 @@
+<launch>
+  <!-- The learned picking policy (k_arm_pick_policy, from a kpick_train.sh job)
+       on the right arm, with the real effort-controlled gripper behind it.
+       Preview first (execute:=false): nothing goes to the robot. -->
+  <!-- result: the result/ directory the job brought back -->
+  <arg name="result" />
+  <arg name="execute" default="false" />
+  <arg name="config" default="$(find k_arm_teleop)/config/kpick_right.yaml" />
+  <arg name="teleop_config" default="$(find k_arm_teleop)/config/teleop.yaml" />
+
+  <include file="$(find k_arm_pick_policy)/launch/kpick_policy.launch">
+    <arg name="result" value="$(arg result)" />
+    <arg name="execute" value="$(arg execute)" />
+    <arg name="config" value="$(arg config)" />
+  </include>
+
+  <!-- 0..1 close command (config command.gripper.topic) -> the gripper's effort -->
+  <node name="k_arm_gripper_bridge" pkg="k_arm_teleop" type="gripper_command_bridge.py"
+        if="$(arg execute)" output="screen">
+    <rosparam command="load" file="$(arg teleop_config)" />
+    <param name="arm" value="rarm" />
+  </node>
+</launch>
