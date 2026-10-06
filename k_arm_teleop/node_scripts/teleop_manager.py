@@ -254,6 +254,7 @@ class TeleopManager(object):
         follower = UrdfKinematics(self.follower_description)
         base_rotation = rpy_to_matrix(*leader_base['rpy'])
         zero_pose = leader_zero_pose(rospy.get_param('~arms'))
+        self.leader_zero = zero_pose
         for arm in self.arms.values():
             if not arm['wrist']:
                 continue
@@ -293,7 +294,8 @@ class TeleopManager(object):
         key = (target, controller)
         if key not in self.clients:
             namespace = self.targets[target]['namespace'].rstrip('/')
-            name = '{}/{}/follow_joint_trajectory'.format(namespace, controller)
+            name = '{}/{}/{}'.format(namespace, controller,
+                                     self.targets[target].get('action', 'follow_joint_trajectory'))
             self.clients[key] = actionlib.SimpleActionClient(name, FollowJointTrajectoryAction)
             self.command_pubs[key] = rospy.Publisher(
                 '{}/{}/command'.format(namespace, controller), JointTrajectory, queue_size=1)
@@ -480,8 +482,15 @@ class TeleopManager(object):
         except (rospy.ROSException, rospy.ServiceException) as error:
             return TriggerResponse(False, '{} failed: {}'.format(service, error))
 
-    def _move_leader(self, follower_positions, label):
-        """Move the leader (under power) to the pose that maps to ``follower_positions``."""
+    def _move_leader(self, follower_positions, label, wrist_seed=None):
+        """Move the leader (under power) to the pose that maps to ``follower_positions``.
+
+        The leader wrist is solved from ``wrist_seed`` (leader angles), else
+        from where the leader is now. The seed matters: with the wrist straight
+        the leader's forearm roll and handle roll share an axis, so many angle
+        pairs give the same hand rotation and the solver keeps the one nearest
+        the seed.
+        """
         with self.lock:
             if self.phase in ACTIVE_PHASES:
                 return TriggerResponse(False, 'stop before moving the leader')
@@ -495,8 +504,10 @@ class TeleopManager(object):
             for name, arm in self.arms.items():
                 if not arm['enabled']:
                     continue
+                seed = dict(leader_now)
+                seed.update(wrist_seed or {})
                 try:
-                    pose, wrist_error = follower_to_leader(arm, follower_positions, leader_now)
+                    pose, wrist_error = follower_to_leader(arm, follower_positions, seed)
                 except KeyError as error:
                     return TriggerResponse(False, '{}: no value for {}'.format(name, error))
                 if wrist_error > WRIST_SOLVE_TOLERANCE:
@@ -528,7 +539,9 @@ class TeleopManager(object):
             if arm['gripper'] is not None:
                 pose[arm['gripper']['follower']] = arm['gripper']['follower_range'][0]
         pose.update(self.leader_move.get('init_pose') or {})
-        return self._move_leader(pose, 'init pose')
+        # solve from the calibration pose, so the default init pose is exactly
+        # the calibration guide (forearm and handle roll 0, not a pair that cancels)
+        return self._move_leader(pose, 'init pose', wrist_seed=self.leader_zero)
 
     def _leader_to_robot(self, _request):
         try:

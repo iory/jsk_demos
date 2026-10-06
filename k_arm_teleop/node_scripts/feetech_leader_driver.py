@@ -269,7 +269,11 @@ class FeetechLeaderDriver(object):
             if not self.bus.ping(servo['id']):
                 state['last_error'] = 'no answer to ping'
                 return
-            if self.torque_off:
+            with self.lock:
+                powered = self.motion is not None
+            # a servo that drops out for a moment during a powered move or hold
+            # keeps its torque; the move's lag check guards the rest
+            if self.torque_off and not powered:
                 self.bus.set_torque(servo['id'], False)
         except FeetechError as error:
             state['last_error'] = str(error)
@@ -527,6 +531,14 @@ class FeetechLeaderDriver(object):
             except rospy.ROSInterruptException:
                 break
         if self.bus is not None:
+            with self.lock:
+                powered = self.motion is not None
+            if powered:
+                # do not leave the leader energised after the driver is gone
+                try:
+                    self._torque_off('driver shutting down')
+                except (FeetechError, serial.SerialException, OSError) as error:
+                    rospy.logerr('could not switch the leader torque off: %s', error)
             self.bus.close()
 
 

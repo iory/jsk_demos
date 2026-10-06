@@ -34,6 +34,7 @@
   <node name="real_stand_in_controller" pkg="k_arm_teleop" type="fake_trajectory_controller.py"
         unless="$(arg real)">
     <rosparam command="load" file="$(arg config)" />
+    <param name="target" value="real" />
   </node>
 
   <!-- virtual (ghost) K_ARM: same joints, links prefixed with virtual/ -->
@@ -42,6 +43,7 @@
            command="python3 $(find k_arm_teleop)/scripts/prefix_urdf.py $(arg robot_model) virtual/" />
     <node name="fake_trajectory_controller" pkg="k_arm_teleop" type="fake_trajectory_controller.py">
       <rosparam command="load" file="$(arg config)" />
+      <param name="target" value="virtual" />
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="world_to_robot" pkg="tf2_ros" type="static_transform_publisher"

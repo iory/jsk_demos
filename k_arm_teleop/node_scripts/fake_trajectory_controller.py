@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Kinematic stand-in for the K_ARM JointTrajectoryControllers.
 
-Serves ``<controller>/follow_joint_trajectory`` and ``<controller>/command``
+Serves ``<controller>/<action>`` (teleop.yaml targets.<~target>.action) and ``<controller>/command``
 for every controller in the ``arms`` section of teleop.yaml and publishes
 ``joint_states`` for all movable joints of ``robot_description``. Joints
 follow the commanded trajectory exactly (linear interpolation between
@@ -58,6 +58,9 @@ class FakeTrajectoryController(object):
         self.segments = {}
         self.pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
+        # serve the action name of the target this node stands in for
+        target = rospy.get_param('~target', 'virtual')
+        self.action = rospy.get_param('~targets/{}/action'.format(target), 'follow_joint_trajectory')
         self.servers = []
         for controller, joints in self._controllers().items():
             missing = [j for j in joints if j not in self.limits]
@@ -65,7 +68,7 @@ class FakeTrajectoryController(object):
                 raise RuntimeError('{}: joints {} are not in robot_description'.format(
                     controller, missing))
             server = actionlib.SimpleActionServer(
-                controller + '/follow_joint_trajectory', FollowJointTrajectoryAction,
+                '{}/{}'.format(controller, self.action), FollowJointTrajectoryAction,
                 execute_cb=lambda goal, c=controller, j=joints: self._execute(c, j, goal),
                 auto_start=False)
             server.start()

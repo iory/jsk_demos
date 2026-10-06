@@ -69,9 +69,12 @@ arms:
       follower_range: [0.0, 0.015]
 
 # Where the commands go. namespace is prepended to "<controller>/follow_joint_trajectory".
+# action: <namespace>/<controller>/<action>. The K_ARM bringup serves
+# follow_joint_trajectory_action (checked with rostopic list on the robot,
+# 2026-10-06); the fake controllers serve the same name for each target.
 targets:
-  real: {namespace: "", joint_states: /joint_states}
-  virtual: {namespace: /virtual, joint_states: /virtual/joint_states}
+  real: {namespace: "", joint_states: /joint_states, action: follow_joint_trajectory_action}
+  virtual: {namespace: /virtual, joint_states: /virtual/joint_states, action: follow_joint_trajectory}
 
 leader_joint_states: /teleop_leader/servo_joint_states
 leader_calibrated_topic: /teleop_leader/calibrated
@@ -129,11 +132,31 @@ follower_limit_margin: 0.02            # [rad] stay inside the URDF limits
 recording:
   directory: ~/k_arm_bags
   prefix: k_arm_teleop
+  # Rates / bandwidth measured on the robot (2026-10-06, 640x480 cameras):
+  # joint_states and rarm_controller/state ~475 Hz (~60 KB/s each); each camera
+  # 30 Hz, colour compressed ~1.3 MB/s, aligned depth compressedDepth 1.7 (wrist)
+  # / 3.8 (head) MB/s. About 8 MB/s in all (~29 GB per hour). The uncompressed
+  # image_raw would be ~20 MB/s per colour stream, so it is not recorded.
   topics:
-    - /joint_states
-    - /virtual/joint_states
-    - /teleop_leader/servo_joint_states
-    - /k_arm_teleop_manager/command
+    # robot
+    - /joint_states                          # all K_ARM joints (incl. LINEAR_JOINT*)
+    - /rarm_controller/state                 # desired / actual / error of the arm
+    - /larm_controller/state
+    - /emergency_mode
+    # teleop
+    - /k_arm_teleop_manager/command          # action label: joint targets sent (50 Hz)
     - /k_arm_teleop_manager/status
+    - /teleop_leader/servo_joint_states      # leader readings (100 Hz)
+    - /virtual/joint_states
+    # wrist camera (right)
+    - /wrist_right_camera/color/image_raw/compressed
+    - /wrist_right_camera/color/camera_info
+    - /wrist_right_camera/aligned_depth_to_color/image_raw/compressedDepth
+    - /wrist_right_camera/aligned_depth_to_color/camera_info
+    # head camera
+    - /head_camera/color/image_raw/compressed
+    - /head_camera/color/camera_info
+    - /head_camera/aligned_depth_to_color/image_raw/compressedDepth
+    - /head_camera/aligned_depth_to_color/camera_info
     - /tf
     - /tf_static
