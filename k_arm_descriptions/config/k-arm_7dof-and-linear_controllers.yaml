@@ -1,0 +1,56 @@
+fullbody_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    # Linear部分
+    - LINEAR_JOINT0
+    - LINEAR_JOINT1
+    - LINEAR_JOINT2
+    - LINEAR_JOINT3
+    # 7DOFアーム部分
+    - RARM_JOINT0
+    - RARM_JOINT1
+    - RARM_JOINT2
+    - RARM_JOINT3
+    - RARM_JOINT4
+    - RARM_JOINT5
+    - RARM_JOINT6
+  constraints:
+    goal_time: 0.6
+    stopped_velocity_tolerance: 0.05
+    # Linear部分の制約
+    LINEAR_JOINT0: {trajectory: 0.1, goal: 0.1}
+    LINEAR_JOINT1: {trajectory: 0.1, goal: 0.1}
+    LINEAR_JOINT2: {trajectory: 0.1, goal: 0.1}
+    LINEAR_JOINT3: {trajectory: 0.1, goal: 0.1}
+    # 7DOFアーム部分の制約
+    RARM_JOINT0: {trajectory: 0.1, goal: 0.1}
+    RARM_JOINT1: {trajectory: 0.1, goal: 0.1}
+    RARM_JOINT2: {trajectory: 0.1, goal: 0.1}
+    RARM_JOINT3: {trajectory: 0.1, goal: 0.1}
+    RARM_JOINT4: {trajectory: 0.1, goal: 0.1}
+    RARM_JOINT5: {trajectory: 0.1, goal: 0.1}
+    RARM_JOINT6: {trajectory: 0.1, goal: 0.1}
+  stop_trajectory_duration: 0.5
+  state_publish_rate: 25
+  action_monitor_rate: 10
+
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+# # PID gains for better control
+# gazebo_ros_control:
+#   pid_gains:
+#     # Linear部分
+#     linear_base_yaw_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     linear_base_pitch_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     linear_top_pitch_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     linear_top_linear_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     # 7DOFアーム部分
+#     shoulder_roll1_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     shoulder_pitch_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     shoulder_roll2_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     elbow_pitch_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     wrist_roll_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     wrist_pitch_joint: {p: 1000.0, i: 0.1, d: 100.0}
+#     wrist_yaw_joint: {p: 1000.0, i: 0.1, d: 100.0}

@@ -1,0 +1,955 @@
+<?xml version="1.0"?>
+<robot name="K_ARM_SINGLEARM_LINEAR"
+       xmlns:xi="http://www.w3.org/2001/XInclude">
+  <link name="LINEAR_BODY">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_BODY_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_BODY_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="45.45" />
+      <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+      <inertia ixx="0.55" ixy="0" ixz="0" iyy="0.55" iyz="0" izz="0.81"/>
+    </inertial>
+  </link>
+  <gazebo reference="LINEAR_BODY">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LINEAR_LINK0">
+    <visual>
+      <origin xyz="0 0 0.195" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_LINK0_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.195" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_LINK0_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="73.24" />
+      <origin xyz="-0.01 -0.02 0.23" rpy="0 -0 0"/>
+      <inertia ixx="3.28" ixy="-0.24" ixz="-0.02" iyy="7.52" iyz="0.12" izz="6.54"/>
+    </inertial>
+  </link>
+  <gazebo reference="LINEAR_LINK0">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LINEAR_LINK1">
+    <visual>
+      <origin xyz="0 0 0.48" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_LINK1_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.48" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_LINK1_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="7.75" />
+      <origin xyz="0.49 -0.01 0" rpy="0 -0 0"/>
+      <inertia ixx="0.13" ixy="0.01" ixz="0.04" iyy="1.53" iyz="-1.06859e-15" izz="1.59"/>
+    </inertial>
+  </link>
+  <gazebo reference="LINEAR_LINK1">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LINEAR_LINK2">
+    <visual>
+      <origin xyz="0.919 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_LINK2_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.919 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_LINK2_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="9.72" />
+      <origin xyz="0.09 0 0.01" rpy="0 -0 0"/>
+      <inertia ixx="0.08" ixy="0" ixz="0" iyy="0.13" iyz="0" izz="0.15"/>
+    </inertial>
+  </link>
+  <gazebo reference="LINEAR_LINK2">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LINEAR_LINK3">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_LINK3_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/LINEAR_LINK3_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.74097" />
+      <origin xyz="0.8426 -0.00018 0.01693" rpy="0 -0 0"/>
+      <inertia ixx="0.02899" ixy="-0.00052" ixz="0.03135" iyy="1.21477" iyz="-0.00025" izz="1.21538"/>
+    </inertial>
+  </link>
+  <gazebo reference="LINEAR_LINK3">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK0">
+    <visual>
+      <origin xyz="0.65 0 0" rpy="0 -0 1.5708"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK0_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.65 0 0" rpy="0 -0 1.5708"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK0_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.71095" />
+      <origin xyz="0.00168 -0.02414 0.00058" rpy="0 -0 0"/>
+      <inertia ixx="0.00104" ixy="-2e-05" ixz="-1e-05" iyy="0.00108" iyz="1.93124e-19" izz="0.00087"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK0">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK1">
+    <visual>
+      <origin xyz="0 -0.038 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK1_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.038 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK1_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.56633" />
+      <origin xyz="0.01055 -0.00874 -0.09225" rpy="0 -0 0"/>
+      <inertia ixx="0.0044" ixy="-3e-05" ixz="0.00023" iyy="0.00521" iyz="3e-05" izz="0.00298"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK1">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK2">
+    <visual>
+      <origin xyz="0 0 -0.156" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK2_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.156" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK2_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.69594" />
+      <origin xyz="-0.00772 0.00515 -0.05849" rpy="0 -0 0"/>
+      <inertia ixx="0.00499" ixy="-2e-05" ixz="0.00033" iyy="0.00486" iyz="-0.0004" izz="0.0019"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK2">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK3">
+    <visual>
+      <origin xyz="0 0 -0.18" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK3_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.18" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK3_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.20579" />
+      <origin xyz="-0.00333 0.00045 -0.04948" rpy="0 -0 0"/>
+      <inertia ixx="0.00353" ixy="1e-05" ixz="0.00017" iyy="0.00366" iyz="2e-05" izz="0.00123"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK3">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK4">
+    <visual>
+      <origin xyz="0 0 -0.1202" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK4_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1202" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK4_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.54122" />
+      <origin xyz="-0.0001 -0.00017 -0.07523" rpy="0 -0 0"/>
+      <inertia ixx="0.00574" ixy="8e-05" ixz="-1e-05" iyy="0.00501" iyz="6e-05" izz="0.00198"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK4">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK5">
+    <visual>
+      <origin xyz="0 0 -0.1458" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK5_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1458" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK5_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.16643" />
+      <origin xyz="0.00318 -0.0014 -0.00013" rpy="0 -0 0"/>
+      <inertia ixx="5e-05" ixy="0" ixz="0" iyy="6e-05" iyz="0" izz="6e-05"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK5">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK6">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK6_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/RARM_LINK6_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5522" />
+      <origin xyz="-0.01382 0.00018 -0.11247" rpy="0 -0 0"/>
+      <inertia ixx="0.00522" ixy="-2.82685e-19" ixz="-0.00055" iyy="0.00558" iyz="-1.20848e-18" izz="0.00084"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK6">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+
+
+ <!--? end effector -->
+    <link name="k_linear_arm_ee_link">
+      <inertial>
+        <mass value="0.0001"/> <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/> </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://k_arm_descriptions/meshes/K_ARM_SINGLEARM_LINEAR_meshes/mnav_apple_harvest_hand_assy.dae"/>
+        </geometry>
+          <material name="orange"/>
+      </visual>
+      <!-- <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://k_arm_descriptions/meshes/k_linear_arm_7dof/mnav_apple_harvest_hand_assy.dae"/>
+        </geometry>
+      </collision> -->
+    </link>
+    <gazebo reference="k_linear_arm_ee_link">
+      <mu1>0.5</mu1>
+      <mu2>0.5</mu2>
+      <kp>1000000.0</kp>
+      <kd>100.0</kd>
+      <self_collide>false</self_collide>
+      <material>Gazebo/Green</material>
+    </gazebo>
+
+
+
+  <!--? Gripper Center visualize -->
+    <link name="gripper_center_link">
+      <inertial>
+      <mass value="0.01"/> <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/> </inertial>
+      <visual>1745"
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="0.005"/>
+        </geometry>
+          <material name="cyan"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="0.005"/>
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="gripper_center_link">
+      <mu1>0.5</mu1>
+      <mu2>0.5</mu2>
+      <kp>1000000.0</kp>
+      <kd>100.0</kd>
+      <self_collide>true</self_collide>
+      <material>Gazebo/Blue</material>
+    </gazebo>
+
+
+
+
+
+
+  <!--! JOINT  -->
+  <joint name="LINEAR_JOINT0" type="revolute">
+    <parent link="LINEAR_BODY"/>
+    <child  link="LINEAR_LINK0"/>
+    <origin xyz="0 0 0.195" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-0.16" upper="0.16" effort="1945.04" velocity="15.5966" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="LINEAR_JOINT0_trans" >
+    <actuator name="LINEAR_JOINT0_motor" />1745"
+    <joint name="LINEAR_JOINT0" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+
+    <transmission name="linear_base_yaw_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="LINEAR_JOINT0">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="linear_base_yaw_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+  
+  <gazebo reference="LINEAR_JOINT0">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  
+
+
+
+  <joint name="LINEAR_JOINT1" type="revolute">
+    <parent link="LINEAR_LINK0"/>
+    <child  link="LINEAR_LINK1"/>
+    <origin xyz="0 0 0.48" rpy="0 -0 0 "/>
+    <axis   xyz="0 -1 0"/>
+    <limit lower="-0.1745" upper="1.745" effort="1158.75" velocity="14.6608" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+    <transmission name="linear_base_pitch_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="LINEAR_JOINT1">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="linear_base_pitch_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="LINEAR_JOINT1_trans" >
+    <actuator name="LINEAR_JOINT1_motor" />
+    <joint name="LINEAR_JOINT1" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+
+  <gazebo reference="LINEAR_JOINT1">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+
+
+  <joint name="LINEAR_JOINT2" type="revolute">
+    <parent link="LINEAR_LINK1"/>
+    <child  link="LINEAR_LINK2"/>
+    <origin xyz="0.919 0 0" rpy="0 -0 0 "/>
+    <axis   xyz="0 -1 0"/>
+    <limit lower="-1.571" upper="0" effort="1158.75" velocity="17.0871" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="LINEAR_JOINT2_trans" >
+    <actuator name="LINEAR_JOINT2_motor" />
+    <joint name="LINEAR_JOINT2" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+      <transmission name="linear_top_pitch_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="LINEAR_JOINT2">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="linear_top_pitch_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="LINEAR_JOINT2">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+
+  <joint name="LINEAR_JOINT3" type="prismatic">
+    <parent link="LINEAR_LINK2"/>
+    <child  link="LINEAR_LINK3"/>
+    <origin xyz="0 0 0" rpy="0 -0 0 "/>
+    <axis   xyz="1 0 0"/>
+    <limit lower="0" upper="0.676" effort="1158.75" velocity="17.0871" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="LINEAR_JOINT3_trans" >
+    <actuator name="LINEAR_JOINT3_motor" />
+    <joint name="LINEAR_JOINT3" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+    <transmission name="linear_top_linear_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="LINEAR_JOINT3">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="linear_top_linear_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="LINEAR_JOINT3">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+  <joint name="RARM_JOINT0" type="revolute">
+    <parent link="LINEAR_LINK3"/>
+    <child  link="RARM_LINK0"/>
+    <origin xyz="0.65 0 0" rpy="0 -0 1.5708 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-2.269" upper="2.269" effort="72.1313" velocity="15.5966" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT0_trans" >
+    <actuator name="RARM_JOINT0_motor" />
+    <joint name="RARM_JOINT0" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+    <transmission name="shoulder_roll1_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="RARM_JOINT0">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="shoulder_roll1_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="RARM_JOINT0">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+  <joint name="RARM_JOINT1" type="revolute">
+    <parent link="RARM_LINK0"/>
+    <child  link="RARM_LINK1"/>
+    <origin xyz="0 -0.038 0" rpy="0 -0 0 "/>
+    <axis   xyz="1 0 0"/>
+    <limit lower="-2.4434" upper="0.174533" effort="76.7354" velocity="14.6608" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT1_trans" >
+    <actuator name="RARM_JOINT1_motor" />
+    <joint name="RARM_JOINT1" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+    <transmission name="shoulder_pitch_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="RARM_JOINT1">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="shoulder_pitch_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="RARM_JOINT1">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+  <joint name="RARM_JOINT2" type="revolute">
+    <parent link="RARM_LINK1"/>
+    <child  link="RARM_LINK2"/>
+    <origin xyz="0 0 -0.156" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-2.0944" upper="2.0944" effort="65.839" velocity="17.0871" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT2_trans" >
+    <actuator name="RARM_JOINT2_motor" />
+    <joint name="RARM_JOINT2" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+    <transmission name="shoulder_roll2_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="RARM_JOINT2">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="shoulder_roll2_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="RARM_JOINT2">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+  <joint name="RARM_JOINT3" type="revolute">
+    <parent link="RARM_LINK2"/>
+    <child  link="RARM_LINK3"/>
+    <origin xyz="0 0 -0.18" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-1.95" upper="0" effort="63.8439" velocity="17.6211" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT3_trans" >
+    <actuator name="RARM_JOINT3_motor" />
+    <joint name="RARM_JOINT3" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+    <transmission name="elbow_pitch_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="RARM_JOINT3">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elbow_pitch_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="RARM_JOINT3">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+  <joint name="RARM_JOINT4" type="revolute">
+    <parent link="RARM_LINK3"/>
+    <child  link="RARM_LINK4"/>
+    <origin xyz="0 0 -0.1202" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-2.87979" upper="2.87979" effort="17.507" velocity="64.2598" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT4_trans" >
+    <actuator name="RARM_JOINT4_motor" />
+    <joint name="RARM_JOINT4" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+    <transmission name="wrist_roll_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="RARM_JOINT4">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="wrist_roll_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="RARM_JOINT4">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+  <joint name="RARM_JOINT5" type="revolute">
+    <parent link="RARM_LINK4"/>
+    <child  link="RARM_LINK5"/>
+    <origin xyz="0 0 -0.1458" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="11.25" velocity="20" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT5_trans" >
+    <actuator name="RARM_JOINT5_motor" />
+    <joint name="RARM_JOINT5" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+    <transmission name="wrist_pitch_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="RARM_JOINT5">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="wrist_pitch_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="RARM_JOINT5">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+  <joint name="RARM_JOINT6" type="revolute">
+    <parent link="RARM_LINK5"/>
+    <child  link="RARM_LINK6"/>
+    <origin xyz="0 0 0" rpy="0 -0 0 "/>
+    <axis   xyz="1 0 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="11.25" velocity="20" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+
+  <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT6_trans" >
+    <actuator name="RARM_JOINT6_motor" />
+    <joint name="RARM_JOINT6" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission> -->
+    <transmission name="wrist_yaw_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="RARM_JOINT6">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="wrist_yaw_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+  <gazebo reference="RARM_JOINT6">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+  <!--? end effector -->
+    <!-- J8-fixed -->
+    <joint name="k_linear_arm_ee_joint" type="fixed">
+      <parent link="RARM_LINK6"/>
+      <child link="k_linear_arm_ee_link"/>
+      <origin xyz="0 0 -0.119" rpy="0 1.5707 3.14159"/>
+      <limit lower="0" upper="0" effort="10" velocity="1.0"/>
+      <dynamics damping="0.2" friction="0" />
+    </joint>
+
+    <!--? Gripper Center -->
+    <!-- J9-fixed -->
+    <joint name="gripper_center_fix_joint" type="fixed">
+      <parent link="k_linear_arm_ee_link"/>
+      <child link="gripper_center_link"/>
+      <origin xyz="0.2 0 0" rpy="0 0 0"/>
+      <limit lower="0" upper="0" effort="10" velocity="1.0"/>
+      <dynamics damping="0.2" friction="0" />
+    </joint>
+
+<!--! Camera -->
+  <joint name="camera_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.05"/>
+    <parent link="k_linear_arm_ee_link"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <link name="camera_link" />
+
+  <link name="camera_color_frame"></link>
+  <joint name="camera_color_frame_joint" type="fixed"> <origin rpy="0 0 0" xyz="0 0 0"/> <parent link="camera_link"/> <child link="camera_color_frame"/> </joint>
+  <link name="camera_color_optical_frame"></link>
+  <joint name="camera_color_optical_frame_joint" type="fixed"> <origin rpy="-1.57 0 -1.57" xyz="0 0 0"/> <parent link="camera_color_frame"/> <child link="camera_color_optical_frame"/> </joint>
+
+  <link name="camera_depth_frame"></link>
+  <joint name="camera_depth_frame_joint" type="fixed"> <origin rpy="0 0 0" xyz="0 0 0"/> <parent link="camera_link"/> <child link="camera_depth_frame"/> </joint>
+  <link name="camera_depth_optical_frame"></link>
+  <joint name="camera_depth_optical_frame_joint" type="fixed"> <origin rpy="-1.57 0 -1.57" xyz="0 0 0"/> <parent link="camera_depth_frame"/> <child link="camera_depth_optical_frame"/> </joint>
+
+  <gazebo reference="camera_link">
+    <sensor name="camera" type="depth">
+      <always_on>true</always_on>
+      <update_rate>5.0</update_rate>
+      <camera>
+        <horizontal_fov>1.52</horizontal_fov>
+        <image>
+          <format>YUYV</format>
+          <width>480</width>
+          <height>270</height>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>2.0</far>
+        </clip>
+      </camera>
+      <plugin filename="libgazebo_ros_openni_kinect.so" name="kinect_camera_controller">
+        <cameraName>camera</cameraName>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>5</updateRate>
+        <imageTopicName>rgb/image_raw</imageTopicName>
+        <depthImageTopicName>depth/image_raw</depthImageTopicName>
+        <pointCloudTopicName>depth/points</pointCloudTopicName>
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+        <frameName>camera_depth_optical_frame</frameName>
+        <baseline>0.1</baseline>
+        <distortion_k1>0.0</distortion_k1>
+        <distortion_k2>0.0</distortion_k2>
+        <distortion_k3>0.0</distortion_k3>
+        <distortion_t1>0.0</distortion_t1>
+        <distortion_t2>0.0</distortion_t2>
+        <pointCloudCutoff>0.05</pointCloudCutoff>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+<!-- Shoulder Cameras -->
+  <joint name="shoulder_left_camera_joint_R1" type="fixed">
+    <origin rpy="0 -0.2618 -0.3491" xyz="0.025 0.550 0.915"/>
+    <parent link="LINEAR_BODY"/>
+    <child link="shoulder_left_camera_frame_R1"/>
+  </joint>
+  <link name="shoulder_left_camera_frame_R1" />
+  
+  <joint name="shoulder_left_camera_joint_R2" type="fixed">
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <parent link="shoulder_left_camera_frame_R1"/>
+    <child link="shoulder_left_camera_frame_R2"/>
+  </joint>
+  <link name="shoulder_left_camera_frame_R2" />
+  
+  <joint name="shoulder_left_camera_joint" type="fixed">
+    <origin rpy="0 0 -1.57" xyz="0 0 0"/>
+    <parent link="shoulder_left_camera_frame_R2"/>
+    <child link="shoulder_left_camera_frame"/>
+  </joint>
+
+
+  <link name="shoulder_left_camera_frame" />
+
+  <!-- <link name="shoulder_left_camera_color_frame"></link>
+  <joint name="shoulder_left_camera_color_frame_joint" type="fixed"> <origin rpy="0 0 0" xyz="0 0 0"/> <parent link="shoulder_left_camera_link"/> <child link="shoulder_left_camera_color_frame"/> </joint>
+  <link name="shoulder_left_camera_color_optical_frame"></link>
+  <joint name="shoulder_left_camera_color_optical_frame_joint" type="fixed"> <origin rpy="-1.57 0 -1.57" xyz="0 0 0"/> <parent link="shoulder_left_camera_color_frame"/> <child link="shoulder_left_camera_color_optical_frame"/> </joint>
+
+  <link name="shoulder_left_camera_depth_frame"></link>
+        </clip>
+      </camera>
+  <joint name="shoulder_left_camera_depth_frame_joint" type="fixed"> <origin rpy="0 0 0" xyz="0 0 0"/> <parent link="shoulder_left_camera_link"/> <child link="shoulder_left_camera_depth_frame"/> </joint>
+  <link name="shoulder_left_camera_depth_optical_frame"></link>
+  <joint name="shoulder_left_camera_depth_optical_frame_joint" type="fixed"> <origin rpy="-1.57 0 -1.57" xyz="0 0 0"/> <parent link="shoulder_left_camera_depth_frame"/> <child link="shoulder_left_camera_depth_optical_frame"/> </joint> -->
+
+  <gazebo reference="shoulder_left_camera_frame">
+    <sensor name="shoulder_left_camera" type="depth">
+      <always_on>true</always_on>
+      <update_rate>5.0</update_rate>
+      <camera>
+        <horizontal_fov>1.52</horizontal_fov>
+        <image>
+          <format>YUYV</format>
+          <width>480</width>
+          <height>270</height>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>3.0</far>
+        </clip>
+      </camera>
+      <plugin filename="libgazebo_ros_openni_kinect.so" name="kinect_camera_controller">
+        <cameraName>shoulder_left_camera</cameraName>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>5</updateRate>
+        <imageTopicName>rgb/image_raw</imageTopicName>
+        <depthImageTopicName>depth/image_raw</depthImageTopicName>
+        <pointCloudTopicName>depth/points</pointCloudTopicName>
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+        <frameName>shoulder_left_camera_depth_optical_frame</frameName>
+        <baseline>0.1</baseline>
+        <distortion_k1>0.0</distortion_k1>
+        <distortion_k2>0.0</distortion_k2>
+        <distortion_k3>0.0</distortion_k3>
+        <distortion_t1>0.0</distortion_t1>
+        <distortion_t2>0.0</distortion_t2>
+        <pointCloudCutoff>0.05</pointCloudCutoff>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <joint name="shoulder_right_camera_joint_R1" type="fixed">
+    <origin rpy="0 -0.2618 0.3491" xyz="-0.025 -0.550 0.925"/>
+    <parent link="LINEAR_BODY"/>
+    <child link="shoulder_right_camera_frame_R1"/>
+  </joint>
+  <link name="shoulder_right_camera_frame_R1" />
+
+  <joint name="shoulder_right_camera_joint_R2" type="fixed">
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <parent link="shoulder_right_camera_frame_R1"/>
+    <child link="shoulder_right_camera_frame_R2"/>
+  </joint>
+  <link name="shoulder_right_camera_frame_R2" />
+  
+  <joint name="shoulder_right_camera_joint" type="fixed">
+    <origin rpy="0 0 -1.57" xyz="0 0 0"/>
+    <parent link="shoulder_right_camera_frame_R2"/>
+    <child link="shoulder_right_camera_frame"/>
+  </joint>
+
+
+  <link name="shoulder_right_camera_frame" />
+  <!-- <link name="shoulder_right_camera_color_frame"></link>
+  <joint name="shoulder_right_camera_color_frame_joint" type="fixed"> <origin rpy="0 0 0" xyz="0 0 0"/> <parent link="shoulder_right_camera_link"/> <child link="shoulder_right_camera_color_frame"/> </joint>
+  <link name="shoulder_right_camera_color_optical_frame"></link>
+  <joint name="shoulder_right_camera_color_optical_frame_joint" type="fixed"> <origin rpy="-1.57 0 -1.57" xyz="0 0 0"/> <parent link="shoulder_right_camera_color_frame"/> <child link="shoulder_right_camera_color_optical_frame"/> </joint>
+
+  <link name="shoulder_right_camera_depth_frame"></link>
+  <joint name="shoulder_right_camera_depth_frame_joint" type="fixed"> <origin rpy="0 0 0" xyz="0 0 0"/> <parent link="shoulder_right_camera_link"/> <child link="shoulder_right_camera_depth_frame"/> </joint>
+  <link name="shoulder_right_camera_depth_optical_frame"></link>
+  <joint name="shoulder_right_camera_depth_optical_frame_joint" type="fixed"> <origin rpy="-1.57 0 -1.57" xyz="0 0 0"/> <parent link="shoulder_right_camera_depth_frame"/> <child link="shoulder_right_camera_depth_optical_frame"/> </joint> -->
+
+  <gazebo reference="shoulder_right_camera_frame">
+    <sensor name="shoulder_right_camera" type="depth">
+      <always_on>true</always_on>
+      <update_rate>5.0</update_rate>
+      <camera>
+        <horizontal_fov>1.52</horizontal_fov>
+        <image>
+          <format>YUYV</format>
+          <width>480</width>
+          <height>270</height>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>3.0</far>
+        </clip>
+      </camera>
+      <plugin filename="libgazebo_ros_openni_kinect.so" name="kinect_camera_controller">
+        <cameraName>shoulder_right_camera</cameraName>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>5</updateRate>
+        <imageTopicName>rgb/image_raw</imageTopicName>
+        <depthImageTopicName>depth/image_raw</depthImageTopicName>
+        <pointCloudTopicName>depth/points</pointCloudTopicName>
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+        <frameName>shoulder_right_camera_depth_optical_frame</frameName>
+        <baseline>0.1</baseline>
+        <distortion_k1>0.0</distortion_k1>
+        <distortion_k2>0.0</distortion_k2>
+        <distortion_k3>0.0</distortion_k3>
+        <distortion_t1>0.0</distortion_t1>
+        <distortion_t2>0.0</distortion_t2>
+        <pointCloudCutoff>0.05</pointCloudCutoff>
+      </plugin>
+    </sensor>
+  </gazebo>
+<!-- Shoulder Cameras End -->
+
+<!--! Gazebo settings -->
+  <!--? Gazebo Plugin -->
+    <gazebo>
+      <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control"/>
+    </gazebo>
+
+
+
+
+</robot>

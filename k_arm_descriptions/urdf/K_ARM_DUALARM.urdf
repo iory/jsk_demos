@@ -1,0 +1,919 @@
+<?xml version="1.0"?>
+<robot name="K_ARM_DUALARM"
+       xmlns:xi="http://www.w3.org/2001/XInclude">
+  <link name="ARM_BODY">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/ARM_BODY_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/ARM_BODY_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.74097" />
+      <origin xyz="0.8426 -0.00018 0.01693" rpy="0 -0 0"/>
+      <inertia ixx="0.02899" ixy="-0.00052" ixz="0.03135" iyy="1.21477" iyz="-0.00025" izz="1.21538"/>
+    </inertial>
+  </link>
+  <gazebo reference="ARM_BODY">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LARM_LINK0">
+    <visual>
+      <origin xyz="0 0.1727 0.043" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK0_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0.1727 0.043" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK0_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.71095" />
+      <origin xyz="0.00168 0.02414 0.00058" rpy="0 -0 0"/>
+      <inertia ixx="0.00104" ixy="2e-05" ixz="-1e-05" iyy="0.00108" iyz="1.61783e-19" izz="0.00087"/>
+    </inertial>
+  </link>
+  <gazebo reference="LARM_LINK0">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LARM_LINK1">
+    <visual>
+      <origin xyz="0 0.038 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK1_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0.038 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK1_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.56633" />
+      <origin xyz="0.01055 0.00874 -0.09225" rpy="0 -0 0"/>
+      <inertia ixx="0.0044" ixy="3e-05" ixz="0.00023" iyy="0.00521" iyz="-3e-05" izz="0.00298"/>
+    </inertial>
+  </link>
+  <gazebo reference="LARM_LINK1">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LARM_LINK2">
+    <visual>
+      <origin xyz="0 0 -0.156" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK2_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.156" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK2_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.69594" />
+      <origin xyz="-0.00772 -0.00515 -0.05849" rpy="0 -0 0"/>
+      <inertia ixx="0.00499" ixy="2e-05" ixz="0.00033" iyy="0.00486" iyz="0.0004" izz="0.0019"/>
+    </inertial>
+  </link>
+  <gazebo reference="LARM_LINK2">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LARM_LINK3">
+    <visual>
+      <origin xyz="0 0 -0.18" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK3_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.18" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK3_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.20579" />
+      <origin xyz="-0.00333 -0.00045 -0.04948" rpy="0 -0 0"/>
+      <inertia ixx="0.00353" ixy="-1e-05" ixz="0.00017" iyy="0.00366" iyz="-2e-05" izz="0.00123"/>
+    </inertial>
+  </link>
+  <gazebo reference="LARM_LINK3">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LARM_LINK4">
+    <visual>
+      <origin xyz="0 0 -0.1202" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK4_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1202" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK4_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.54122" />
+      <origin xyz="-0.0001 0.00017 -0.07523" rpy="0 -0 0"/>
+      <inertia ixx="0.00574" ixy="-8e-05" ixz="-1e-05" iyy="0.00501" iyz="-6e-05" izz="0.00198"/>
+    </inertial>
+  </link>
+  <gazebo reference="LARM_LINK4">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LARM_LINK5">
+    <visual>
+      <origin xyz="0 0 -0.1458" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK5_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1458" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK5_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.16643" />
+      <origin xyz="0.00318 0.0014 -0.00013" rpy="0 -0 0"/>
+      <inertia ixx="5e-05" ixy="0" ixz="0" iyy="6e-05" iyz="0" izz="6e-05"/>
+    </inertial>
+  </link>
+  <gazebo reference="LARM_LINK5">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="LARM_LINK6">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 3.14159"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK6_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 3.14159"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/LARM_LINK6_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5522" />
+      <origin xyz="-0.01382 -0.00018 -0.11247" rpy="0 -0 3.14159"/>
+      <inertia ixx="0.00522" ixy="-2.04368e-19" ixz="-0.00055" iyy="0.00558" iyz="-1.05538e-18" izz="0.00084"/>
+    </inertial>
+  </link>
+  <gazebo reference="LARM_LINK6">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK0">
+    <visual>
+      <origin xyz="0 -0.1727 0.043" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK0_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.1727 0.043" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK0_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.71095" />
+      <origin xyz="0.00168 -0.02414 0.00058" rpy="0 -0 0"/>
+      <inertia ixx="0.00104" ixy="-2e-05" ixz="-1e-05" iyy="0.00108" iyz="1.97359e-19" izz="0.00087"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK0">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK1">
+    <visual>
+      <origin xyz="0 -0.038 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK1_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.038 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK1_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.56633" />
+      <origin xyz="0.01055 -0.00874 -0.09225" rpy="0 -0 0"/>
+      <inertia ixx="0.0044" ixy="-3e-05" ixz="0.00023" iyy="0.00521" iyz="3e-05" izz="0.00298"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK1">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK2">
+    <visual>
+      <origin xyz="0 0 -0.156" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK2_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.156" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK2_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.69594" />
+      <origin xyz="-0.00772 0.00515 -0.05849" rpy="0 -0 0"/>
+      <inertia ixx="0.00499" ixy="-2e-05" ixz="0.00033" iyy="0.00486" iyz="-0.0004" izz="0.0019"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK2">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK3">
+    <visual>
+      <origin xyz="0 0 -0.18" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK3_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.18" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK3_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.20579" />
+      <origin xyz="-0.00333 0.00045 -0.04948" rpy="0 -0 0"/>
+      <inertia ixx="0.00353" ixy="1e-05" ixz="0.00017" iyy="0.00366" iyz="2e-05" izz="0.00123"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK3">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK4">
+    <visual>
+      <origin xyz="0 0 -0.1202" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK4_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1202" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK4_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.54122" />
+      <origin xyz="-0.0001 -0.00017 -0.07523" rpy="0 -0 0"/>
+      <inertia ixx="0.00574" ixy="8e-05" ixz="-1e-05" iyy="0.00501" iyz="6e-05" izz="0.00198"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK4">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK5">
+    <visual>
+      <origin xyz="0 0 -0.1458" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK5_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.1458" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK5_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.16643" />
+      <origin xyz="0.00318 -0.0014 -0.00013" rpy="0 -0 0"/>
+      <inertia ixx="5e-05" ixy="0" ixz="0" iyy="6e-05" iyz="0" izz="6e-05"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK5">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <link name="RARM_LINK6">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 3.14159"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK6_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 3.14159"/>
+      <geometry>
+        <mesh filename="package://k_arm_descriptions/meshes/K_ARM_DUALARM_meshes/RARM_LINK6_mesh.dae" scale="1 1 1" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5522" />
+      <origin xyz="-0.01382 0.00018 -0.11247" rpy="0 -0 3.14159"/>
+      <inertia ixx="0.00522" ixy="-2.04368e-19" ixz="-0.00055" iyy="0.00558" iyz="-1.05538e-18" izz="0.00084"/>
+    </inertial>
+  </link>
+  <gazebo reference="RARM_LINK6">
+    <mu1>0.9</mu1>
+    <mu2>0.9</mu2>
+  </gazebo>
+  <joint name="LARM_JOINT0" type="revolute">
+    <parent link="ARM_BODY"/>
+    <child  link="LARM_LINK0"/>
+    <origin xyz="0 0.1727 0.043" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-1.0472" upper="3.31613" effort="72.1313" velocity="15.5966" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="LARM_JOINT0_trans" >
+    <actuator name="LARM_JOINT0_motor" />
+    <joint name="LARM_JOINT0" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="LARM_JOINT0">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="LARM_JOINT1" type="revolute">
+    <parent link="LARM_LINK0"/>
+    <child  link="LARM_LINK1"/>
+    <origin xyz="0 0.038 0" rpy="0 -0 0 "/>
+    <axis   xyz="1 0 0"/>
+    <limit lower="-0.174533" upper="3.31613" effort="76.7354" velocity="14.6608" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="LARM_JOINT1_trans" >
+    <actuator name="LARM_JOINT1_motor" />
+    <joint name="LARM_JOINT1" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="LARM_JOINT1">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="LARM_JOINT2" type="revolute">
+    <parent link="LARM_LINK1"/>
+    <child  link="LARM_LINK2"/>
+    <origin xyz="0 0 -0.156" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-2.0944" upper="2.0944" effort="65.839" velocity="17.0871" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="LARM_JOINT2_trans" >
+    <actuator name="LARM_JOINT2_motor" />
+    <joint name="LARM_JOINT2" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="LARM_JOINT2">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="LARM_JOINT3" type="revolute">
+    <parent link="LARM_LINK2"/>
+    <child  link="LARM_LINK3"/>
+    <origin xyz="0 0 -0.18" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-1.95" upper="0" effort="63.8439" velocity="17.6211" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="LARM_JOINT3_trans" >
+    <actuator name="LARM_JOINT3_motor" />
+    <joint name="LARM_JOINT3" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="LARM_JOINT3">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="LARM_JOINT4" type="revolute">
+    <parent link="LARM_LINK3"/>
+    <child  link="LARM_LINK4"/>
+    <origin xyz="0 0 -0.1202" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-2.87979" upper="2.87979" effort="17.507" velocity="64.2598" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="LARM_JOINT4_trans" >
+    <actuator name="LARM_JOINT4_motor" />
+    <joint name="LARM_JOINT4" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="LARM_JOINT4">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="LARM_JOINT5" type="revolute">
+    <parent link="LARM_LINK4"/>
+    <child  link="LARM_LINK5"/>
+    <origin xyz="0 0 -0.1458" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="11.25" velocity="20" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="LARM_JOINT5_trans" >
+    <actuator name="LARM_JOINT5_motor" />
+    <joint name="LARM_JOINT5" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="LARM_JOINT5">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="LARM_JOINT6" type="revolute">
+    <parent link="LARM_LINK5"/>
+    <child  link="LARM_LINK6"/>
+    <origin xyz="0 0 0" rpy="0 -0 0 "/>
+    <axis   xyz="1 0 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="11.25" velocity="20" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="LARM_JOINT6_trans" >
+    <actuator name="LARM_JOINT6_motor" />
+    <joint name="LARM_JOINT6" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="LARM_JOINT6">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="RARM_JOINT0" type="revolute">
+    <parent link="ARM_BODY"/>
+    <child  link="RARM_LINK0"/>
+    <origin xyz="0 -0.1727 0.043" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-3.31613" upper="1.0472" effort="72.1313" velocity="15.5966" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT0_trans" >
+    <actuator name="RARM_JOINT0_motor" />
+    <joint name="RARM_JOINT0" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="RARM_JOINT0">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="RARM_JOINT1" type="revolute">
+    <parent link="RARM_LINK0"/>
+    <child  link="RARM_LINK1"/>
+    <origin xyz="0 -0.038 0" rpy="0 -0 0 "/>
+    <axis   xyz="1 0 0"/>
+    <limit lower="-3.31613" upper="0.174533" effort="76.7354" velocity="14.6608" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT1_trans" >
+    <actuator name="RARM_JOINT1_motor" />
+    <joint name="RARM_JOINT1" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="RARM_JOINT1">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="RARM_JOINT2" type="revolute">
+    <parent link="RARM_LINK1"/>
+    <child  link="RARM_LINK2"/>
+    <origin xyz="0 0 -0.156" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-2.0944" upper="2.0944" effort="65.839" velocity="17.0871" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT2_trans" >
+    <actuator name="RARM_JOINT2_motor" />
+    <joint name="RARM_JOINT2" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="RARM_JOINT2">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="RARM_JOINT3" type="revolute">
+    <parent link="RARM_LINK2"/>
+    <child  link="RARM_LINK3"/>
+    <origin xyz="0 0 -0.18" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-1.95" upper="0" effort="63.8439" velocity="17.6211" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT3_trans" >
+    <actuator name="RARM_JOINT3_motor" />
+    <joint name="RARM_JOINT3" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="RARM_JOINT3">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="RARM_JOINT4" type="revolute">
+    <parent link="RARM_LINK3"/>
+    <child  link="RARM_LINK4"/>
+    <origin xyz="0 0 -0.1202" rpy="0 -0 0 "/>
+    <axis   xyz="0 0 1"/>
+    <limit lower="-2.87979" upper="2.87979" effort="17.507" velocity="64.2598" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT4_trans" >
+    <actuator name="RARM_JOINT4_motor" />
+    <joint name="RARM_JOINT4" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="RARM_JOINT4">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="RARM_JOINT5" type="revolute">
+    <parent link="RARM_LINK4"/>
+    <child  link="RARM_LINK5"/>
+    <origin xyz="0 0 -0.1458" rpy="0 -0 0 "/>
+    <axis   xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="11.25" velocity="20" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT5_trans" >
+    <actuator name="RARM_JOINT5_motor" />
+    <joint name="RARM_JOINT5" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="RARM_JOINT5">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+  <joint name="RARM_JOINT6" type="revolute">
+    <parent link="RARM_LINK5"/>
+    <child  link="RARM_LINK6"/>
+    <origin xyz="0 0 0" rpy="0 -0 0 "/>
+    <axis   xyz="1 0 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="11.25" velocity="20" />
+    <dynamics damping="0.2" friction="0" />
+  </joint>
+  <transmission type="pr2_mechanism_model/SimpleTransmission" name="RARM_JOINT6_trans" >
+    <actuator name="RARM_JOINT6_motor" />
+    <joint name="RARM_JOINT6" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+  <gazebo reference="RARM_JOINT6">
+    <cfmDamping>0.4</cfmDamping>
+  </gazebo>
+
+
+
+
+
+
+
+
+
+
+
+<!-- ! left gripper -->
+
+<!-- color -->
+    <material name="green">
+        <color rgba="0.0 0.5 0.0 1.0"/>
+    </material>
+
+    <material name="orange">
+        <color rgba="1.0 0.5 0.0 1.0"/>
+    </material>
+
+
+<!-- links -->
+    <link name="left_gripper_base_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_base.dae" scale="1 1 1" />
+            </geometry>
+            <material name="green"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_base.dae" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.237" />
+            <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+            <inertia ixx="0.001107915" ixy="0.000003098" ixz="-0.000023669" iyy="0.001134454" iyz="-0.000002919" izz="0.000149074"/>
+        </inertial>
+    </link>
+
+
+    <link name="left_finger_0_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.062" />
+            <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+            <inertia ixx="0.000186071" ixy="0" ixz="0.000022876" iyy="0.000193748" iyz="0" izz="0.000013049"/>
+        </inertial>
+    </link>
+
+
+    <link name="left_finger_120_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.062" />
+            <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+            <inertia ixx="0.000186071" ixy="0" ixz="0.000022876" iyy="0.000193748" iyz="0" izz="0.000013049"/>
+        </inertial>
+    </link>
+
+
+    <link name="left_finger_240_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.062" />
+            <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+            <inertia ixx="0.000186071" ixy="0" ixz="0.000022876" iyy="0.000193748" iyz="0" izz="0.000013049"/>
+        </inertial>
+    </link>
+
+
+    <link name="left_finger_slider_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.005 0.005 0.005" />
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia ixx="4.1666666667e-08" ixy="0" ixz="0" iyy="4.1666666667e-08" iyz="0" izz="4.1666666667e-08"/>
+        </inertial>
+    </link> 
+
+
+<!-- joints -->
+    
+    <joint name="left_gripper_fixed_joint" type="fixed">
+        <parent link="LARM_LINK6"/>
+        <child  link="left_gripper_base_link"/>
+        <origin xyz="0 0 -0.06" rpy="0 -0 1.57 "/>
+    </joint>
+
+
+    <joint name="left_gripper_slider_joint" type="prismatic">
+        <parent link="left_gripper_base_link"/>
+      <child    link="left_finger_slider_link"/>
+        <origin xyz="0 0 -0.155" rpy="0 -0 0 "/>
+        <axis     xyz="0 0 1"/>
+        <limit lower="0" upper="0.015" effort="1945.04" velocity="15.5966" />
+        <dynamics damping="0.2" friction="0" />
+    </joint>
+
+
+    <joint name="left_gripper_joint_0" type="revolute">
+        <parent link="left_gripper_base_link"/>
+        <child    link="left_finger_0_link"/>
+        <origin xyz="0 0.04525 -0.15319" rpy="0.3944 -0 0 "/>
+        <axis     xyz="1 0 0"/>
+        <limit lower="-0.57595" upper="0" effort="1945.04" velocity="15.5966" />
+        <dynamics damping="0.2" friction="0" />
+        <mimic joint="left_gripper_slider_joint" multiplier="-38.397243" offset="0"/>
+    </joint>
+
+
+    <joint name="left_gripper_joint_120" type="revolute">
+        <parent link="left_gripper_base_link"/>
+        <child    link="left_finger_120_link"/>
+        <origin xyz="-0.03918764952124584 -0.022625 -0.15319" rpy="0.3944 -0 2.0943951023931953 "/>
+        <axis     xyz="1 0 0"/>
+        <limit lower="-0.57595" upper="0" effort="1945.04" velocity="15.5966" />
+        <dynamics damping="0.2" friction="0" />
+        <mimic joint="left_gripper_slider_joint" multiplier="-38.397243" offset="0"/>
+    </joint>
+
+
+    <joint name="left_gripper_joint_240" type="revolute">
+        <parent link="left_gripper_base_link"/>
+        <child    link="left_finger_240_link"/>
+        <origin xyz="0.03918764952124584 -0.022625 -0.15319" rpy="0.3944 -0 -2.0943951023931953 "/>
+        <axis     xyz="1 0 0"/>
+        <limit lower="-0.57595" upper="0" effort="1945.04" velocity="15.5966" />
+        <dynamics damping="0.2" friction="0" />
+        <mimic joint="left_gripper_slider_joint" multiplier="-38.397243" offset="0"/>
+    </joint>
+
+
+
+
+
+
+
+<!-- !right gripper -->
+<!-- links -->
+    <link name="right_gripper_base_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_base.dae" scale="1 1 1" />
+            </geometry>
+            <material name="green"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_base.dae" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.237" />
+            <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+            <inertia ixx="0.001107915" ixy="0.000003098" ixz="-0.000023669" iyy="0.001134454" iyz="-0.000002919" izz="0.000149074"/>
+        </inertial>
+    </link>
+
+
+    <link name="right_finger_0_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.062" />
+            <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+            <inertia ixx="0.000186071" ixy="0" ixz="0.000022876" iyy="0.000193748" iyz="0" izz="0.000013049"/>
+        </inertial>
+    </link>
+
+
+    <link name="right_finger_120_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.062" />
+            <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+            <inertia ixx="0.000186071" ixy="0" ixz="0.000022876" iyy="0.000193748" iyz="0" izz="0.000013049"/>
+        </inertial>
+    </link>
+
+
+    <link name="right_finger_240_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 -0 0"/>
+            <geometry>
+                <mesh filename="package://k_arm_descriptions/meshes/HARVEST_GRIPPER_meshes/gripper_finger.dae" scale="1 1 1" />
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.062" />
+            <origin xyz="0 0 0.1" rpy="0 -0 0"/>
+            <inertia ixx="0.000186071" ixy="0" ixz="0.000022876" iyy="0.000193748" iyz="0" izz="0.000013049"/>
+        </inertial>
+    </link>
+
+
+    <link name="right_finger_slider_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.005 0.005 0.005" />
+            </geometry>
+            <material name="orange"/>
+        </visual>
+        <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia ixx="4.1666666667e-08" ixy="0" ixz="0" iyy="4.1666666667e-08" iyz="0" izz="4.1666666667e-08"/>
+        </inertial>
+    </link> 
+
+
+<!-- joints -->
+    
+    <joint name="right_gripper_fixed_joint" type="fixed">
+      <parent link="RARM_LINK6"/>
+        <child  link="right_gripper_base_link"/>
+        <origin xyz="0 0 -0.06" rpy="0 -0 1.57 "/>
+    </joint>
+
+
+    <joint name="right_gripper_slider_joint" type="prismatic">
+        <parent link="right_gripper_base_link"/>
+      <child    link="right_finger_slider_link"/>
+        <origin xyz="0 0 -0.155" rpy="0 -0 0 "/>
+        <axis     xyz="0 0 1"/>
+        <limit lower="0" upper="0.015" effort="1945.04" velocity="15.5966" />
+        <dynamics damping="0.2" friction="0" />
+    </joint>
+
+
+    <joint name="right_gripper_joint_0" type="revolute">
+        <parent link="right_gripper_base_link"/>
+        <child    link="right_finger_0_link"/>
+        <origin xyz="0 0.04525 -0.15319" rpy="0.3944 -0 0 "/>
+        <axis     xyz="1 0 0"/>
+        <limit lower="-0.57595" upper="0" effort="1945.04" velocity="15.5966" />
+        <dynamics damping="0.2" friction="0" />
+        <mimic joint="right_gripper_slider_joint" multiplier="-38.397243" offset="0"/>
+    </joint>
+
+
+    <joint name="right_gripper_joint_120" type="revolute">
+        <parent link="right_gripper_base_link"/>
+        <child    link="right_finger_120_link"/>
+        <origin xyz="-0.03918764952124584 -0.022625 -0.15319" rpy="0.3944 -0 2.0943951023931953 "/>
+        <axis     xyz="1 0 0"/>
+        <limit lower="-0.57595" upper="0" effort="1945.04" velocity="15.5966" />
+        <dynamics damping="0.2" friction="0" />
+        <mimic joint="right_gripper_slider_joint" multiplier="-38.397243" offset="0"/>
+    </joint>
+
+
+    <joint name="right_gripper_joint_240" type="revolute">
+        <parent link="right_gripper_base_link"/>
+        <child    link="right_finger_240_link"/>
+        <origin xyz="0.03918764952124584 -0.022625 -0.15319" rpy="0.3944 -0 -2.0943951023931953 "/>
+        <axis     xyz="1 0 0"/>
+        <limit lower="-0.57595" upper="0" effort="1945.04" velocity="15.5966" />
+        <dynamics damping="0.2" friction="0" />
+        <mimic joint="right_gripper_slider_joint" multiplier="-38.397243" offset="0"/>
+    </joint>
+
+
+
+
+
+</robot>

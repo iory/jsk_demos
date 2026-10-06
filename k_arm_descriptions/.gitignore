@@ -1,0 +1,4 @@
+# Arm meshes are not redistributable. K_ARM_DUALARM_primitive.urdf replaces
+# them with primitives (regenerate with scripts/generate_primitive_urdf.py).
+meshes/K_ARM_DUALARM_meshes/
+meshes/K_ARM_SINGLEARM_LINEAR_meshes/
