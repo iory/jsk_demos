@@ -178,6 +178,38 @@ rosrun k_arm_teleop recenter_leader.py --device follower      # フォロワー�
 
 カメラ（RGB・深度）は `recording.topics` に追加する（容量のため `.../compressed`、`.../compressedDepth` を推奨）．
 
+## 学習した方策で動かす（右腕）
+
+テレオペで撮った bag を学習サーバー（supernova の tree-vla-il）で追加学習し、できた方策を
+`k_arm_pick_policy` の実行ノードで右腕に動かす．方策自体は左腕用なので、右腕のデータと指令は
+tree-vla-il 側（ブランチ field-pipeline、1e4f6a2 以降）で ARM_BODY の xz 平面について鏡映する．
+右手首カメラの取り付けが左の鏡映になっていることが前提（未確認）．
+
+```bash
+rosrun k_arm_teleop kpick.sh check ~/k_arm_bags/xxx.bag    # トピックが足りているか（サーバー側で確認）
+rosrun k_arm_teleop kpick.sh train                         # ~/k_arm_bags の bag を全部送って学習 -> ~/kpick_results/<job>/result
+rosrun k_arm_teleop kpick.sh train -e 20 ~/k_arm_bags/today # シミュレーションの確認を 20 本に減らす
+rosrun k_arm_teleop kpick.sh run                           # 最新の結果を確認モードで（ロボットには送らない）
+rosrun k_arm_teleop kpick.sh run execute                   # 実際に動かす（テレオペは STOP にしておく）
+```
+
+- rviz パネルの「Learned policy (right arm)」からも同じことができる（`kpick_manager.py`、teleop.launch で起動）．
+  `Train on the recorded bags` で録画ディレクトリの bag を全部送って学習（進捗を表示、結果は `~/kpick_results`）、
+  `Result` で結果を選んで `Report` でレポートを開き、`Preview`（ロボットに送らない）/ `Execute`（実機）で起動、
+  `Start picking` / `Stop picking` で 1 回の収穫を開始・停止、`Shut down` で終了．Execute はテレオペが実機に
+  追従している間は押せない．学習の Cancel はこの PC の待ち受けをやめるだけで、サーバーに渡ったジョブは続く．
+- rviz（`real:=true`）の `Policy detections` に、方策ノードの検出結果（`/kpick_policy/debug/image`）が出る．
+  対象のりんごは赤（TARGET）、ほかは緑．待機中も出るので、Start picking でどのりんごを狙うかを先に見られる．
+  パネルには `/kpick_policy/status` を 1 行にして出す（状態、ステップ、検出、1 tick の時間）．
+  どちらも tree-vla-il f9e8933 以降のノード、つまりそれ以降に学習したジョブの結果で出る（結果ごとに `deploy/` のコードで動くため）．
+- 設定は `config/kpick_right.yaml`．tree-vla-il の `k_arm_right`（右腕、右手首カメラ、`/rarm_controller/command`）に
+  グリッパーの送り先を足しただけ．学習ジョブと実行ノードの両方に渡る．`k_arm_right` を持たない古い学習結果では動かない．
+- グリッパー: 方策は 0（開）〜1（閉）を出す．`gripper_command_bridge.py` がテレオペのトリガーと同じ開閉の
+  ロジック（`teleop.yaml` の `arms/rarm/gripper/real`）で実機の effort に変える．`execute` のときだけ起動し、
+  最初の指令が来るまで何も送らない．指令が止まっても最後の状態を保つ（つかんだものを落とさない）．
+  開くときは `rosservice call /k_arm_gripper_bridge/release`．
+- 学習の流れ・レポートの見方・困ったときは tree-vla-il の `docs/trickstar_guide.md`．
+
 ## 設定
 
 - `config/leader_bus.yaml`: ポート、ボーレート、`joint_ranges_deg`（キャリブレーション姿勢からの可動域．出典はユーザー提供の表）

@@ -12,6 +12,8 @@
 #include <QAbstractItemView>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDesktopServices>
+#include <QFileInfo>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -24,6 +26,7 @@
 #include <QScrollArea>
 #include <QTableWidget>
 #include <QTimer>
+#include <QUrl>
 #include <QVBoxLayout>
 
 namespace k_arm_teleop
@@ -37,6 +40,8 @@ const int kDirectionColumn = 2;
 const char* kCalibrateTriggerService = "/teleop_leader/calibrate_trigger";
 const double kWarnTemperature = 55.0;  // [C] STS3215 default limit is 70
 const double kLowVoltage = 6.0;        // [V]
+const char* kPolicyManager = "/kpick_manager";
+const char* kPolicyNode = "/kpick_policy";
 const double kStatusTimeout = 2.0;  // [s] without ~status -> manager shown as missing
 const int kRefreshMs = 200;
 
@@ -72,7 +77,7 @@ QString phaseColor(const std::string& phase)
 }  // namespace
 
 TeleopPanel::TeleopPanel(QWidget* parent)
-  : rviz::Panel(parent), have_servo_status_(false), have_status_(false), dir_edited_(false), blink_(0)
+  : rviz::Panel(parent), have_servo_status_(false), have_policy_(false), have_status_(false), dir_edited_(false), blink_(0)
 {
   QVBoxLayout* layout = new QVBoxLayout;
 
@@ -182,6 +187,45 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   record_box->setLayout(record);
   layout->addWidget(record_box);
 
+  // -- learned policy (kpick_manager.py)
+  QGroupBox* policy_box = new QGroupBox("Learned policy (right arm)");
+  QGridLayout* policy = new QGridLayout;
+  train_button_ = new QPushButton("Train on the recorded bags");
+  train_button_->setToolTip("Send every bag of the recording directory to the training server "
+                            "(scripts/kpick.sh train). The result comes back to ~/kpick_results.");
+  cancel_train_button_ = new QPushButton("Cancel");
+  train_label_ = new QLabel;
+  train_label_->setWordWrap(true);
+  policy->addWidget(train_button_, 0, 0, 1, 2);
+  policy->addWidget(cancel_train_button_, 0, 2);
+  policy->addWidget(train_label_, 1, 0, 1, 3);
+  result_combo_ = new QComboBox;
+  result_combo_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+  result_combo_->setMinimumContentsLength(16);
+  report_button_ = new QPushButton("Report");
+  policy->addWidget(new QLabel("Result:"), 2, 0);
+  policy->addWidget(result_combo_, 2, 1);
+  policy->addWidget(report_button_, 2, 2);
+  preview_button_ = new QPushButton("Preview");
+  preview_button_->setToolTip("Run the policy without sending anything to the robot (targets on /kpick_policy/preview/*).");
+  execute_button_ = new QPushButton("Execute");
+  execute_button_->setToolTip("Run the policy on the REAL right arm and gripper.");
+  shutdown_button_ = new QPushButton("Shut down");
+  policy->addWidget(preview_button_, 3, 0);
+  policy->addWidget(execute_button_, 3, 1);
+  policy->addWidget(shutdown_button_, 3, 2);
+  policy_start_button_ = new QPushButton("Start picking");
+  policy_start_button_->setToolTip("/kpick_policy/start: pick the detected apple nearest the image centre.");
+  policy_stop_button_ = new QPushButton("Stop picking");
+  policy_stop_button_->setStyleSheet("background-color: #c62828; color: white; font-weight: bold;");
+  policy->addWidget(policy_start_button_, 4, 0, 1, 2);
+  policy->addWidget(policy_stop_button_, 4, 2);
+  policy_label_ = new QLabel;
+  policy_label_->setWordWrap(true);
+  policy->addWidget(policy_label_, 5, 0, 1, 3);
+  policy_box->setLayout(policy);
+  layout->addWidget(policy_box);
+
   result_label_ = new QLabel;
   result_label_->setWordWrap(true);
   layout->addWidget(result_label_);
@@ -213,6 +257,14 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   connect(dir_edit_, &QLineEdit::textEdited, this, [this]() { dir_edited_ = true; });
   connect(dir_edit_, SIGNAL(returnPressed()), this, SLOT(onApplyDirectory()));
   connect(record_button_, SIGNAL(clicked()), this, SLOT(onRecordToggle()));
+  connect(train_button_, SIGNAL(clicked()), this, SLOT(onTrain()));
+  connect(cancel_train_button_, SIGNAL(clicked()), this, SLOT(onCancelTrain()));
+  connect(report_button_, SIGNAL(clicked()), this, SLOT(onOpenReport()));
+  connect(preview_button_, SIGNAL(clicked()), this, SLOT(onPolicyPreview()));
+  connect(execute_button_, SIGNAL(clicked()), this, SLOT(onPolicyExecute()));
+  connect(shutdown_button_, SIGNAL(clicked()), this, SLOT(onPolicyShutdown()));
+  connect(policy_start_button_, SIGNAL(clicked()), this, SLOT(onPolicyStart()));
+  connect(policy_stop_button_, SIGNAL(clicked()), this, SLOT(onPolicyStop()));
 
   timer_ = new QTimer(this);
   connect(timer_, SIGNAL(timeout()), this, SLOT(refresh()));
@@ -220,6 +272,7 @@ TeleopPanel::TeleopPanel(QWidget* parent)
 
   connectManager(kDefaultManager);
   servo_sub_ = nh_.subscribe(kServoStatusTopic, 1, &TeleopPanel::servoCallback, this);
+  policy_sub_ = nh_.subscribe(std::string(kPolicyManager) + "/status", 1, &TeleopPanel::policyCallback, this);
   refresh();
 }
 
@@ -409,9 +462,175 @@ void TeleopPanel::rebuildArms()
   }
 }
 
+void TeleopPanel::policyCallback(const k_arm_teleop::PolicyStatus::ConstPtr& msg)
+{
+  policy_ = *msg;
+  have_policy_ = true;
+  last_policy_time_ = ros::WallTime::now();
+}
+
+void TeleopPanel::refreshPolicy()
+{
+  bool alive = have_policy_ && (ros::WallTime::now() - last_policy_time_).toSec() < kStatusTimeout;
+  const PolicyStatus& p = policy_;
+  // results, newest first; keep the user's choice while it still exists
+  QStringList results;
+  for (const std::string& r : p.results)
+    results << QString::fromStdString(r);
+  QStringList shown;
+  for (int i = 0; i < result_combo_->count(); ++i)
+    shown << result_combo_->itemData(i).toString();
+  if (alive && shown != results && !result_combo_->view()->isVisible())
+  {
+    QString keep = result_combo_->currentData().toString();
+    result_combo_->clear();
+    for (const QString& r : results)
+      result_combo_->addItem(QFileInfo(QFileInfo(r).path()).fileName(), r);
+    int index = result_combo_->findData(keep);
+    result_combo_->setCurrentIndex(index >= 0 ? index : 0);
+  }
+  bool running = alive && !p.policy.empty();
+  bool teleop_active = have_status_ && (status_.phase == "approaching" || status_.phase == "following" ||
+                                        status_.phase == "moving_to_zero");
+  train_button_->setEnabled(alive && !p.training && !(have_status_ && status_.recording));
+  cancel_train_button_->setEnabled(alive && p.training);
+  result_combo_->setEnabled(alive && !running);
+  report_button_->setEnabled(result_combo_->count() > 0);
+  preview_button_->setEnabled(alive && !running && result_combo_->count() > 0);
+  execute_button_->setEnabled(alive && !running && result_combo_->count() > 0 && !teleop_active);
+  shutdown_button_->setEnabled(running);
+  policy_start_button_->setEnabled(running && !teleop_active);
+  policy_stop_button_->setEnabled(running);
+
+  if (!alive)
+  {
+    train_label_->setText(QString("<span style='color:#c62828'>no %1/status</span> (kpick_manager.py not running)")
+                              .arg(kPolicyManager));
+    policy_label_->clear();
+    return;
+  }
+  QString train;
+  if (p.training)
+    train = QString("<b style='color:#ef6c00'>training</b> %1<br>%2")
+                .arg(QString::fromStdString(p.train_job), QString::fromStdString(p.train_stage).toHtmlEscaped());
+  else if (!p.train_error.empty())
+    train = QString("<b style='color:#c62828'>training failed</b>: %1")
+                .arg(QString::fromStdString(p.train_error).toHtmlEscaped());
+  else if (!p.train_stage.empty())
+    train = QString::fromStdString(p.train_stage).toHtmlEscaped();
+  else
+    train = QString("%1 result(s)").arg(p.results.size());
+  train_label_->setText(train);
+
+  QString state;
+  if (!running)
+    state = "policy: not running";
+  else if (p.policy == "execute")
+    state = QString("<b style='color:#c62828'>EXECUTE</b> (real right arm) %1")
+                .arg(QFileInfo(QFileInfo(QString::fromStdString(p.policy_result)).path()).fileName());
+  else
+    state = QString("<b style='color:#2e7d32'>preview</b> (nothing sent to the robot) %1")
+                .arg(QFileInfo(QFileInfo(QString::fromStdString(p.policy_result)).path()).fileName());
+  if (running && !p.policy_status.empty())
+    state += "<br>" + QString::fromStdString(p.policy_status).toHtmlEscaped();
+  if (!p.message.empty())
+    state += "<br>" + QString::fromStdString(p.message).toHtmlEscaped();
+  policy_label_->setText(state);
+}
+
+std::string TeleopPanel::selectedResult() const
+{
+  return result_combo_->currentData().toString().toStdString();
+}
+
+bool TeleopPanel::callService(const std::string& service, const std::string* data)
+{
+  if (!ros::service::waitForService(service, ros::Duration(0.5)))
+  {
+    report(false, service + " is not available");
+    return false;
+  }
+  bool ok;
+  std::string message;
+  if (data)
+  {
+    k_arm_teleop::SetString srv;
+    srv.request.data = *data;
+    ok = ros::service::call(service, srv);
+    message = srv.response.message;
+    ok = ok && srv.response.success;
+  }
+  else
+  {
+    std_srvs::Trigger srv;
+    ok = ros::service::call(service, srv);
+    message = srv.response.message;
+    ok = ok && srv.response.success;
+  }
+  report(ok, message.empty() ? service + (ok ? " ok" : " call failed") : message);
+  return ok;
+}
+
+void TeleopPanel::onTrain()
+{
+  std::string dir = have_status_ ? status_.record_directory : std::string();
+  QString text = QString("Send all %1 bags in\n%2\nto the training server and fine-tune the policy?\n\n"
+                         "Only successful picks belong there (gripper closed with the apple in it).")
+                     .arg(have_status_ ? QString::number(status_.bag_count) : QString("the"),
+                          QString::fromStdString(dir));
+  if (QMessageBox::question(this, "Train", text, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) ==
+      QMessageBox::Yes)
+    callService(std::string(kPolicyManager) + "/train", &dir);
+}
+
+void TeleopPanel::onCancelTrain()
+{
+  callService(std::string(kPolicyManager) + "/cancel_train", nullptr);
+}
+
+void TeleopPanel::onOpenReport()
+{
+  QString report = result_combo_->currentData().toString() + "/report.html";
+  if (!QFileInfo::exists(report) || !QDesktopServices::openUrl(QUrl::fromLocalFile(report)))
+    TeleopPanel::report(false, "cannot open " + report.toStdString());
+}
+
+void TeleopPanel::onPolicyPreview()
+{
+  std::string request = "preview " + selectedResult();
+  callService(std::string(kPolicyManager) + "/launch", &request);
+}
+
+void TeleopPanel::onPolicyExecute()
+{
+  if (QMessageBox::warning(this, "Execute the policy",
+                           "The learned policy will move the REAL right arm and gripper once you press "
+                           "\"Start picking\".\nTeleop must stay on STOP. Keep the STOP buttons at hand.\n\nLaunch it?",
+                           QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+    return;
+  std::string request = "execute " + selectedResult();
+  callService(std::string(kPolicyManager) + "/launch", &request);
+}
+
+void TeleopPanel::onPolicyShutdown()
+{
+  callService(std::string(kPolicyManager) + "/shutdown", nullptr);
+}
+
+void TeleopPanel::onPolicyStart()
+{
+  callService(std::string(kPolicyNode) + "/start", nullptr);
+}
+
+void TeleopPanel::onPolicyStop()
+{
+  callService(std::string(kPolicyNode) + "/stop", nullptr);
+}
+
 void TeleopPanel::refresh()
 {
   refreshServos();
+  refreshPolicy();
   bool alive = have_status_ && (ros::WallTime::now() - last_status_time_).toSec() < kStatusTimeout;
   const TeleopStatus& s = status_;
   bool active = alive && (s.phase == "approaching" || s.phase == "following" ||

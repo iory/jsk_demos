@@ -3,6 +3,7 @@
 
 #ifndef Q_MOC_RUN
 #include <k_arm_teleop/LeaderServoStatus.h>
+#include <k_arm_teleop/PolicyStatus.h>
 #include <k_arm_teleop/TeleopStatus.h>
 #include <ros/ros.h>
 #include <rviz/panel.h>
@@ -50,6 +51,14 @@ private Q_SLOTS:
   void onBrowse();
   void onApplyDirectory();
   void onRecordToggle();
+  void onTrain();
+  void onCancelTrain();
+  void onOpenReport();
+  void onPolicyPreview();
+  void onPolicyExecute();
+  void onPolicyShutdown();
+  void onPolicyStart();
+  void onPolicyStop();
   void refresh();
 
 private:
@@ -57,6 +66,10 @@ private:
   void statusCallback(const k_arm_teleop::TeleopStatus::ConstPtr& msg);
   void servoCallback(const k_arm_teleop::LeaderServoStatus::ConstPtr& msg);
   void refreshServos();
+  void refreshPolicy();
+  void policyCallback(const k_arm_teleop::PolicyStatus::ConstPtr& msg);
+  bool callService(const std::string& service, const std::string* data);
+  std::string selectedResult() const;
   void flipDirection(int row);
   void calibrateTrigger(const std::string& joint, const std::string& point);
   bool callTrigger(const std::string& name);
@@ -69,6 +82,10 @@ private:
   ros::NodeHandle nh_;
   ros::Subscriber status_sub_;
   ros::Subscriber servo_sub_;
+  ros::Subscriber policy_sub_;
+  k_arm_teleop::PolicyStatus policy_;
+  ros::WallTime last_policy_time_;
+  bool have_policy_;
   k_arm_teleop::LeaderServoStatus servo_status_;
   ros::WallTime last_servo_time_;
   bool have_servo_status_;
@@ -108,6 +125,17 @@ private:
   QLabel* current_bag_label_;
   QLabel* record_warning_label_;
   int blink_;
+  QPushButton* train_button_;
+  QPushButton* cancel_train_button_;
+  QLabel* train_label_;
+  QComboBox* result_combo_;
+  QPushButton* report_button_;
+  QPushButton* preview_button_;
+  QPushButton* execute_button_;
+  QPushButton* shutdown_button_;
+  QPushButton* policy_start_button_;
+  QPushButton* policy_stop_button_;
+  QLabel* policy_label_;
   QLabel* result_label_;
   QTimer* timer_;
 };

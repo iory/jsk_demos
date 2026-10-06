@@ -134,6 +134,10 @@
     <param name="arms/larm/enabled" value="$(eval arm == 'left')" />
   </node>
 
+  <!-- the panel's "Learned policy" box: train on the recorded bags, run the result
+       (scripts/kpick.sh, launch/kpick_right.launch) -->
+  <node name="kpick_manager" pkg="k_arm_teleop" type="kpick_manager.py" output="screen" />
+
   <!-- with real:=true also show the robot's wrist and head cameras (compressed transport) -->
   <arg name="rviz_config" default="$(eval find('k_arm_teleop') + ('/rviz/teleop_real.rviz' if real else '/rviz/teleop.rviz'))" />
   <node name="rviz" pkg="rviz" type="rviz" if="$(arg rviz)" args="-d $(arg rviz_config)" />
