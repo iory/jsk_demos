@@ -202,6 +202,36 @@ recording:
     - /gripper_right/joint_group_effort_controller/command
     - /gripper_left/joint_states
     - /gripper_left/joint_group_effort_controller/command
+    # gripper finger sensors, as the gripper's record_rosbag.launch records them (its default
+    # gripper:=gripper; names checked on the robot 2026-10-07): UDTS proximity array of
+    # finger 0 (force_proximity_ros/ProximityArray) and its three WSB proximity / ToF sensors
+    # (ToF sensor_msgs/Range at ~10 Hz)
+    - /gripper_tactile/udts/finger_0/proximities_intensity/raw
+    - /gripper_tactile/udts/finger_0/proximities_intensity
+    - /gripper_tactile/wsb/finger_0/0/proximity_intensity/raw
+    - /gripper_tactile/wsb/finger_0/0/proximity_intensity
+    - /gripper_tactile/wsb/finger_0/0/range_tof/raw
+    - /gripper_tactile/wsb/finger_0/0/range_tof
+    - /gripper_tactile/wsb/finger_0/0/range_low_pass_filter/output
+    - /gripper_tactile/wsb/finger_0/0/intensity_model_acquisition/output/intensity_model_param
+    - /gripper_tactile/wsb/finger_0/0/intensity_model_acquisition/output/range_intensity
+    - /gripper_tactile/wsb/finger_0/0/intensity_model_acquisition/output/range_combined
+    - /gripper_tactile/wsb/finger_0/1/proximity_intensity/raw
+    - /gripper_tactile/wsb/finger_0/1/proximity_intensity
+    - /gripper_tactile/wsb/finger_0/1/range_tof/raw
+    - /gripper_tactile/wsb/finger_0/1/range_tof
+    - /gripper_tactile/wsb/finger_0/1/range_low_pass_filter/output
+    - /gripper_tactile/wsb/finger_0/1/intensity_model_acquisition/output/intensity_model_param
+    - /gripper_tactile/wsb/finger_0/1/intensity_model_acquisition/output/range_intensity
+    - /gripper_tactile/wsb/finger_0/1/intensity_model_acquisition/output/range_combined
+    - /gripper_tactile/wsb/finger_0/2/proximity_intensity/raw
+    - /gripper_tactile/wsb/finger_0/2/proximity_intensity
+    - /gripper_tactile/wsb/finger_0/2/range_tof/raw
+    - /gripper_tactile/wsb/finger_0/2/range_tof
+    - /gripper_tactile/wsb/finger_0/2/range_low_pass_filter/output
+    - /gripper_tactile/wsb/finger_0/2/intensity_model_acquisition/output/intensity_model_param
+    - /gripper_tactile/wsb/finger_0/2/intensity_model_acquisition/output/range_intensity
+    - /gripper_tactile/wsb/finger_0/2/intensity_model_acquisition/output/range_combined
     - /virtual/joint_states
     # wrist camera (right)
     - /wrist_right_camera/color/image_raw/compressed
