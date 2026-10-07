@@ -265,8 +265,12 @@ rosrun k_arm_teleop kpick.sh run execute                   # 実際に動かす�
     手先の回転を合わせる（`k_arm_teleop/kinematics.py` の `WristMap`）．J5 は ±90° で頭打ち、特異姿勢付近では J4 を保持．
   - `leader_zero` はキャリブレーション姿勢のリーダー URDF 上の関節角．ドライバ、ガイド表示、マネージャがここを読む．
   - `leader_base`: リーダーのベース → K_ARM の向き（対応計算と rviz 表示の両方で使う）と表示位置．
-  - `follow`: 50 Hz、到達時間 0.04 s（遅れ約 50〜70 ms）．`max_velocity` は送り先・関節ごと（virtual 10 rad/s、
-    real は腕 1.5、手首 J4 5 / J5・J6 3 rad/s）．
+  - `follow`: virtual は 50 Hz、到達時間 0.04 s（遅れ約 50〜70 ms）．**real は `ri.angle_vector(pose, 5000)` 式**：
+    5 秒ごとにリーダーのその時の姿勢を「5 秒かけて到達する」action goal で送る（`send_rate.real` 0.2、
+    `lookahead.real` 5.0、`interface.real` action）．速い動きで実機が落ちるため．ロボットはリーダーから最大 10 秒ほど
+    遅れる．STOP / リーダー切断で goal を取り消すので、動作中の goal はその場で止まる．N を変えるときは
+    `lookahead.real` を N、`send_rate.real` を 1/N にする（以前の追従は 10.0 / 0.1）．
+    `max_velocity` は送り先・関節ごと（virtual 10 rad/s、real は腕 1.5、手首 J4 5 / J5・J6 3 rad/s）．
 - `config/leader_calibration.yaml`: `zero_raw`（ゼロ点）、`direction`（flip の結果）、`trigger`（2 点）．リーダーのハードウェア固有の値．
   左右で 1 ファイルを共有し、保存時は今つないでいない腕の値を残す（右でキャリブレーションしても左の値は消えない）
 

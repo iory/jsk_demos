@@ -693,7 +693,10 @@ class TeleopManager(object):
                 self.speed_limited.append(joint)
         self.last_command = command
         lookahead = rospy.Duration(float(self.follow['lookahead'][self.target]))
-        use_action = self.follow.get('interface', 'topic') == 'action'
+        interface = self.follow.get('interface', 'topic')
+        if isinstance(interface, dict):
+            interface = interface[self.target]
+        use_action = interface == 'action'
         now = rospy.get_time()
         send = now - self.last_send >= 1.0 / float(self.follow['send_rate'][self.target]) - 0.5 * dt
         if send:
@@ -706,6 +709,9 @@ class TeleopManager(object):
             client = self._client(self.target, controller)
             if use_action:
                 client.send_goal(FollowJointTrajectoryGoal(trajectory=trajectory))
+                # tracked, so STOP / leader lost cancel the move (a long goal would run on)
+                if client not in self.pending_goals:
+                    self.pending_goals.append(client)
             else:
                 self.command_pubs[(self.target, controller)].publish(trajectory)
         msg = JointState()
