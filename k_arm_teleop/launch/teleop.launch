@@ -14,11 +14,22 @@
   <arg name="this_hostname" value="$(optenv ROS_HOSTNAME)" />
   <arg name="master_host" value="$(eval master_uri.split('//')[-1].split('/')[0].rsplit(':', 1)[0])" />
   <arg name="master_is_local" value="$(eval master_host != '' and master_host in ('localhost', '127.0.0.1', this_ip, this_hostname))" />
-  <arg name="sim_guard" value="$(eval '' if real or master_is_local or allow_remote_sim else (_ for _ in ()).throw(RuntimeError(
-      'real:=false would put the simulated stand-in on the master at ' + master_uri + ' (not this PC): it overwrites '
-      '/robot_description and serves the arm controllers there. Connected to the robot? add real:=true. '
-      'Meant to simulate? use a local master (export ROS_MASTER_URI=http://localhost:11311). '
-      'Really want it there? add allow_remote_sim:=true')))" />
+  <!-- the refusal, framed so it stands out from roslaunch's own output -->
+  <arg name="sim_guard_text" value="$(eval '\n'.join(['', '  +' + '-' * 64 + '+'] + ['  |  ' + line.ljust(60) + '  |' for line in [
+      'STOP: real:=false, but the ROS master is NOT this PC',
+      '      ' + master_uri,
+      '',
+      'real:=false starts a simulated stand-in for the robot.',
+      'On that master it would overwrite /robot_description and',
+      'serve the arm controllers in place of the robot ones.',
+      '',
+      'Connected to the robot?',
+      '    roslaunch k_arm_teleop teleop.launch real:=true',
+      'Meant to simulate on this PC?',
+      '    export ROS_MASTER_URI=http://localhost:11311',
+      'Really want the stand-in on that master?',
+      '    add allow_remote_sim:=true']] + ['  +' + '-' * 64 + '+', '']))" />
+  <arg name="sim_guard" value="$(eval '' if real or master_is_local or allow_remote_sim else (_ for _ in ()).throw(RuntimeError(sim_guard_text)))" />
   <!-- with the Real robot target only the grippers move; no arm command is sent -->
   <arg name="gripper_only" default="false" />
   <!-- only the wrists (and grippers) follow the leader; shoulder and elbow hold the pose
