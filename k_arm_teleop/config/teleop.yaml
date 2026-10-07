@@ -49,10 +49,11 @@ arms:
         servo_topic: /gripper_left/dynamixel_general_control/servo            # std_msgs/Bool, set on Start
         state_topic: /gripper_left/joint_states                               # recorded
         close_effort: -0.4               # trigger pulled all the way: closing torque
-        # The Dynamixel runs in current mode: 0 only goes limp, so opening is a
-        # push the other way, held until the gripper stops (open end) or
-        # open_timeout, then 0 so it does not stall there.
-        open_effort: 0.3
+        # The Dynamixel runs in current mode. open_effort > 0 pushes it open,
+        # held until the gripper stops (open end) or open_timeout, then 0 so it
+        # does not stall there; 0 only releases it (it then opens by itself).
+        # Was 0.3 (2026-10-06, when releasing did not open it); 0 from 2026-10-07.
+        open_effort: 0.0
         release_fraction: 0.05           # trigger below this counts as let go
         open_min_time: 0.3               # [s] push at least this long
         open_stall_velocity: 0.05        # [rad/s] slower than this = reached the open end
@@ -89,10 +90,11 @@ arms:
         servo_topic: /gripper_right/dynamixel_general_control/servo            # std_msgs/Bool, set on Start
         state_topic: /gripper_right/joint_states                               # recorded
         close_effort: -0.4               # trigger pulled all the way: closing torque
-        # The Dynamixel runs in current mode: 0 only goes limp, so opening is a
-        # push the other way, held until the gripper stops (open end) or
-        # open_timeout, then 0 so it does not stall there.
-        open_effort: 0.3
+        # The Dynamixel runs in current mode. open_effort > 0 pushes it open,
+        # held until the gripper stops (open end) or open_timeout, then 0 so it
+        # does not stall there; 0 only releases it (it then opens by itself).
+        # Was 0.3 (2026-10-06, when releasing did not open it); 0 from 2026-10-07.
+        open_effort: 0.0
         release_fraction: 0.05           # trigger below this counts as let go
         open_min_time: 0.3               # [s] push at least this long
         open_stall_velocity: 0.05        # [rad/s] slower than this = reached the open end
