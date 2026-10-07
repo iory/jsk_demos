@@ -39,7 +39,7 @@ source /opt/ros/one/setup.bash
 cd ~/catkin_ws && catkin config --extend /opt/ros/one && catkin build k_arm_teleop
 source devel/setup.bash
 sudo usermod -aG dialout $USER   # シリアルポートの権限（初回のみ．再ログインが必要）
-# USB アダプタを挿して、/dev/k_arm_leader と /dev/k_arm_follower の名前を付ける（PC ごとに初回のみ）
+# USB アダプタを挿して、/dev/k_arm_leader、/dev/k_arm_follower、/dev/k_arm_rec_button（AtomS3）の名前を付ける（PC ごとに初回のみ）
 sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply
 roslaunch k_arm_teleop teleop.launch
 ```
@@ -101,6 +101,8 @@ roslaunch k_arm_teleop teleop.launch real:=true
 | `gripper_only` | `false` | `true`: Real robot には腕の指令を送らず、グリッパー（トリガー）だけ動かす |
 | `leader` | `feetech` | `feetech`: サーボから読む．`gui`: スライダー（机上テスト）．`external`: 何も起動しない（bag 再生など） |
 | `rviz` | `true` | rviz（TeleopPanel 付き）を起動．`real:=true` では `rviz/teleop_real.rviz`（手首・頭カメラの画像付き） |
+| `rec_button` | `true` | AtomS3 の記録ボタン（`rec_button_bridge.py`）を起動．AtomS3 がなくてもポートを 1 秒ごとに開き直すだけで、他は止めない |
+| `rec_button_port` | `/dev/k_arm_rec_button` | AtomS3 のシリアルポート |
 | `port` | （空） | リーダーのシリアルポート．空なら `leader_bus.yaml` の `port`（`/dev/k_arm_leader`） |
 | `config` | `config/teleop.yaml` | 対応・速度・記録トピック |
 | `leader_bus` | `config/leader_bus.yaml` | ポート、サーボ id、可動域 |
@@ -125,6 +127,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 7. `Robot -> zero pose` は選択中の target をゆっくりゼロ姿勢へ．`STOP` はいつでも．
 8. **記録**: ディレクトリを選んで `Start recording`．パネルにディレクトリ内の bag 数・合計サイズ・空き容量、
    記録中は経過時間とサイズが出る．記録トピックは `config/teleop.yaml` の `recording.topics`．
+   リーダーを持ったままなら、AtomS3 の画面を押しても記録の開始・停止ができる（下記）．
 
 ### リーダーを動かす（サーボに通電）
 
@@ -177,6 +180,41 @@ rosrun k_arm_teleop recenter_leader.py --device follower      # フォロワー�
 | `/tf`, `/tf_static` | `tf2_msgs/TFMessage` | |
 
 カメラ（RGB・深度）は `recording.topics` に追加する（容量のため `.../compressed`、`.../compressedDepth` を推奨）．
+
+### AtomS3 の記録ボタン
+
+AtomS3（画面付き．AtomS3 Lite・AtomS3R ではない）を USB でこの PC につなぐと、記録の状態を画面に出し、
+画面（ボタン）を押すと記録を開始・停止する．`teleop.launch` が `rec_button_bridge.py` を起動し、
+`/k_arm_teleop_manager/status` を AtomS3 に送り、押されたら `start_recording` / `stop_recording` を呼ぶ
+（パネルの `Start recording` と同じサービス．パネルの表示とずれない）．
+
+| 画面 | 意味 |
+| --- | --- |
+| 赤地に `REC`、経過時間とサイズ | 記録中 |
+| `REC` の下に黄色の `NO LABEL` | 記録中だが following でない．`/k_arm_teleop_manager/command`（行動ラベル）が出ていない |
+| `REC` の下に `VIRTUAL` | target が virtual．実機は動いていない |
+| オレンジの点滅で `NOT REC` | following なのに記録していない |
+| 暗い地に `STANDBY`、bag の本数とフェーズ | 記録していない |
+| 灰色の `NO TELEOP` | ブリッジは動いているが、`/k_arm_teleop_manager/status` が 2 秒以上来ない |
+| 灰色の `NO LINK` | PC から 2 秒以上何も来ない（ブリッジが動いていない・ポートが開けない） |
+| 白帯の `...` → `OK` / `ERR <理由>` | 押した結果．結果が返るまで次の押下は無視する．5 秒返らなければ `no reply from the PC` |
+
+following でないときに押しても、確認なしでそのまま記録を始める（画面に `NO LABEL` が出る）．パネルのボタンは
+確認ダイアログを出す．
+
+初回（PC ごと）: `sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply` で
+`/dev/k_arm_rec_button` の名前を付ける（`config/usb_adapters.yaml` に AtomS3 のシリアル番号が載っている．別の
+AtomS3 なら `--role rec_button` を付けて一度実行する）．
+
+ファームウェアは `firmware/atoms3_rec_button`（PlatformIO、M5Unified）．書き込み:
+
+```bash
+pio run -d $(rospack find k_arm_teleop)/firmware/atoms3_rec_button -t upload --upload-port /dev/k_arm_rec_button
+```
+
+PC との通信は 115200 bps の 1 行テキスト（`rec_button_bridge.py` と `src/main.cpp` の先頭に仕様）．
+`pio device monitor` で開いて `S rec=1 dur=12 size=3000000 bags=2 phase=following target=real` と打てば、
+ROS なしで表示を確かめられる．
 
 ## 学習した方策で動かす（右腕）
 

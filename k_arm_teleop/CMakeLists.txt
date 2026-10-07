@@ -50,6 +50,7 @@ catkin_install_python(
     node_scripts/gripper_command_bridge.py
     node_scripts/kpick_manager.py
     node_scripts/leader_display_joint_states.py
+    node_scripts/rec_button_bridge.py
     node_scripts/recenter_leader.py
     node_scripts/teleop_manager.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

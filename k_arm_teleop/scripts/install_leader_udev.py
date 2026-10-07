@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Give the arms' USB serial adapters fixed names: /dev/k_arm_leader, /dev/k_arm_follower.
+"""Give the teleop's USB serial devices fixed names under /dev.
+
+/dev/k_arm_leader and /dev/k_arm_follower are the arms' adapters,
+/dev/k_arm_rec_button the AtomS3 record button (firmware/atoms3_rec_button).
 
 Reads each adapter's vendor / product / serial number with udevadm and writes
 a udev rule matching exactly that adapter, so the name follows the adapter
@@ -32,20 +35,21 @@ import subprocess
 import sys
 
 RULE_DIR = '/etc/udev/rules.d'
-NAMES = {'leader': 'k_arm_leader', 'follower': 'k_arm_follower'}
+NAMES = {'leader': 'k_arm_leader', 'follower': 'k_arm_follower', 'rec_button': 'k_arm_rec_button'}
 MARK = 'written by k_arm_teleop install_leader_udev.py'
 SERIAL = re.compile(r'ATTRS\{serial\}=="([^"]*)"')
 SYMLINK = re.compile(r'SYMLINK\+="([^"]*)"')
 ADAPTERS = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'config',
                                          'usb_adapters.yaml'))
-ADAPTER_LINE = re.compile(r'^\s*["\']?([^"\'\s:#]+)["\']?\s*:\s*(\w+)\s*(#.*)?$')
+# "<serial>: <role>"; a serial number with ':' (the ESP32's MAC) is quoted
+ADAPTER_LINE = re.compile(r'^\s*(?:"([^"\s#]+)"|\'([^\'\s#]+)\'|([^"\'\s:#]+))\s*:\s*(\w+)\s*(#.*)?$')
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--role', choices=sorted(NAMES),
-                        help='which arm the adapter drives, for an adapter not in {}: {}'.format(
+                        help='what the adapter is, for an adapter not in {}: {}'.format(
                             os.path.basename(ADAPTERS),
                             ', '.join('{} -> /dev/{}'.format(k, v) for k, v in sorted(NAMES.items()))))
     parser.add_argument('--device', help='serial device of the adapter (default: every one, or the '
@@ -97,10 +101,10 @@ def known_adapters():
             if not line.strip() or line.lstrip().startswith('#'):
                 continue
             match = ADAPTER_LINE.match(line)
-            if match is None or match.group(2) not in NAMES:
+            if match is None or match.group(4) not in NAMES:
                 sys.exit('{}:{}: expected "<serial>: {}"'.format(
                     ADAPTERS, number, '|'.join(sorted(NAMES))))
-            adapters[match.group(1)] = match.group(2)
+            adapters[match.group(1) or match.group(2) or match.group(3)] = match.group(4)
     return adapters
 
 
@@ -108,7 +112,8 @@ def remember_adapter(serial, role):
     """Add ``serial: role`` to usb_adapters.yaml, keeping the file's owner (written under sudo)."""
     stat = os.stat(ADAPTERS) if os.path.exists(ADAPTERS) else None
     with open(ADAPTERS, 'a') as f:
-        f.write('{}: {}\n'.format(serial, role))
+        # YAML needs the quotes for a serial number with ':'
+        f.write('{}: {}\n'.format('"{}"'.format(serial) if ':' in serial else serial, role))
     if stat is not None:
         os.chown(ADAPTERS, stat.st_uid, stat.st_gid)
     print('added "{}: {}" to {}; commit it so other PCs know this adapter'.format(
@@ -166,7 +171,7 @@ def plan_rule(device, role, name, replace):
             sys.exit('/dev/{} already belongs to another adapter (serial {}, {}), not to {} '
                      '(serial {}).\nPass --replace if this adapter takes its place.'.format(
                          other_name, other_serial, other, device, serial))
-    rule = ('# {name}: {role} arm USB adapter ({model}), {mark}\n'
+    rule = ('# {name}: {role} USB device ({model}), {mark}\n'
             'SUBSYSTEM=="tty", ATTRS{{idVendor}}=="{vendor}", ATTRS{{idProduct}}=="{product}", '
             'ATTRS{{serial}}=="{serial}", SYMLINK+="{name}", GROUP="dialout", MODE="0660"\n').format(
                 name=name, role=role, model=props.get('ID_MODEL', '?'), mark=MARK,
@@ -192,8 +197,9 @@ def from_list(devices):
         else:
             unknown.append('{} (serial {})'.format(device, serial))
     if unknown:
-        sys.exit('{} not in {}: say which arm it drives with --role leader|follower '
-                 '(and --device if several are connected)'.format(', '.join(unknown), ADAPTERS))
+        sys.exit('{} not in {}: say what it is with --role {} '
+                 '(and --device if several are connected)'.format(', '.join(unknown), ADAPTERS,
+                                                                  '|'.join(sorted(NAMES))))
     return roles
 
 

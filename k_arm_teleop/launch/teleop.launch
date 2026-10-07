@@ -23,6 +23,10 @@
   <!-- serial device of the leader; empty: the one in leader_bus.yaml -->
   <arg name="port" default="$(eval '' if arg('leader_device') == 'leader' else '/dev/k_arm_' + arg('leader_device'))" />
   <arg name="rviz" default="true" />
+  <!-- AtomS3 showing REC / STANDBY, its screen starts / stops the recording
+       (firmware/atoms3_rec_button). Without the device it only retries the port. -->
+  <arg name="rec_button" default="true" />
+  <arg name="rec_button_port" default="/dev/k_arm_rec_button" />
   <arg name="config" default="$(find k_arm_teleop)/config/teleop.yaml" />
   <arg name="leader_bus" default="$(find k_arm_teleop)/config/leader_bus.yaml" />
   <arg name="leader_servos" default="$(find k_arm_teleop)/config/leader_servos_$(arg arm).yaml" />
@@ -132,6 +136,10 @@
     <!-- only the arm the leader is wired to starts enabled (the panel can change it) -->
     <param name="arms/rarm/enabled" value="$(eval arm == 'right')" />
     <param name="arms/larm/enabled" value="$(eval arm == 'left')" />
+  </node>
+
+  <node name="rec_button_bridge" pkg="k_arm_teleop" type="rec_button_bridge.py" if="$(arg rec_button)">
+    <param name="port" value="$(arg rec_button_port)" />
   </node>
 
   <!-- the panel's "Learned policy" box: train on the recorded bags, run the result
