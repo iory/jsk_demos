@@ -151,6 +151,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 # teleop.launch を止めてから（バスを占有するため）
 rosrun k_arm_teleop recenter_leader.py --arm right           # 確認のみ（dry run）
 rosrun k_arm_teleop recenter_leader.py --arm right --apply   # EEPROM と config/leader_calibration.yaml を更新
+# 書き込んだら必ずサーボの電源を入れ直す（入れ直すまで位置制御は古いオフセットのままで、通電した移動が逆向きに暴れる）
 rosrun k_arm_teleop recenter_leader.py --device follower      # フォロワーの腕をリーダーに使うとき
 ```
 

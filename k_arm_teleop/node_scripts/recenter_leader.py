@@ -14,6 +14,11 @@ too: it is the same hardware.
 Dry run by default; ``--apply`` writes. Stop teleop.launch first: the tool
 needs the serial bus to itself.
 
+Power-cycle the servos afterwards, before any powered move of the leader:
+the servos report positions with the new offset at once, but their position
+control keeps the old one until restarted (seen 2026-10-07: servo 3, offset
+changed by 1986 counts, ran the wrong way at full speed until power-cycled).
+
     rosrun k_arm_teleop recenter_leader.py --arm right            # show the plan
     rosrun k_arm_teleop recenter_leader.py --arm right --apply    # write EEPROM + calibration
     rosrun k_arm_teleop recenter_leader.py --device follower      # the follower arm used as leader
@@ -189,6 +194,10 @@ def main():
                 '# trigger: counts with the gripper trigger released / pulled.\n')
         yaml.safe_dump(calibration, f, default_flow_style=False)
     print('updated {}'.format(args.calibration))
+    print('\n*** Power-cycle the leader servos (servo power off / on) before "Leader -> init pose" '
+          'or "Leader -> robot pose". ***\n'
+          'Until then their position control uses the old offset and a powered move turns the '
+          'wrong way.')
 
 
 if __name__ == '__main__':
