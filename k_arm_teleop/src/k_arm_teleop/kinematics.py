@@ -121,6 +121,10 @@ def zyx_angles(rotation):
     return a, b, c
 
 
+# damping of the leader-wrist solver (WristMap.leader_wrist)
+WRIST_DAMPING = 1e-2
+
+
 class WristMap(object):
     """Leader wrist joints -> follower wrist joints by matching the hand rotation.
 
@@ -166,7 +170,7 @@ class WristMap(object):
         """Forget the last wrist solution (call when following restarts)."""
         self._last = None
 
-    def leader_wrist(self, follower_angles, seed, iterations=50, tolerance=1e-6):
+    def leader_wrist(self, follower_angles, seed, iterations=200, tolerance=1e-6):
         """Leader wrist angles that give the hand rotation of ``follower_angles``.
 
         The inverse of follower_wrist(): solved numerically (Gauss-Newton on
@@ -210,8 +214,14 @@ class WristMap(object):
                 dq = np.zeros(3)
                 dq[i] = step
                 jacobian[:, i] = (error(q + dq) - residual) / step
-            # damped least squares, so a singular wrist does not blow up
-            update = np.linalg.solve(jacobian.T.dot(jacobian) + 1e-6 * np.eye(3),
+            # Damped least squares. With the wrist straight the two leader rolls
+            # share an axis, so the Jacobian has a null direction (one roll +x,
+            # the other -x) along which every point is a solution. Weak damping
+            # (1e-6) let finite-difference noise slide the solution along it,
+            # e.g. to +90 / -90 deg (out of the range) instead of the 0 / 0 next
+            # to the seed, or thousands of degrees for some poses; WRIST_DAMPING
+            # keeps the solution near the seed.
+            update = np.linalg.solve(jacobian.T.dot(jacobian) + WRIST_DAMPING * np.eye(3),
                                      jacobian.T.dot(residual))
             q = q - update
             residual = error(q)
