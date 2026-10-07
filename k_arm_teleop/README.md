@@ -210,6 +210,17 @@ following でないときに押しても、確認なしでそのまま記録を�
 なる）．画面右上に `CLOSE` / `OPEN` の札が出ている間がこの状態．トリガーに戻すには STOP → Start．
 target が real のときだけ効く（virtual では `ERR` で断る）．短く押した場合は今までどおり記録の開始・停止．
 
+**テレオペなしで記録だけ**: リーダーも rviz も使わず、AtomS3 で rosbag の記録開始・停止だけをする．
+ロボットへは何も送らない（ロボットを別の方法で動かしながら記録する用）．
+
+```bash
+roslaunch k_arm_teleop record_only.launch     # ROS_MASTER_URI はロボットのマスター
+```
+
+記録するトピック・保存先・ファイル名の頭は `teleop.yaml` の `recording` と同じ（`~/k_arm_bags`）．
+AtomS3 の画面は同じだが、行動ラベルも送り先もないので `NO LABEL` / `VIRTUAL` は出ない（フェーズ `record_only`）．
+長押し（グリッパー）は `ERR` になる．`rosservice call /k_arm_recorder/start_recording`（`stop_recording`）でも操作できる．
+
 初回（PC ごと）: `sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply` で
 `/dev/k_arm_rec_button` の名前を付ける（`config/usb_adapters.yaml` に AtomS3 のシリアル番号が載っている．別の
 AtomS3 なら `--role rec_button` を付けて一度実行する）．

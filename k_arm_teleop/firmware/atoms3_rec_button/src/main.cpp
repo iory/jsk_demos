@@ -18,7 +18,9 @@
 // not recording), NO TELEOP ("S none"), NO LINK (no line from the PC for
 // LINK_TIMEOUT_MS). While recording, NO LABEL warns that teleop is not
 // following (/k_arm_teleop_manager/command is only published while
-// following), VIRTUAL that the real robot is not moving.
+// following), VIRTUAL that the real robot is not moving; neither is shown
+// with phase=record_only (launch/record_only.launch: recording without the
+// teleop, so there is no label and no target to warn about).
 
 #include <M5Unified.h>
 
@@ -230,9 +232,10 @@ void draw(uint32_t now)
     title("REC", WHITE, RED, 22);
     small(clockText(status.duration), WHITE, RED, 52);
     small(humanSize(status.size), WHITE, RED, 72);
-    if (status.phase != "following")
+    bool record_only = status.phase == "record_only";
+    if (!record_only && status.phase != "following")
       banner("NO LABEL", BLACK, YELLOW, 96);
-    if (status.target != "real")
+    if (!record_only && status.target != "real")
       small("VIRTUAL", YELLOW, RED, 118);
   }
   else
