@@ -198,6 +198,10 @@ rosrun k_arm_teleop kpick.sh run execute                   # 実際に動かす�
   `Result` で結果を選んで `Report` でレポートを開き、`Preview`（ロボットに送らない）/ `Execute`（実機）で起動、
   `Start picking` / `Stop picking` で 1 回の収穫を開始・停止、`Shut down` で終了．Execute はテレオペが実機に
   追従している間は押せない．学習の Cancel はこの PC の待ち受けをやめるだけで、サーバーに渡ったジョブは続く．
+- `Step mode`（既定で ON）: 起動した方策は Start picking で次の 8 ステップ分の予測を rviz（`Policy prediction`。
+  太線が次に実行する分で、グリッパーが閉じるところは赤、細い灰色はその先）に出すだけで止まり、`Step` を押すと
+  その 8 ステップだけ実行して次の予測を出す．表示は方策が出す手先の目標で、腕が実際にたどる軌道ではない
+  （シミュレーションでは 8 ステップ後の実際の手先と中央値 48 mm ずれた）．tree-vla-il 6011254 以降の結果で使える．
 - rviz（`real:=true`）の `Policy detections` に、方策ノードの検出結果（`/kpick_policy/debug/image`）が出る．
   対象のりんごは赤（TARGET）、ほかは緑．待機中も出るので、Start picking でどのりんごを狙うかを先に見られる．
   パネルには `/kpick_policy/status` を 1 行にして出す（状態、ステップ、検出、1 tick の時間）．

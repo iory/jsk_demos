@@ -59,6 +59,8 @@ private Q_SLOTS:
   void onPolicyShutdown();
   void onPolicyStart();
   void onPolicyStop();
+  void onPolicyStep();
+  void onStepModeToggled(bool checked);
   void refresh();
 
 private:
@@ -135,6 +137,8 @@ private:
   QPushButton* shutdown_button_;
   QPushButton* policy_start_button_;
   QPushButton* policy_stop_button_;
+  QCheckBox* step_mode_box_;
+  QPushButton* step_button_;
   QLabel* policy_label_;
   QLabel* result_label_;
   QTimer* timer_;

@@ -4,7 +4,9 @@
 Wraps scripts/kpick.sh: ``~train`` runs ``kpick.sh train`` on a directory of
 bags (the server fine-tunes, the result comes back to ``~results_dir``);
 ``~launch`` starts launch/kpick_right.launch with a result, in preview
-(nothing goes to the robot) or execute mode; ``~shutdown`` stops it.
+(nothing goes to the robot) or execute mode, optionally in the node's step
+mode (it shows the next steps and runs them on its ``~step``);
+``~shutdown`` stops it.
 Starting and stopping an episode is the policy node's own ``~start`` /
 ``~stop``. ``~status`` (PolicyStatus) reports both.
 
@@ -35,6 +37,7 @@ import threading
 import rospkg
 import rospy
 from std_msgs.msg import String
+from std_srvs.srv import SetBool
 from std_srvs.srv import Trigger
 from std_srvs.srv import TriggerResponse
 
@@ -64,6 +67,11 @@ def describe_policy_status(data):
             ', '.join('{:+.2f}'.format(v) for v in target.get('position', [])), target.get('n_apples', '?')))
     else:
         parts.append('no apple detected')
+    prediction = st.get('prediction') or {}
+    if st.get('state') == 'awaiting_step' and prediction:
+        parts.append('next {} steps: {:.0f} mm{}'.format(
+            prediction.get('n_steps', '?'), prediction.get('move_mm', 0),
+            ', gripper closes' if prediction.get('gripper_closes') else ''))
     if st.get('teleop_active'):
         parts.append('teleop is commanding')
     tick = st.get('tick_ms') or {}
@@ -77,6 +85,7 @@ class KpickManager(object):
     def __init__(self):
         self.results_dir = os.path.expanduser(rospy.get_param('~results_dir', '~/kpick_results'))
         self.sim_trees = int(rospy.get_param('~sim_trees', 20))
+        self.policy_node = rospy.get_param('~policy_node', '/kpick_policy')
         self.script = os.path.join(rospkg.RosPack().get_path('k_arm_teleop'), 'scripts', 'kpick.sh')
         self.lock = threading.Lock()
         self.train_proc = None
@@ -88,6 +97,8 @@ class KpickManager(object):
         self.policy_result = ''
         self.policy_status = ''
         self.policy_status_time = None
+        self.policy_state = ''
+        self.step_mode = False
         self.teleop = None
         self.message = 'ready'
         rospy.Subscriber(rospy.get_param('~teleop_status', '/k_arm_teleop_manager/status'),
@@ -108,8 +119,14 @@ class KpickManager(object):
 
     def _policy_status_cb(self, msg):
         text = describe_policy_status(msg.data)
+        try:
+            st = json.loads(msg.data)
+        except ValueError:
+            st = {}
         with self.lock:
             self.policy_status = text
+            self.policy_state = st.get('state', '')
+            self.step_mode = bool(st.get('step_mode', False))
             self.policy_status_time = rospy.get_time()
 
     def results(self):
@@ -184,8 +201,10 @@ class KpickManager(object):
 
     def _launch(self, request):
         words = request.data.split()
+        step = 'step' in words[1:]
+        words = [w for w in words if w != 'step']
         if not words or words[0] not in ('preview', 'execute'):
-            return SetStringResponse(False, 'expected "preview|execute [result_dir]"')
+            return SetStringResponse(False, 'expected "preview|execute [result_dir] [step]"')
         mode = words[0]
         result = os.path.expanduser(words[1]) if len(words) > 1 else (self.results() or [''])[0]
         if not os.path.isdir(result):
@@ -206,8 +225,32 @@ class KpickManager(object):
             self.policy_status = ''
             self.message = 'policy {} starting'.format(mode)
         threading.Thread(target=self._watch_policy, args=(self.policy_proc,), daemon=True).start()
+        if step:
+            threading.Thread(target=self._enable_step_mode, args=(self.policy_proc,), daemon=True).start()
         rospy.loginfo('policy: %s', ' '.join(command))
-        return SetStringResponse(True, '{}: {}'.format(mode, result))
+        return SetStringResponse(True, '{}{}: {}'.format(mode, ' (step mode)' if step else '', result))
+
+    def _enable_step_mode(self, proc):
+        """Switch the freshly launched node to step mode once its service is up."""
+        service = self.policy_node + '/set_step_mode'
+        deadline = rospy.get_time() + 120.0  # the node loads the detector and the policy first
+        while not rospy.is_shutdown() and proc.poll() is None and rospy.get_time() < deadline:
+            try:
+                rospy.wait_for_service(service, timeout=1.0)
+            except rospy.ROSException:
+                continue
+            try:
+                response = rospy.ServiceProxy(service, SetBool)(True)
+            except rospy.ServiceException as error:
+                response = None
+                rospy.logerr('%s: %s', service, error)
+            with self.lock:
+                self.message = 'step mode on' if response is not None and response.success else \
+                    'could not switch the policy to step mode: press Shut down'
+            return
+        if proc.poll() is None:
+            with self.lock:
+                self.message = 'no {} after 120 s: is this result older than step mode?'.format(service)
 
     def _watch_policy(self, proc):
         code = proc.wait()
@@ -248,6 +291,8 @@ class KpickManager(object):
             msg.policy_result = self.policy_result if self.policy_mode else ''
             fresh = self.policy_status_time is not None and rospy.get_time() - self.policy_status_time < 2.0
             msg.policy_status = self.policy_status if fresh else ''
+            msg.policy_state = self.policy_state if fresh else ''
+            msg.step_mode = self.step_mode if fresh else False
             msg.message = self.message
         self.status_pub.publish(msg)
 

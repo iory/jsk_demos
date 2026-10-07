@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <std_srvs/SetBool.h>
 #include <std_srvs/Trigger.h>
 
 #include <QAbstractItemView>
@@ -225,9 +226,16 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   policy_stop_button_->setStyleSheet("QPushButton:enabled { background-color: #c62828; color: white; font-weight: bold; }");
   policy->addWidget(policy_start_button_, 4, 0, 1, 2);
   policy->addWidget(policy_stop_button_, 4, 2);
+  step_mode_box_ = new QCheckBox("Step mode");
+  step_mode_box_->setChecked(true);
+  step_mode_box_->setToolTip("Start only shows the next 8 steps in rviz (thick line; red where the gripper closes);\n"
+                             "Step runs exactly those, stops, and shows the next ones.");
+  step_button_ = new QPushButton("Step (run the shown steps)");
+  policy->addWidget(step_mode_box_, 5, 0);
+  policy->addWidget(step_button_, 5, 1, 1, 2);
   policy_label_ = new QLabel;
   policy_label_->setWordWrap(true);
-  policy->addWidget(policy_label_, 5, 0, 1, 3);
+  policy->addWidget(policy_label_, 6, 0, 1, 3);
   policy_box->setLayout(policy);
   layout->addWidget(policy_box);
 
@@ -270,6 +278,8 @@ TeleopPanel::TeleopPanel(QWidget* parent)
   connect(shutdown_button_, SIGNAL(clicked()), this, SLOT(onPolicyShutdown()));
   connect(policy_start_button_, SIGNAL(clicked()), this, SLOT(onPolicyStart()));
   connect(policy_stop_button_, SIGNAL(clicked()), this, SLOT(onPolicyStop()));
+  connect(step_button_, SIGNAL(clicked()), this, SLOT(onPolicyStep()));
+  connect(step_mode_box_, SIGNAL(clicked(bool)), this, SLOT(onStepModeToggled(bool)));
 
   timer_ = new QTimer(this);
   connect(timer_, SIGNAL(timeout()), this, SLOT(refresh()));
@@ -506,6 +516,13 @@ void TeleopPanel::refreshPolicy()
   shutdown_button_->setEnabled(running);
   policy_start_button_->setEnabled(running && !teleop_active);
   policy_stop_button_->setEnabled(running);
+  bool awaiting = running && p.policy_state == "awaiting_step";
+  step_button_->setEnabled(awaiting && !teleop_active);
+  step_button_->setStyleSheet(awaiting ? "QPushButton:enabled { background-color: #2e7d32; color: white; font-weight: bold; }" : "");
+  // follow the node once it reports; before that the box is the choice for the next launch
+  if (running && !p.policy_state.empty())
+    step_mode_box_->setChecked(p.step_mode);
+  step_mode_box_->setEnabled(alive && (!running || p.policy_state != "running"));
 
   if (!alive)
   {
@@ -602,7 +619,7 @@ void TeleopPanel::onOpenReport()
 
 void TeleopPanel::onPolicyPreview()
 {
-  std::string request = "preview " + selectedResult();
+  std::string request = "preview " + selectedResult() + (step_mode_box_->isChecked() ? " step" : "");
   callService(std::string(kPolicyManager) + "/launch", &request);
 }
 
@@ -613,7 +630,7 @@ void TeleopPanel::onPolicyExecute()
                            "\"Start picking\".\nTeleop must stay on STOP. Keep the STOP buttons at hand.\n\nLaunch it?",
                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
     return;
-  std::string request = "execute " + selectedResult();
+  std::string request = "execute " + selectedResult() + (step_mode_box_->isChecked() ? " step" : "");
   callService(std::string(kPolicyManager) + "/launch", &request);
 }
 
@@ -630,6 +647,24 @@ void TeleopPanel::onPolicyStart()
 void TeleopPanel::onPolicyStop()
 {
   callService(std::string(kPolicyNode) + "/stop", nullptr);
+}
+
+void TeleopPanel::onPolicyStep()
+{
+  callService(std::string(kPolicyNode) + "/step", nullptr);
+}
+
+void TeleopPanel::onStepModeToggled(bool checked)
+{
+  if (!have_policy_ || policy_.policy.empty())
+    return;  // not running: the box only sets how the next launch starts
+  std::string service = std::string(kPolicyNode) + "/set_step_mode";
+  std_srvs::SetBool srv;
+  srv.request.data = checked;
+  if (!ros::service::waitForService(service, ros::Duration(0.5)) || !ros::service::call(service, srv))
+    report(false, service + " call failed (is this result older than step mode?)");
+  else
+    report(srv.response.success, srv.response.message);
 }
 
 void TeleopPanel::refresh()

@@ -75,6 +75,24 @@ Visualization Manager:
       Median window: 5
       Min Value: 0
       Normalize Range: true
+    # step mode: the steps ~step runs next (thick; red where the gripper closes) and the ones after
+    - Class: rviz/MarkerArray
+      Name: Policy prediction
+      Enabled: true
+      Marker Topic: /kpick_policy/predicted/markers
+      Queue Size: 10
+      Namespaces: {}
+    - Class: rviz/Path
+      Name: Policy predicted path
+      Enabled: false
+      Topic: /kpick_policy/predicted/path
+      Color: 25; 255; 0
+      Alpha: 1
+      Line Style: Lines
+      Line Width: 0.03
+      Buffer Length: 1
+      Pose Style: None
+      Queue Size: 10
   Global Options:
     Background Color: 48; 48; 48
     Fixed Frame: ARM_BODY
