@@ -200,6 +200,9 @@ class TeleopManager(object):
         self.gripper_state = {}
         self.gripper_velocity = {}
         self.gripper_effort_sent = {}
+        # 'open' / 'closed' from ~toggle_gripper (the AtomS3 long press), in place of
+        # the trigger until the next Start; None: the trigger drives the gripper
+        self.gripper_override = None
         if not self.real_is_simulated:
             for name, arm in self.arms.items():
                 real = (arm['gripper'] or {}).get('real')
@@ -262,6 +265,7 @@ class TeleopManager(object):
         rospy.Service('~leader_to_robot', Trigger, self._leader_to_robot)
         rospy.Service('~leader_release', Trigger, self._leader_release)
         rospy.Service('~start_recording', Trigger, self._start_recording)
+        rospy.Service('~toggle_gripper', Trigger, self._toggle_gripper)
         rospy.Service('~stop_recording', Trigger, self._stop_recording)
         rospy.Service('~set_record_directory', SetString, self._set_record_directory)
         rospy.on_shutdown(self._shutdown)
@@ -300,17 +304,27 @@ class TeleopManager(object):
                 and arm['gripper'].get('send_to_real', False) and 'real' in arm['gripper']]
 
     def _send_gripper_efforts(self, msg):
-        """Trigger -> effort for the real grippers; adds them to the command message."""
+        """Trigger (or the button's override) -> effort for the real grippers.
+
+        ``msg`` is the command message (the action label) the grippers are
+        added to; None when nothing is being followed (the override alone).
+        """
         leader, _ = self.leader.snapshot()
         for name, gripper in self._effort_grippers():
-            try:
-                fraction = trigger_fraction(gripper, leader)
-            except KeyError:
-                continue
+            if self.gripper_override is not None:
+                fraction = 1.0 if self.gripper_override == 'closed' else 0.0
+            else:
+                try:
+                    fraction = trigger_fraction(gripper, leader)
+                except KeyError:
+                    continue
             velocity = self.gripper_velocity.get(name)
             effort = gripper_effort(fraction, gripper['real'], self.gripper_state.setdefault(name, {}),
                                     rospy.get_time(), velocity)
             self.gripper_effort_pubs[name].publish(Float64MultiArray(data=[effort]))
+            self.gripper_effort_sent[name] = effort
+            if msg is None:
+                continue
             f0, f1 = gripper['follower_range']
             # the action label: how far closed (as the slider joint) and the torque sent;
             # in binary mode the open / close decision, not the raw trigger
@@ -319,7 +333,6 @@ class TeleopManager(object):
             msg.name.append(gripper['follower'])
             msg.position.append(f0 + fraction * (f1 - f0))
             msg.effort.append(effort)
-            self.gripper_effort_sent[name] = effort
 
     def _grippers_held_back(self):
         """Grippers of enabled arms that the current target does not get."""
@@ -495,6 +508,8 @@ class TeleopManager(object):
                 # like the robot's GripperInterface.move_in: servo on before any torque
                 for name, gripper in self._effort_grippers():
                     self.gripper_servo_pubs[name].publish(Bool(data=True))
+            # the trigger drives the gripper again
+            self.gripper_override = None
             if self.leader_motion == 'holding':
                 # hold the leader before pressing Start: its torque goes off here
                 self._call_leader_trigger(self.leader_move['release_service'])
@@ -528,6 +543,30 @@ class TeleopManager(object):
                 self._set_phase(APPROACHING, 'moving to the leader pose ({:.2f} rad in {:.1f} s)'
                                 .format(distance, duration))
             return TriggerResponse(True, self.message)
+
+    def _toggle_gripper(self, _request):
+        """Open a closed real gripper or close an open one, in place of the trigger.
+
+        For the AtomS3 long press. The choice holds (also while following, where
+        it is the recorded gripper label) until the next Start hands the
+        gripper back to the trigger.
+        """
+        with self.lock:
+            grippers = self._effort_grippers()
+            if not grippers:
+                return TriggerResponse(False, 'only the real robot gripper (target real) can be '
+                                              'toggled; target is {}'.format(self.target))
+            if self.gripper_override is not None:
+                closed = self.gripper_override == 'closed'
+            else:
+                closed = any(self.gripper_state.get(name, {}).get('closed', False)
+                             for name, _ in grippers)
+            self.gripper_override = 'open' if closed else 'closed'
+            for name, _ in grippers:
+                self.gripper_servo_pubs[name].publish(Bool(data=True))
+            rospy.loginfo('gripper %s by the button (the trigger is ignored until Start)',
+                          self.gripper_override)
+            return TriggerResponse(True, 'gripper {}'.format(self.gripper_override))
 
     def _stop(self, _request):
         with self.lock:
@@ -741,6 +780,10 @@ class TeleopManager(object):
             errors = [abs(v - follower[j]) for j, v in self.last_command.items() if j in follower]
             self.max_tracking_error = max(errors or [0.0])
 
+        if self.phase != FOLLOWING and self.gripper_override is not None:
+            # following sends the efforts itself (with the label)
+            self._send_gripper_efforts(None)
+
         if self.phase == APPROACHING:
             state = self._goals_state()
             if state == 'running':
@@ -803,6 +846,7 @@ class TeleopManager(object):
         msg.leader_rate = self.leader.rate()
         msg.max_tracking_error = self.max_tracking_error
         recorder = self.recorder
+        msg.gripper_override = self.gripper_override or ''
         msg.recording = recorder.process is not None
         msg.record_directory = recorder.directory
         if msg.recording:

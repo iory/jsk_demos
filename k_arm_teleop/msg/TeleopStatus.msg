@@ -21,6 +21,10 @@ float32 leader_rate
 # Largest |command - follower state| over the enabled joints [rad or m].
 float32 max_tracking_error
 
+# Real gripper set by the AtomS3 long press (~toggle_gripper) in place of the
+# trigger until the next Start: "open", "closed", or "" (the trigger drives it).
+string gripper_override
+
 bool recording
 string record_directory
 string current_bag

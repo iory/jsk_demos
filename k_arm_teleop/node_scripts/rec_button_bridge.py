@@ -3,8 +3,10 @@
 
 Forwards ``<manager>/status`` (k_arm_teleop/TeleopStatus) to the AtomS3 over
 its USB serial as one line, about 5 Hz, and turns a press of its screen
-(``CLICK``) into ``<manager>/start_recording`` or ``stop_recording``,
-answering ``R ok`` / ``R err <reason>``. A click while teleop is not
+(``CLICK``) into ``<manager>/start_recording`` or ``stop_recording``, and a
+long press (``HOLD``) into ``<manager>/toggle_gripper`` (open <-> close the
+real gripper in place of the trigger until the next Start), answering
+``R ok`` / ``R err <reason>``. A click while teleop is not
 following still starts recording; the AtomS3 then shows NO LABEL, as the
 rviz panel warns. The firmware and the line protocol are in
 firmware/atoms3_rec_button.
@@ -45,9 +47,10 @@ def status_line(status):
     """
     if status is None:
         return 'S none\n'
-    return 'S rec={} dur={:.1f} size={} bags={} phase={} target={}\n'.format(
+    return 'S rec={} dur={:.1f} size={} bags={} phase={} target={} grip={}\n'.format(
         int(status.recording), status.recording_duration, status.current_bag_size,
-        status.bag_count, status.phase or '?', status.target or '?')
+        status.bag_count, status.phase or '?', status.target or '?',
+        status.gripper_override or '-')
 
 
 def reply_line(ok, message):
@@ -146,6 +149,8 @@ class RecButtonBridge(object):
     def _on_line(self, line):
         if line == 'CLICK':
             self._on_click()
+        elif line == 'HOLD':
+            self._on_hold()
         elif line.startswith('HELLO '):
             rospy.loginfo('rec button: %s', line[len('HELLO '):])
         # anything else is the ESP32's boot log
@@ -168,6 +173,17 @@ class RecButtonBridge(object):
                           'until it follows', status.phase)
         # the service call blocks; keep the status lines going meanwhile
         threading.Thread(target=self._call, args=(service,)).start()
+
+    def _on_hold(self):
+        if self._latest_status() is None:
+            self._write(reply_line(False, 'no teleop manager'))
+            return
+        with self.lock:
+            if self.busy:
+                self._write(reply_line(False, 'busy'))
+                return
+            self.busy = True
+        threading.Thread(target=self._call, args=('toggle_gripper',)).start()
 
     def _call(self, service):
         name = '{}/{}'.format(self.manager, service)

@@ -199,10 +199,16 @@ AtomS3（画面付き．AtomS3 Lite・AtomS3R ではない）を USB でこの P
 | 暗い地に `STANDBY`、bag の本数とフェーズ | 記録していない |
 | 灰色の `NO TELEOP` | ブリッジは動いているが、`/k_arm_teleop_manager/status` が 2 秒以上来ない |
 | 灰色の `NO LINK` | PC から 2 秒以上何も来ない（ブリッジが動いていない・ポートが開けない） |
+| 右上の `CLOSE` / `OPEN` の札 | 長押しでグリッパーを閉じた / 開いた状態（トリガーは無視中） |
 | 白帯の `...` → `OK` / `ERR <理由>` | 押した結果．結果が返るまで次の押下は無視する．5 秒返らなければ `no reply from the PC` |
 
 following でないときに押しても、確認なしでそのまま記録を始める（画面に `NO LABEL` が出る）．パネルのボタンは
 確認ダイアログを出す．
+
+**長押し（0.8 秒）でグリッパーの開閉**: 実機のグリッパーを開いていれば閉じ、閉じていれば開く（`/k_arm_teleop_manager/toggle_gripper`）．
+以後はリーダーのトリガーを無視してその状態を保つ（following 中も．記録する行動ラベル `RARM_GRIPPER` もボタンの開閉に
+なる）．画面右上に `CLOSE` / `OPEN` の札が出ている間がこの状態．トリガーに戻すには STOP → Start．
+target が real のときだけ効く（virtual では `ERR` で断る）．短く押した場合は今までどおり記録の開始・停止．
 
 初回（PC ごと）: `sudo $(rospack find k_arm_teleop)/scripts/install_leader_udev.py --apply` で
 `/dev/k_arm_rec_button` の名前を付ける（`config/usb_adapters.yaml` に AtomS3 のシリアル番号が載っている．別の

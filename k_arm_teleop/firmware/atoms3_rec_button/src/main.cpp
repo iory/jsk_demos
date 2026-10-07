@@ -3,14 +3,16 @@
 // Line protocol over the USB serial, one message per line:
 //
 //   PC -> AtomS3
-//     S rec=<0|1> dur=<s> size=<bytes> bags=<n> phase=<phase> target=<target>
-//         teleop status, about 5 Hz (rec_button_bridge.py)
+//     S rec=<0|1> dur=<s> size=<bytes> bags=<n> phase=<phase> target=<target> grip=<open|closed|->
+//         teleop status, about 5 Hz (rec_button_bridge.py); grip: the gripper
+//         set by HOLD in place of the trigger, - when the trigger drives it
 //     S none             the bridge runs but hears no teleop manager
-//     R ok               the last CLICK started / stopped the recording
+//     R ok               the last CLICK / HOLD did what it asked
 //     R err <reason>     it did not
 //   AtomS3 -> PC
 //     HELLO k_arm_rec_button board=<board>   at boot and on "?"
-//     CLICK              the screen (button) was pressed
+//     CLICK              the screen (button) was pressed briefly: start / stop recording
+//     HOLD               it was held HOLD_MS: open <-> close the real gripper
 //
 // Screens: REC (red), STANDBY (dark), NOT REC (orange blink: following but
 // not recording), NO TELEOP ("S none"), NO LINK (no line from the PC for
@@ -24,6 +26,7 @@ namespace
 {
 constexpr uint32_t LINK_TIMEOUT_MS = 2000;     // no line from the PC for this long -> NO LINK
 constexpr uint32_t REPLY_TIMEOUT_MS = 5000;    // CLICK without "R ..." for this long -> NO REPLY
+constexpr uint32_t HOLD_MS = 800;              // a press this long is HOLD, not CLICK
 constexpr uint32_t RESULT_SHOW_MS = 1500;      // how long "R ..." stays on the screen
 constexpr uint32_t BLINK_PERIOD_MS = 400;
 constexpr uint32_t FRAME_PERIOD_MS = 50;
@@ -46,6 +49,7 @@ struct Status
   long bags = -1;          // -1: not sent
   String phase;
   String target;
+  String grip;             // "open" / "closed" set by HOLD, "-" or empty: the trigger
 };
 
 M5Canvas canvas(&M5.Display);
@@ -111,6 +115,7 @@ void handleLine(const String& text)
     status.bags = bags.length() ? bags.toInt() : -1;
     status.phase = field(text, "phase");
     status.target = field(text, "target");
+    status.grip = field(text, "grip");
   }
   else if (text.startsWith("R "))
   {
@@ -249,6 +254,16 @@ void draw(uint32_t now)
     small(status.phase, WHITE, bg, 116);
   }
 
+  // gripper held by the button (HOLD), top-right corner
+  if (status.manager && (status.grip == "open" || status.grip == "closed"))
+  {
+    bool closed = status.grip == "closed";
+    canvas.fillRoundRect(canvas.width() - 44, 2, 42, 16, 4, closed ? YELLOW : WHITE);
+    canvas.setTextColor(BLACK, closed ? YELLOW : WHITE);
+    canvas.setFont(&fonts::Font0);
+    canvas.drawString(closed ? "CLOSE" : "OPEN", canvas.width() - 23, 10);
+  }
+
   if (waiting_reply)
   {
     banner("...", BLACK, WHITE, 64);
@@ -283,6 +298,7 @@ void setup()
   M5.begin(config);
   Serial.setTxTimeoutMs(0);   // never stall the loop when nothing on the PC reads
   M5.Display.setRotation(0);
+  M5.BtnA.setHoldThresh(HOLD_MS);
   canvas.createSprite(M5.Display.width(), M5.Display.height());
   hello();
 }
@@ -299,10 +315,12 @@ void loop()
     result = "no reply from the PC";
     result_ms = now;
   }
-  // one request at a time: clicks are ignored until the PC answers
-  if (M5.BtnA.wasPressed() && !waiting_reply)
+  // one request at a time: presses are ignored until the PC answers. A short
+  // press is reported on release (wasClicked), a long one once it passes
+  // HOLD_MS (wasHold), so a long press never also sends CLICK.
+  if (!waiting_reply && (M5.BtnA.wasClicked() || M5.BtnA.wasHold()))
   {
-    Serial.print("CLICK\n");
+    Serial.print(M5.BtnA.wasHold() ? "HOLD\n" : "CLICK\n");
     waiting_reply = true;
     click_ms = now;
   }
