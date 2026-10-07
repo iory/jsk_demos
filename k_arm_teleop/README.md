@@ -95,6 +95,7 @@ roslaunch k_arm_teleop teleop.launch real:=true
 | 引数 | 既定値 | 内容 |
 | --- | --- | --- |
 | `real` | `false` | `true`: 実機に送る．`false`: 実機の代わりに `fake_trajectory_controller.py` を起動 |
+| `allow_remote_sim` | `false` | `real:=false` はマスターがこの PC（localhost、127.0.0.1、`$ROS_IP`、`$ROS_HOSTNAME`）でないと起動を断る（実機のマスターで代わりのコントローラが `/robot_description` を上書きし、腕のコントローラと同じ名前で出てしまうため）．`true` でそれでも起動する |
 | `real_robot_state_publisher` | `not real` | 実機側の bringup が robot_state_publisher を出していないなら `true` |
 | `arm` | `right` | リーダー（サーボ id 1-8）でどちらの腕を動かすか．`right` / `left`．サーボの割り当ては `config/leader_servos_<arm>.yaml` |
 | `wrist_only` | `false` | `true`: 手首（とグリッパー）だけリーダーに追従．肩・肘は Start 時のロボットの姿勢で固定（virtual でも同じ） |

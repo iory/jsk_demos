@@ -2,6 +2,23 @@
   <!-- real:=false starts a simulated stand-in for the robot's controllers, so
        the "real" target can be tried without hardware. The panel says so. -->
   <arg name="real" default="false" />
+  <!-- The stand-in overwrites /robot_description and serves the arm controllers,
+       so on the robot's master it replaces the robot's own model (and competes
+       with its controllers). Refuse real:=false unless the master is this PC
+       (localhost, 127.0.0.1, $ROS_IP or $ROS_HOSTNAME); allow_remote_sim:=true
+       overrides, e.g. for a master named by this PC's hostname. Checked while
+       the launch file is read, before any parameter is set. -->
+  <arg name="allow_remote_sim" default="false" />
+  <arg name="master_uri" value="$(optenv ROS_MASTER_URI)" />
+  <arg name="this_ip" value="$(optenv ROS_IP)" />
+  <arg name="this_hostname" value="$(optenv ROS_HOSTNAME)" />
+  <arg name="master_host" value="$(eval master_uri.split('//')[-1].split('/')[0].rsplit(':', 1)[0])" />
+  <arg name="master_is_local" value="$(eval master_host != '' and master_host in ('localhost', '127.0.0.1', this_ip, this_hostname))" />
+  <arg name="sim_guard" value="$(eval '' if real or master_is_local or allow_remote_sim else (_ for _ in ()).throw(RuntimeError(
+      'real:=false would put the simulated stand-in on the master at ' + master_uri + ' (not this PC): it overwrites '
+      '/robot_description and serves the arm controllers there. Connected to the robot? add real:=true. '
+      'Meant to simulate? use a local master (export ROS_MASTER_URI=http://localhost:11311). '
+      'Really want it there? add allow_remote_sim:=true')))" />
   <!-- with the Real robot target only the grippers move; no arm command is sent -->
   <arg name="gripper_only" default="false" />
   <!-- only the wrists (and grippers) follow the leader; shoulder and elbow hold the pose
