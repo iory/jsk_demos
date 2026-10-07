@@ -22,7 +22,7 @@ direction:
 trigger:
   RARM_GRIPPER:
     pulled: 1423
-    released: 2729
+    released: 2664
 zero_raw:
   LARM_GRIPPER: 1957
   LARM_JOINT0: 1471
