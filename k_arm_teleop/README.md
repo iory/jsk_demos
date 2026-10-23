@@ -237,9 +237,8 @@ ROS なしで表示を確かめられる．
 
 ## 学習した方策で動かす（右腕）
 
-テレオペで撮った bag を学習サーバー（supernova の tree-vla-il）で追加学習し、できた方策を
-`k_arm_pick_policy` の実行ノードで右腕に動かす．方策自体は左腕用なので、右腕のデータと指令は
-tree-vla-il 側（ブランチ field-pipeline、1e4f6a2 以降）で ARM_BODY の xz 平面について鏡映する．
+テレオペで撮った bag を学習サーバーで追加学習し、できた方策を `k_arm_pick_policy` の実行ノードで
+右腕に動かす．方策自体は左腕用なので、右腕のデータと指令は学習側で ARM_BODY の xz 平面について鏡映する．
 右手首カメラの取り付けが左の鏡映になっていることが前提（未確認）．
 
 ```bash
@@ -258,12 +257,12 @@ rosrun k_arm_teleop kpick.sh run execute                   # 実際に動かす�
 - `Step mode`（既定で ON）: 起動した方策は Start picking で次の 8 ステップ分の予測を rviz（`Policy prediction`。
   太線が次に実行する分で、グリッパーが閉じるところは赤、細い灰色はその先）に出すだけで止まり、`Step` を押すと
   その 8 ステップだけ実行して次の予測を出す．表示は方策が出す手先の目標で、腕が実際にたどる軌道ではない
-  （シミュレーションでは 8 ステップ後の実際の手先と中央値 48 mm ずれた）．tree-vla-il 6011254 以降の結果で使える．
+  （シミュレーションでは 8 ステップ後の実際の手先と中央値 48 mm ずれた）．
 - rviz（`real:=true`）の `Policy detections` に、方策ノードの検出結果（`/kpick_policy/debug/image`）が出る．
   対象のりんごは赤（TARGET）、ほかは緑．待機中も出るので、Start picking でどのりんごを狙うかを先に見られる．
   パネルには `/kpick_policy/status` を 1 行にして出す（状態、ステップ、検出、1 tick の時間）．
-  どちらも tree-vla-il f9e8933 以降のノード、つまりそれ以降に学習したジョブの結果で出る（結果ごとに `deploy/` のコードで動くため）．
-- 設定は `config/kpick_right.yaml`．tree-vla-il の `k_arm_right`（右腕、右手首カメラ、`/rarm_controller/command`）に
+  どちらも結果の `deploy/` に入っているノードが対応していれば出る（結果ごとにそのコードで動くため）．
+- 設定は `config/kpick_right.yaml`．学習側の右腕の設定 `k_arm_right`（右腕、右手首カメラ、`/rarm_controller/command`）に
   グリッパーの送り先を足しただけ．学習ジョブと実行ノードの両方に渡る．`k_arm_right` を持たない古い学習結果では動かない．
 - グリッパー: 方策は 0（開）〜1（閉）を出す．`gripper_command_bridge.py` がテレオペのトリガーと同じ開閉の
   ロジック（`teleop.yaml` の `arms/rarm/gripper/real`）で実機の effort に変える．`execute` のときだけ起動し、
@@ -282,7 +281,6 @@ rosrun k_arm_teleop kpick.sh run execute                   # 実際に動かす�
   手で閉じたものは `open_on_release` でも開かない）: 録画と一緒なら
   `roslaunch k_arm_teleop record_only.launch gripper_service:=/grasp_close_gripper/toggle_gripper`、
   録画なしなら `grasp_close_gripper.launch rec_button:=true`（同じポートを開くので両方は起動しない）．
-- 学習の流れ・レポートの見方・困ったときは tree-vla-il の `docs/trickstar_guide.md`．
 
 ## 設定
 
