@@ -269,6 +269,19 @@ rosrun k_arm_teleop kpick.sh run execute                   # 実際に動かす�
   ロジック（`teleop.yaml` の `arms/rarm/gripper/real`）で実機の effort に変える．`execute` のときだけ起動し、
   最初の指令が来るまで何も送らない．指令が止まっても最後の状態を保つ（つかんだものを落とさない）．
   開くときは `rosservice call /k_arm_gripper_bridge/release`．
+- 指先センサで閉じる: `roslaunch k_arm_grasp_close grasp_close.launch model:=<model.pt> gripper:=true`
+  （このパッケージの `grasp_close_gripper.launch` を含む）．k_arm_grasp_close の判断（`/grasp_close/close`）が最初に True になったら右グリッパーを閉じ、
+  その後はモデルの出力によらず閉じたまま保つ．開くのは `rosservice call /grasp_close_gripper/open`．開いた後は判断が
+  一度 False に戻るまで閉じない．`/grasp_close_gripper/enable`（SetBool）で閉じる動作を止められる．
+  手で試すときは `open_on_release:=true` で、判断が `open_delay`（既定 0.3 s）続けて False になったら開く
+  （掴んでいる間のモデルの出力は当てにならないので、収穫では使わない）．
+  テレオペのトリガー / AtomS3 も同じグリッパーに送るので、テレオペと同時に起動しないこと．
+  止める（Ctrl-C）と、一度でも指令を送っていればグリッパーの力を抜く（effort 0 をコントローラに直接送る）．
+  掴んでいるものは落ちる．
+  AtomS3 の長押しで開閉（`/grasp_close_gripper/toggle_gripper`．閉じていれば開き、開いていれば手で閉じる．
+  手で閉じたものは `open_on_release` でも開かない）: 録画と一緒なら
+  `roslaunch k_arm_teleop record_only.launch gripper_service:=/grasp_close_gripper/toggle_gripper`、
+  録画なしなら `grasp_close_gripper.launch rec_button:=true`（同じポートを開くので両方は起動しない）．
 - 学習の流れ・レポートの見方・困ったときは tree-vla-il の `docs/trickstar_guide.md`．
 
 ## 設定

@@ -48,6 +48,7 @@ catkin_install_python(
     node_scripts/display_description.py
     node_scripts/feetech_leader_driver.py
     node_scripts/gripper_command_bridge.py
+    node_scripts/grasp_close_gripper.py
     node_scripts/kpick_manager.py
     node_scripts/leader_display_joint_states.py
     node_scripts/rec_button_bridge.py

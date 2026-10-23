@@ -6,7 +6,10 @@ its USB serial as one line, about 5 Hz, and turns a press of its screen
 (``CLICK``) into ``<manager>/start_recording`` or ``stop_recording``, and a
 long press (``HOLD``) into ``<manager>/toggle_gripper`` (open <-> close the
 real gripper in place of the trigger until the next Start), answering
-``R ok`` / ``R err <reason>``. A click while teleop is not
+``R ok`` / ``R err <reason>``. ``~gripper_service`` sends the long press to
+another std_srvs/Trigger instead (e.g. /grasp_close_gripper/toggle_gripper
+with record_only.py, which has no gripper); it then works without the
+manager's status. A click while teleop is not
 following still starts recording; the AtomS3 then shows NO LABEL, as the
 rviz panel warns. The firmware and the line protocol are in
 firmware/atoms3_rec_button.
@@ -79,6 +82,8 @@ class RecButtonBridge(object):
     def __init__(self):
         self.port = rospy.get_param('~port', '/dev/k_arm_rec_button')
         self.manager = rospy.get_param('~manager', '/k_arm_teleop_manager').rstrip('/')
+        # empty: the manager's toggle_gripper
+        self.gripper_service = rospy.get_param('~gripper_service', '')
         self.status_timeout = rospy.get_param('~status_timeout', 2.0)
         self.lock = threading.Lock()
         self.status = None
@@ -172,10 +177,10 @@ class RecButtonBridge(object):
             rospy.logwarn('rec button: starting to record while teleop is %s: no action labels '
                           'until it follows', status.phase)
         # the service call blocks; keep the status lines going meanwhile
-        threading.Thread(target=self._call, args=(service,)).start()
+        threading.Thread(target=self._call, args=('{}/{}'.format(self.manager, service),)).start()
 
     def _on_hold(self):
-        if self._latest_status() is None:
+        if not self.gripper_service and self._latest_status() is None:
             self._write(reply_line(False, 'no teleop manager'))
             return
         with self.lock:
@@ -183,10 +188,11 @@ class RecButtonBridge(object):
                 self._write(reply_line(False, 'busy'))
                 return
             self.busy = True
-        threading.Thread(target=self._call, args=('toggle_gripper',)).start()
+        name = self.gripper_service or '{}/toggle_gripper'.format(self.manager)
+        threading.Thread(target=self._call, args=(name,)).start()
 
-    def _call(self, service):
-        name = '{}/{}'.format(self.manager, service)
+    def _call(self, name):
+        service = name.rsplit('/', 1)[-1]
         try:
             rospy.wait_for_service(name, timeout=SERVICE_TIMEOUT)
             response = rospy.ServiceProxy(name, Trigger)()

@@ -4,6 +4,9 @@
        directory and prefix: the recording section of config/teleop.yaml. -->
   <arg name="config" default="$(find k_arm_teleop)/config/teleop.yaml" />
   <arg name="rec_button_port" default="/dev/k_arm_rec_button" />
+  <!-- long press: this Trigger service (e.g. /grasp_close_gripper/toggle_gripper);
+       empty = the recorder's, which has none -->
+  <arg name="gripper_service" default="" />
 
   <node name="k_arm_recorder" pkg="k_arm_teleop" type="record_only.py" output="screen">
     <rosparam command="load" file="$(arg config)" />
@@ -12,5 +15,6 @@
   <node name="rec_button_bridge" pkg="k_arm_teleop" type="rec_button_bridge.py" output="screen">
     <param name="port" value="$(arg rec_button_port)" />
     <param name="manager" value="/k_arm_recorder" />
+    <param name="gripper_service" value="$(arg gripper_service)" />
   </node>
 </launch>

@@ -1,0 +1,43 @@
+<launch>
+  <!-- The grasp_close decision (/grasp_close/close, k_arm_grasp_close) closes the
+       real right gripper; start the decision with
+       roslaunch k_arm_grasp_close grasp_close.launch model:=... (gripper:=true
+       includes this launch).
+       The first close decision closes it and it stays closed until
+       rosservice call /grasp_close_gripper/open.
+       Do not run with the teleop: its trigger / AtomS3 also drive this gripper. -->
+  <arg name="enabled" default="true" />
+  <!-- true: open again once the decision goes False (for trying it by hand) -->
+  <arg name="open_on_release" default="false" />
+  <arg name="open_delay" default="0.3" />
+  <arg name="teleop_config" default="$(find k_arm_teleop)/config/teleop.yaml" />
+  <!-- true: the AtomS3 long press opens / closes the gripper. Only without
+       record_only.launch, whose rec_button_bridge holds the same port; there use
+       record_only.launch gripper_service:=/grasp_close_gripper/toggle_gripper -->
+  <arg name="rec_button" default="false" />
+  <arg name="rec_button_port" default="/dev/k_arm_rec_button" />
+
+  <!-- releases the gripper (zero effort) when stopped -->
+  <node name="grasp_close_gripper" pkg="k_arm_teleop" type="grasp_close_gripper.py" output="screen">
+    <rosparam command="load" file="$(arg teleop_config)" />
+    <param name="arm" value="rarm" />
+    <param name="enabled" value="$(arg enabled)" />
+    <param name="open_on_release" value="$(arg open_on_release)" />
+    <param name="open_delay" value="$(arg open_delay)" />
+    <remap from="~close" to="/grasp_close/close" />
+    <remap from="~command" to="/k_arm_gripper_bridge/command" />
+  </node>
+
+  <node if="$(arg rec_button)" name="rec_button_bridge" pkg="k_arm_teleop"
+        type="rec_button_bridge.py" output="screen">
+    <param name="port" value="$(arg rec_button_port)" />
+    <param name="manager" value="/k_arm_recorder" />
+    <param name="gripper_service" value="/grasp_close_gripper/toggle_gripper" />
+  </node>
+
+  <!-- 0..1 close command -> the gripper's effort -->
+  <node name="k_arm_gripper_bridge" pkg="k_arm_teleop" type="gripper_command_bridge.py" output="screen">
+    <rosparam command="load" file="$(arg teleop_config)" />
+    <param name="arm" value="rarm" />
+  </node>
+</launch>
