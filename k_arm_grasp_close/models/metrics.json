@@ -1,0 +1,221 @@
+{
+ "bags": [
+  "k_arm_teleop_20261007-133709",
+  "k_arm_teleop_20261007-133857",
+  "k_arm_teleop_20261007-133920",
+  "k_arm_teleop_20261007-133938",
+  "k_arm_teleop_20261007-133952",
+  "k_arm_teleop_20261007-134014",
+  "k_arm_teleop_20261007-134027",
+  "k_arm_teleop_20261007-134043",
+  "k_arm_teleop_20261007-134104",
+  "k_arm_teleop_20261007-134117",
+  "k_arm_teleop_20261007-134132",
+  "k_arm_teleop_20261007-134147",
+  "k_arm_teleop_20261007-134206",
+  "k_arm_teleop_20261007-145044",
+  "k_arm_teleop_20261007-145256",
+  "k_arm_teleop_20261007-145611",
+  "k_arm_teleop_20261007-145938",
+  "k_arm_teleop_20261007-150148",
+  "k_arm_teleop_20261007-150437",
+  "k_arm_teleop_20261007-153404",
+  "k_arm_teleop_20261007-153537",
+  "k_arm_teleop_20261007-153639",
+  "k_arm_teleop_20261007-155213",
+  "k_arm_teleop_20261007-155323"
+ ],
+ "cv": {
+  "per_close": [
+   {
+    "bag": "k_arm_teleop_20261007-133709",
+    "outcome": "on time",
+    "dt_s": -0.16
+   },
+   {
+    "bag": "k_arm_teleop_20261007-133857",
+    "outcome": "on time",
+    "dt_s": -0.51
+   },
+   {
+    "bag": "k_arm_teleop_20261007-133920",
+    "outcome": "on time",
+    "dt_s": -0.57
+   },
+   {
+    "bag": "k_arm_teleop_20261007-133938",
+    "outcome": "on time",
+    "dt_s": -0.43
+   },
+   {
+    "bag": "k_arm_teleop_20261007-133952",
+    "outcome": "on time",
+    "dt_s": -0.02
+   },
+   {
+    "bag": "k_arm_teleop_20261007-134014",
+    "outcome": "early",
+    "dt_s": -0.63
+   },
+   {
+    "bag": "k_arm_teleop_20261007-134027",
+    "outcome": "on time",
+    "dt_s": -0.13
+   },
+   {
+    "bag": "k_arm_teleop_20261007-134043",
+    "outcome": "on time",
+    "dt_s": -0.46
+   },
+   {
+    "bag": "k_arm_teleop_20261007-134104",
+    "outcome": "early",
+    "dt_s": -1.38
+   },
+   {
+    "bag": "k_arm_teleop_20261007-134117",
+    "outcome": "on time",
+    "dt_s": 0.05
+   },
+   {
+    "bag": "k_arm_teleop_20261007-134132",
+    "outcome": "early",
+    "dt_s": -2.58
+   },
+   {
+    "bag": "k_arm_teleop_20261007-134147",
+    "outcome": "on time",
+    "dt_s": -0.01
+   },
+   {
+    "bag": "k_arm_teleop_20261007-134206",
+    "outcome": "on time",
+    "dt_s": -0.08
+   },
+   {
+    "bag": "k_arm_teleop_20261007-145044",
+    "outcome": "on time",
+    "dt_s": -0.26
+   },
+   {
+    "bag": "k_arm_teleop_20261007-145256",
+    "outcome": "on time",
+    "dt_s": 0.01
+   },
+   {
+    "bag": "k_arm_teleop_20261007-145611",
+    "outcome": "early",
+    "dt_s": -2.47
+   },
+   {
+    "bag": "k_arm_teleop_20261007-145938",
+    "outcome": "on time",
+    "dt_s": -0.12
+   },
+   {
+    "bag": "k_arm_teleop_20261007-145938",
+    "outcome": "on time",
+    "dt_s": 0.03
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150148",
+    "outcome": "early",
+    "dt_s": -0.75
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150148",
+    "outcome": "missed",
+    "dt_s": null
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150148",
+    "outcome": "missed",
+    "dt_s": null
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150148",
+    "outcome": "missed",
+    "dt_s": null
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150148",
+    "outcome": "missed",
+    "dt_s": null
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150148",
+    "outcome": "missed",
+    "dt_s": null
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150437",
+    "outcome": "missed",
+    "dt_s": null
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150437",
+    "outcome": "early",
+    "dt_s": -14.75
+   },
+   {
+    "bag": "k_arm_teleop_20261007-150437",
+    "outcome": "early",
+    "dt_s": -43.61
+   },
+   {
+    "bag": "k_arm_teleop_20261007-153404",
+    "outcome": "early",
+    "dt_s": -1.71
+   },
+   {
+    "bag": "k_arm_teleop_20261007-153537",
+    "outcome": "on time",
+    "dt_s": -0.45
+   },
+   {
+    "bag": "k_arm_teleop_20261007-153639",
+    "outcome": "on time",
+    "dt_s": -0.08
+   },
+   {
+    "bag": "k_arm_teleop_20261007-155213",
+    "outcome": "no close, fired",
+    "dt_s": 59.6
+   },
+   {
+    "bag": "k_arm_teleop_20261007-155323",
+    "outcome": "early",
+    "dt_s": -7.27
+   },
+   {
+    "bag": "k_arm_teleop_20261007-155323",
+    "outcome": "early",
+    "dt_s": -10.77
+   },
+   {
+    "bag": "k_arm_teleop_20261007-155323",
+    "outcome": "early",
+    "dt_s": -21.49
+   },
+   {
+    "bag": "k_arm_teleop_20261007-155323",
+    "outcome": "missed",
+    "dt_s": null
+   }
+  ],
+  "counts": {
+   "on time": 16,
+   "early": 11,
+   "missed": 7,
+   "no close, fired": 1
+  },
+  "frame_recall": 0.559,
+  "frame_false_close": 0.047,
+  "frames": {
+   "pos": 263,
+   "pos_ok": 147,
+   "neg": 9262,
+   "neg_fire": 437
+  }
+ }
+}

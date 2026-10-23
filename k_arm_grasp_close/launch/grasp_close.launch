@@ -4,7 +4,8 @@
        gripper:=true also closes the real right gripper on it (k_arm_teleop
        grasp_close_gripper.launch; open: rosservice call /grasp_close_gripper/open).
        Do not use gripper:=true with the teleop: it drives the same gripper. -->
-  <arg name="model" />
+  <!-- default: the model trained on the bundled data (models/model.pt) -->
+  <arg name="model" default="$(find k_arm_grasp_close)/models/model.pt" />
   <arg name="gripper" default="false" />
   <arg name="open_on_release" default="false" />
   <arg name="rec_button" default="false" />

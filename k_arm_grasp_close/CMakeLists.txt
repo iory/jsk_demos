@@ -14,4 +14,4 @@ catkin_install_python(
     scripts/train.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-install(DIRECTORY config launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(DIRECTORY config data launch models DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

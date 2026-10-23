@@ -1,0 +1,194 @@
+[
+ {
+  "bag": "k_arm_teleop_20261007-133709",
+  "frames": 184,
+  "valid": 182,
+  "closes": 1,
+  "positive": 8,
+  "negative": 93
+ },
+ {
+  "bag": "k_arm_teleop_20261007-133857",
+  "frames": 190,
+  "valid": 188,
+  "closes": 1,
+  "positive": 8,
+  "negative": 89
+ },
+ {
+  "bag": "k_arm_teleop_20261007-133920",
+  "frames": 250,
+  "valid": 250,
+  "closes": 1,
+  "positive": 8,
+  "negative": 75
+ },
+ {
+  "bag": "k_arm_teleop_20261007-133938",
+  "frames": 211,
+  "valid": 210,
+  "closes": 1,
+  "positive": 8,
+  "negative": 84
+ },
+ {
+  "bag": "k_arm_teleop_20261007-133952",
+  "frames": 182,
+  "valid": 180,
+  "closes": 1,
+  "positive": 8,
+  "negative": 65
+ },
+ {
+  "bag": "k_arm_teleop_20261007-134014",
+  "frames": 195,
+  "valid": 195,
+  "closes": 1,
+  "positive": 8,
+  "negative": 84
+ },
+ {
+  "bag": "k_arm_teleop_20261007-134027",
+  "frames": 207,
+  "valid": 207,
+  "closes": 1,
+  "positive": 8,
+  "negative": 89
+ },
+ {
+  "bag": "k_arm_teleop_20261007-134043",
+  "frames": 343,
+  "valid": 342,
+  "closes": 1,
+  "positive": 8,
+  "negative": 226
+ },
+ {
+  "bag": "k_arm_teleop_20261007-134104",
+  "frames": 191,
+  "valid": 191,
+  "closes": 1,
+  "positive": 8,
+  "negative": 92
+ },
+ {
+  "bag": "k_arm_teleop_20261007-134117",
+  "frames": 187,
+  "valid": 186,
+  "closes": 1,
+  "positive": 8,
+  "negative": 67
+ },
+ {
+  "bag": "k_arm_teleop_20261007-134132",
+  "frames": 174,
+  "valid": 172,
+  "closes": 1,
+  "positive": 8,
+  "negative": 75
+ },
+ {
+  "bag": "k_arm_teleop_20261007-134147",
+  "frames": 213,
+  "valid": 211,
+  "closes": 1,
+  "positive": 8,
+  "negative": 58
+ },
+ {
+  "bag": "k_arm_teleop_20261007-134206",
+  "frames": 155,
+  "valid": 154,
+  "closes": 1,
+  "positive": 8,
+  "negative": 21
+ },
+ {
+  "bag": "k_arm_teleop_20261007-145044",
+  "frames": 1021,
+  "valid": 1019,
+  "closes": 1,
+  "positive": 8,
+  "negative": 391
+ },
+ {
+  "bag": "k_arm_teleop_20261007-145256",
+  "frames": 494,
+  "valid": 493,
+  "closes": 1,
+  "positive": 8,
+  "negative": 159
+ },
+ {
+  "bag": "k_arm_teleop_20261007-145611",
+  "frames": 546,
+  "valid": 545,
+  "closes": 1,
+  "positive": 8,
+  "negative": 200
+ },
+ {
+  "bag": "k_arm_teleop_20261007-145938",
+  "frames": 788,
+  "valid": 785,
+  "closes": 2,
+  "positive": 16,
+  "negative": 380
+ },
+ {
+  "bag": "k_arm_teleop_20261007-150148",
+  "frames": 1886,
+  "valid": 1885,
+  "closes": 6,
+  "positive": 42,
+  "negative": 1054
+ },
+ {
+  "bag": "k_arm_teleop_20261007-150437",
+  "frames": 2559,
+  "valid": 2557,
+  "closes": 3,
+  "positive": 24,
+  "negative": 1590
+ },
+ {
+  "bag": "k_arm_teleop_20261007-153404",
+  "frames": 1109,
+  "valid": 1107,
+  "closes": 1,
+  "positive": 8,
+  "negative": 173
+ },
+ {
+  "bag": "k_arm_teleop_20261007-153537",
+  "frames": 846,
+  "valid": 845,
+  "closes": 1,
+  "positive": 8,
+  "negative": 476
+ },
+ {
+  "bag": "k_arm_teleop_20261007-153639",
+  "frames": 624,
+  "valid": 623,
+  "closes": 1,
+  "positive": 8,
+  "negative": 230
+ },
+ {
+  "bag": "k_arm_teleop_20261007-155213",
+  "frames": 1259,
+  "valid": 1036,
+  "closes": 0,
+  "positive": 0,
+  "negative": 1036
+ },
+ {
+  "bag": "k_arm_teleop_20261007-155323",
+  "frames": 3960,
+  "valid": 3948,
+  "closes": 4,
+  "positive": 32,
+  "negative": 2921
+ }
+]

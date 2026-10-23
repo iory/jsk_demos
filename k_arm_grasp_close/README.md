@@ -14,16 +14,22 @@ rosbag ──make_dataset.py──> data/*.npz ──train.py──> runs/v1/mod
 
 ## TL;DR
 
-学習済みのモデル（`train.py` が出す `model.pt`）で、指先センサが反応したら右グリッパーを閉じたいだけなら:
+同梱の学習済みモデル（`models/model.pt`）で、指先センサが反応したら右グリッパーを閉じたいだけなら:
 
 ```bash
 source <catkin ワークスペース>/devel/setup.bash
-roslaunch k_arm_grasp_close grasp_close.launch model:=/path/to/model.pt gripper:=true
+roslaunch k_arm_grasp_close grasp_close.launch gripper:=true
 # 開く
 rosservice call /grasp_close_gripper/open
 ```
 
 - 判断だけ見たい（グリッパーは動かさない）なら `gripper:=true` を外す．
+- 自分で学習したモデルを使うなら `model:=/path/to/model.pt` を足す．
+- 同梱のデータで学習し直すなら（`models/` と同じものができる）:
+
+  ```bash
+  rosrun k_arm_grasp_close train.py --data $(rospack find k_arm_grasp_close)/data --out runs/v1 --cv
+  ```
 - 自分の bag で学習し直すなら:
 
   ```bash
@@ -137,6 +143,16 @@ roslaunch k_arm_grasp_close grasp_close.launch model:=/path/to/runs/v1/model.pt 
   - launch を止めるとグリッパーの力を抜く（つかんでいるものは落ちる）．
   - テレオペと同時に使わない（同じグリッパーに指令を送る）．
 
+## 同梱のデータとモデル
+
+- `data/`: 2026-10-07 にテレオペで撮った bag 24 本を `make_dataset.py` で変換したもの（bag 1 本につき `.npz` 1 つ、
+  計 808 KB．元の bag は画像込みで数 GB あるので入れていない）．`config.yaml` は変換に使った設定、
+  `summary.json` は bag ごとのフレーム数・閉じた回数・正例 / 負例の数．
+  - `.npz` の中身: `t`（時刻 s）、`X`（フレーム × 53 特徴量）、`valid`（入力がそろっていたか）、
+    `y`（1 閉じる / 0 閉じない / -1 使わない）、`events`（操作者が閉じた・開いた時刻）、`names`（特徴量の名前）．
+- `models/model.pt`: `data/` の 24 本すべてで学習したモデル（`grasp_close.launch` の既定）．
+  `models/metrics.json` はその leave-one-bag-out の結果（下の「結果」の元）．
+
 ## ファイル
 
 | ファイル | 中身 |
@@ -147,6 +163,8 @@ roslaunch k_arm_grasp_close grasp_close.launch model:=/path/to/runs/v1/model.pt 
 | `node_scripts/grasp_close_node.py` | 実機で判断を出すノード |
 | `src/k_arm_grasp_close/features.py` | 特徴量・ラベル・判断（3 つで共通） |
 | `src/k_arm_grasp_close/model.py` | ネットワークと保存形式 |
+| `data/` | 同梱の学習データ（変換済み） |
+| `models/` | 同梱の学習済みモデルと評価結果 |
 
 ## 結果（2026-10-07 に撮った bag）
 
