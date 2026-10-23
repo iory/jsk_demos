@@ -1,0 +1,44 @@
+# Close-the-gripper decision on K_ARM's right arm from the fingertip sensors
+# (gripper driver launch, namespace /gripper_tactile) and the arm's joints.
+# Shared by make_dataset.py, train.py and grasp_close_node.py; train.py stores
+# it in the model file, so the node always uses the config it was trained with.
+
+rate_hz: 20.0          # one feature frame per tick
+window_s: 1.0          # the model sees the last window_s of frames
+max_age_s: 0.3         # an input older than this makes the frame invalid (sensors ~10 Hz)
+
+features:
+  range_clip_m: 0.3    # ToF range clipped here; out of range (8.191 m) -> this
+  ranges:              # sensor_msgs/Range (ToF)
+    - /gripper_tactile/wsb/finger_0/0/range_tof
+    - /gripper_tactile/wsb/finger_0/1/range_tof
+    - /gripper_tactile/wsb/finger_0/2/range_tof
+  intensities:         # std_msgs/UInt32 (proximity intensity), log(1 + value)
+    - /gripper_tactile/wsb/finger_0/0/proximity_intensity/raw
+    - /gripper_tactile/wsb/finger_0/1/proximity_intensity/raw
+    - /gripper_tactile/wsb/finger_0/2/proximity_intensity/raw
+  arrays:              # std_msgs/UInt32MultiArray: topic -> length, log(1 + value)
+    /gripper_tactile/udts/finger_0/proximities_intensity/raw: 37
+  joint_states: /joint_states
+  joints: [RARM_JOINT0, RARM_JOINT1, RARM_JOINT2, RARM_JOINT3, RARM_JOINT4, RARM_JOINT5, RARM_JOINT6]
+  # joint velocity says "the hand is approaching / has stopped"; the joint
+  # angles say where the apples were in the training bags, so they are off
+  joint_velocity: true
+  joint_position: false
+  # the gripper's own reading is not used: the driver's zero moves between
+  # runs (the same open gripper read -3.1 in one run, about -497 in another)
+
+label:
+  # the operator's close: the gripper's effort command data[index] drops
+  # below `below` (-0.4 closes, 0.0 releases); back above it = opened
+  command_topic: /gripper_right/joint_group_effort_controller/command
+  index: 0
+  below: -0.2
+  lead_s: 0.3          # positive from lead_s before the close ...
+  after_s: 0.1         # ... to after_s after it
+  gap_s: 0.3           # unused before the positives (the operator's reaction time)
+  reopen_settle_s: 1.0 # unused from after_s until this long after the reopen
+
+decision:
+  threshold: 0.5
+  debounce: 2          # consecutive frames at or above threshold to close

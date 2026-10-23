@@ -1,0 +1,21 @@
+<launch>
+  <!-- The close-the-gripper decision of a train.py model on the real robot:
+       /grasp_close/close, /grasp_close/close_probability, /grasp_close/status.
+       gripper:=true also closes the real right gripper on it (k_arm_teleop
+       grasp_close_gripper.launch; open: rosservice call /grasp_close_gripper/open).
+       Do not use gripper:=true with the teleop: it drives the same gripper. -->
+  <arg name="model" />
+  <arg name="gripper" default="false" />
+  <arg name="open_on_release" default="false" />
+  <arg name="rec_button" default="false" />
+
+  <node name="grasp_close" pkg="k_arm_grasp_close" type="grasp_close_node.py"
+        output="screen" required="true">
+    <param name="model" value="$(arg model)" />
+  </node>
+
+  <include if="$(arg gripper)" file="$(find k_arm_teleop)/launch/grasp_close_gripper.launch">
+    <arg name="open_on_release" value="$(arg open_on_release)" />
+    <arg name="rec_button" value="$(arg rec_button)" />
+  </include>
+</launch>

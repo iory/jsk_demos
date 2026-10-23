@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>k_arm_grasp_close</name>
+  <version>0.1.0</version>
+  <description>
+    When to close K_ARM's right gripper, learned from teleoperation rosbags:
+    fingertip ToF / proximity sensors and arm joint velocities -> close or not.
+    Dataset conversion, training and a ROS node.
+  </description>
+  <maintainer email="yanokura@jsk.imi.i.u-tokyo.ac.jp">Iori Yanokura</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>k_arm_teleop</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>rosbag</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+</package>
